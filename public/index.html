@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mercado Circular | Lima</title>
+    <!-- Google Fonts para una tipografía moderna -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Vista de Login (Fase 2) -->
+    <div id="login-view" class="login-split">
+        <div class="login-left">
+            <div class="login-left-content">
+                <h2>El marketplace circular de Lima</h2>
+                <p>Únete para comprar, intercambiar o donar, y asegúrate de que nada útil termine en la basura.</p>
+            </div>
+        </div>
+        <div class="login-right">
+            <div class="login-form-container">
+                <h2>Ingresa a tu cuenta</h2>
+                <p>Bienvenido de nuevo a CicloLima</p>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="email">Correo electrónico</label>
+                        <input type="email" id="email" placeholder="correo@ejemplo.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" id="btn-ingresar">Ingresar</button>
+                </form>
+                <p class="login-footer">¿No tienes cuenta? <a href="#">Regístrate aquí</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Layout Principal -->
+    <div id="main-layout" class="hidden">
+        <div class="dashboard-grid">
+            <!-- Sidebar Izquierda -->
+            <aside class="sidebar">
+                <div class="sidebar-logo">
+                    <h2>CicloLima</h2>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="#" class="active">Explorar Catálogo</a>
+                    <a href="#">Mis Publicaciones</a>
+                    <a href="#">Mensajes</a>
+                    <a href="#">Guardados</a>
+                </nav>
+                <div class="sidebar-footer">
+                    <button class="btn btn-outline btn-full" id="btn-logout">Cerrar Sesión</button>
+                </div>
+            </aside>
+
+            <!-- Contenido Principal -->
+            <main class="main-content">
+                <header class="topbar">
+                    <div class="search-bar">
+                        <input type="text" placeholder="Buscar artículos en tu zona...">
+                    </div>
+                    <div class="user-profile">
+                        <span class="user-name">Hola, Usuario</span>
+                        <div class="avatar" style="background-image: url('https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100&auto=format&fit=crop');"></div>
+                    </div>
+                </header>
+
+                <section class="catalog-section">
+                    <div class="catalog-header">
+                        <h2>Descubre artículos</h2>
+                        <div class="filters">
+                            <button class="btn btn-primary">Todos</button>
+                            <button class="btn btn-outline">Venta</button>
+                            <button class="btn btn-outline">Trueque</button>
+                            <button class="btn btn-outline">Donación</button>
+                        </div>
+                    </div>
+
+                    <!-- Grilla de Artículos Generada con JS -->
+                    <div class="items-grid" id="marketplace-items">
+                        <!-- Las tarjetas se inyectarán aquí desde app.js -->
+                    </div>
+                </section>
+
+                <!-- Vista de Detalle de Artículo (Oculto por defecto) -->
+                <section id="article-detail" class="detail-section hidden">
+                    <button class="btn btn-outline mb-4" id="btn-back">← Volver al catálogo</button>
+                    
+                    <div class="detail-grid">
+                        <div class="detail-image-container">
+                            <img id="detail-image" src="" alt="Imagen del artículo">
+                        </div>
+                        <div class="detail-info-panel">
+                            <span id="detail-badge" class="badge"></span>
+                            <h2 id="detail-title" class="detail-title"></h2>
+                            <p id="detail-location" class="detail-location text-muted"></p>
+                            <p class="detail-description">
+                                Este es un artículo de nuestra comunidad circular. Está disponible y esperando una segunda oportunidad. Únete al movimiento de consumo responsable conectando con tu vecindario.
+                            </p>
+                            
+                            <!-- Formularios de acción (se adaptan según el tipo de artículo) -->
+                            <div class="action-box">
+                                <h3 id="action-title"></h3>
+                                
+                                <form id="action-form">
+                                    <div class="form-group" id="exchange-offer-group">
+                                        <label for="exchange-item">¿Qué ofreces a cambio?</label>
+                                        <textarea id="exchange-item" rows="3" placeholder="Ej. Tengo una guitarra acústica en buen estado..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-full" id="btn-action-submit">Confirmar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div> <!-- Cierre de main-layout -->
+
+    <script src="app.js"></script>
+</body>
+</html>

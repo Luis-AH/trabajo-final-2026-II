@@ -1,21 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Aplicación del Marketplace Circular inicializada.');
     
+    // Variables globales
+    let articulos = [];
+    
     // Elementos del DOM para la transición de Login
     const loginForm = document.getElementById('login-form');
     const loginView = document.getElementById('login-view');
     const mainLayout = document.getElementById('main-layout');
 
-    // Lógica del Login (Fase 2)
     if (loginForm) {
         loginForm.addEventListener('submit', (e) => {
-            e.preventDefault(); // Evitamos recargar la página
-
-            // Transición suave ocultando login y mostrando el main
+            e.preventDefault();
             loginView.classList.add('hidden');
             mainLayout.classList.remove('hidden');
-            
-            console.log('Usuario ha ingresado. Mostrando layout principal.');
         });
     }
 
@@ -27,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Elementos de Vista de Detalle (Fase 4) ---
+    // --- Elementos de Vista de Detalle ---
     const catalogSection = document.querySelector('.catalog-section');
     const detailSection = document.getElementById('article-detail');
     const btnBack = document.getElementById('btn-back');
@@ -61,115 +59,62 @@ document.addEventListener('DOMContentLoaded', () => {
         const art = articulos.find(a => a.id === idArticulo);
         if(!art) return;
 
-        // Llenar datos básicos
-        detailImage.src = art.imagen;
+        detailImage.src = 'https://images.unsplash.com/photo-1593085260707-5377ba37f868?q=80&w=600&auto=format&fit=crop'; 
         detailTitle.textContent = art.titulo;
-        detailLocation.textContent = art.ubicacion;
+        detailLocation.textContent = art.propietario ? 'Vendedor: ' + art.propietario.nombre : 'Ubicación no especificada';
 
-        // Configurar etiqueta (badge)
-        detailBadge.className = `badge ${art.tipo}`;
-        detailBadge.textContent = art.tipo === 'venta' ? `Venta - ${art.precio}` : 
-                                  art.tipo === 'trueque' ? 'Trueque' : 'Donación';
+        const tipoLimpio = art.tipo ? art.tipo.toLowerCase() : 'donacion';
+        let badgeClass = tipoLimpio === 'intercambio' ? 'trueque' : tipoLimpio;
+        detailBadge.className = 'badge ' + badgeClass;
+        detailBadge.textContent = tipoLimpio === 'venta' ? 'Venta - S/ ' + (art.precio || 0) : 
+                                  tipoLimpio === 'intercambio' ? 'Trueque' : 'Donación';
 
-        // Configurar Action Box según el tipo de transacción
-        if (art.tipo === 'trueque') {
+        if (tipoLimpio === 'intercambio' || tipoLimpio === 'trueque') {
             actionTitle.textContent = 'Proponer Intercambio';
             exchangeGroup.classList.remove('hidden');
             btnActionSubmit.textContent = 'Enviar Propuesta';
-        } else if (art.tipo === 'venta') {
-            actionTitle.textContent = `Comprar por ${art.precio}`;
+        } else if (tipoLimpio === 'venta') {
+            actionTitle.textContent = 'Comprar por S/ ' + (art.precio || 0);
             exchangeGroup.classList.add('hidden');
             btnActionSubmit.textContent = 'Confirmar Compra';
-        } else { // donacion
+        } else {
             actionTitle.textContent = 'Solicitar Donación';
             exchangeGroup.classList.add('hidden');
             btnActionSubmit.textContent = 'Solicitar Artículo';
         }
 
-        // Transición de vistas
         catalogSection.classList.add('hidden');
         detailSection.classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // --- FASE 3: Catálogo Dinámico ---
-    const articulos = [
-        {
-            id: 1,
-            titulo: "Bicicleta Urbana Retro",
-            tipo: "venta",
-            precio: "S/ 250.00",
-            ubicacion: "San Isidro, Lima",
-            imagen: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?q=80&w=600&auto=format&fit=crop"
-        },
-        {
-            id: 2,
-            titulo: "Macetas de cerámica",
-            tipo: "trueque",
-            precio: "Intercambio",
-            ubicacion: "Barranco, Lima",
-            imagen: "https://images.unsplash.com/photo-1485955900006-10f4d324d411?q=80&w=600&auto=format&fit=crop"
-        },
-        {
-            id: 3,
-            titulo: "Abrigo de invierno",
-            tipo: "donacion",
-            precio: "Gratis",
-            ubicacion: "Surco, Lima",
-            imagen: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=600&auto=format&fit=crop"
-        },
-        {
-            id: 4,
-            titulo: "Libros universitarios",
-            tipo: "donacion",
-            precio: "Gratis",
-            ubicacion: "Cercado de Lima",
-            imagen: "https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=600&auto=format&fit=crop"
-        },
-        {
-            id: 5,
-            titulo: "Mesa de centro vintage",
-            tipo: "venta",
-            precio: "S/ 120.00",
-            ubicacion: "Miraflores, Lima",
-            imagen: "https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?q=80&w=600&auto=format&fit=crop"
-        },
-        {
-            id: 6,
-            titulo: "Cámara analógica",
-            tipo: "trueque",
-            precio: "Intercambio",
-            ubicacion: "Lince, Lima",
-            imagen: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=600&auto=format&fit=crop"
-        }
-    ];
-
     const renderArticulos = () => {
         const grid = document.getElementById('marketplace-items');
         if (!grid) return;
-        
-        grid.innerHTML = ''; // Limpiamos el contenedor
+        grid.innerHTML = '';
         
         articulos.forEach(art => {
             const card = document.createElement('article');
             card.className = 'card';
             
-            // Determinar estilo de la etiqueta (badge) según el tipo
-            let badgeClass = art.tipo;
-            let badgeText = art.tipo === 'venta' ? `Venta - ${art.precio}` : 
-                            art.tipo === 'trueque' ? 'Trueque' : 'Donación';
+            const tipoLimpio = art.tipo ? art.tipo.toLowerCase() : 'donacion';
+            let badgeClass = tipoLimpio === 'intercambio' ? 'trueque' : tipoLimpio;
+            let badgeText = tipoLimpio === 'venta' ? 'Venta - S/ ' + (art.precio || 0) : 
+                            tipoLimpio === 'intercambio' ? 'Trueque' : 'Donación';
 
-            card.innerHTML = `
-                <div class="card-image" style="background-image: url('${art.imagen}');"></div>
+            const imgSrc = 'https://images.unsplash.com/photo-1593085260707-5377ba37f868?q=80&w=600&auto=format&fit=crop';
+            const locationText = art.propietario ? 'Vendedor: ' + art.propietario.nombre : 'Lima';
+
+            card.innerHTML = 
+                <div class="card-image" style="background-image: url('');"></div>
                 <div class="card-content">
-                    <span class="badge ${badgeClass}">${badgeText}</span>
-                    <h3>${art.titulo}</h3>
-                    <p class="location">${art.ubicacion}</p>
+                    <span class="badge "></span>
+                    <h3></h3>
+                    <p class="location"></p>
                     <button class="btn btn-outline btn-full btn-ver-detalles">Ver detalles</button>
                 </div>
-            `;
+            ;
             
-            // Asignar evento click al botón de detalles
             const btnDetail = card.querySelector('.btn-ver-detalles');
             btnDetail.addEventListener('click', () => mostrarDetalle(art.id));
             
@@ -177,6 +122,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // Renderizar los artículos dinámicamente al iniciar
-    renderArticulos();
+    // --- FASE 5: Cargar Catálogo Dinámicamente desde API ---
+    const cargarCatalogo = async () => {
+        try {
+            const res = await fetch('/api/articulos');
+            const data = await res.json();
+            articulos = data;
+            renderArticulos();
+        } catch (error) {
+            console.error('Error al cargar catálogo:', error);
+            const grid = document.getElementById('marketplace-items');
+            if (grid) grid.innerHTML = '<p>No se pudo cargar el catálogo.</p>';
+        }
+    };
+
+    cargarCatalogo();
 });

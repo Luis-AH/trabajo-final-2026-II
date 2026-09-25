@@ -20,6 +20,13 @@
   },
   "homepage": "https://github.com/Luis-AH/practica_2#readme",
   "dependencies": {
+    "@prisma/client": "^5.22.0",
     "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   }
 }

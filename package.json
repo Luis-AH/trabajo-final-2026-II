@@ -9,16 +9,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Luis-AH/practica_2.git"
+    "url": "git+https://github.com/Luis-AH/trabajo-final-2026-II.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/Luis-AH/practica_2/issues"
+    "url": "https://github.com/Luis-AH/trabajo-final-2026-II/issues"
   },
-  "homepage": "https://github.com/Luis-AH/practica_2#readme",
+    "homepage": "https://github.com/Luis-AH/trabajo-final-2026-II#readme",
   "dependencies": {
     "express": "^5.2.1"
   }

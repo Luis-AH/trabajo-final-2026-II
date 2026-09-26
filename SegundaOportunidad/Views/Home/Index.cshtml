@@ -1,0 +1,30 @@
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<div class="text-center mt-5">
+    <h1 class="display-4 fw-bold" style="color: #1b4332;">Bienvenido a SegundaOportunidad 🍃</h1>
+    <p class="lead mt-3">
+        Dale una segunda vida a lo que ya no usas. Únete a nuestra comunidad en Lima para vender, intercambiar (trueque) y donar artículos de forma segura.
+    </p>
+    
+    <div class="mt-5">
+        <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-lg text-white" style="background-color: #1b4332; padding: 10px 30px;">Crear mi Cuenta</a>
+        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-lg btn-outline-secondary ms-3" style="padding: 10px 30px;">Iniciar Sesión</a>
+    </div>
+    
+    <div class="row mt-5 pt-5 text-start">
+        <div class="col-md-4">
+            <h3 style="color: #2d6a4f;">Identidad Verificada</h3>
+            <p>Comunidad segura con verificación de DNI para todos nuestros usuarios.</p>
+        </div>
+        <div class="col-md-4">
+            <h3 style="color: #2d6a4f;">Impacto Ecológico</h3>
+            <p>Mide cuántos kilogramos de CO2 ahorras al darle una segunda vida a las cosas.</p>
+        </div>
+        <div class="col-md-4">
+            <h3 style="color: #2d6a4f;">Encuentros Seguros</h3>
+            <p>Promovemos espacios y pautas seguras para que concretes tus entregas presencialmente.</p>
+        </div>
+    </div>
+</div>

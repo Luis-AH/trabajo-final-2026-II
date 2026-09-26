@@ -1,0 +1,51 @@
+@page
+@model RegisterModel
+
+@{
+    ViewData["Title"] = "Crear Cuenta";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link" asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Iniciar Sesión</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link active" href="#">Crear Cuenta</a>
+    </li>
+</ul>
+
+<form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+    <div class="mb-3">
+        <label asp-for="Input.Email" class="form-label">Correo electrónico</label>
+        <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="nombre@ejemplo.com" />
+        <span asp-validation-for="Input.Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.Password" class="form-label">Contraseña</label>
+        <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="••••••••" />
+        <span asp-validation-for="Input.Password" class="text-danger"></span>
+    </div>
+
+    <div class="mb-4">
+        <label asp-for="Input.ConfirmPassword" class="form-label">Confirmar Contraseña</label>
+        <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="••••••••" />
+        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+    </div>
+
+    <div class="form-check mb-4">
+        <input class="form-check-input" type="checkbox" id="terms" required />
+        <label class="form-check-label" for="terms">
+            Acepto los <a href="#" style="color: #1b4332;">Términos y Políticas de Seguridad</a>
+        </label>
+    </div>
+
+    <button id="registerSubmit" type="submit" class="btn-brand">Crear Cuenta en SegundaOportunidad</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

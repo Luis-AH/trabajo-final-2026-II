@@ -12,6 +12,9 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<SegundaOportunidad.Models.ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddSingleton<SegundaOportunidad.Services.AlgoliaService>();
+builder.Services.AddSingleton<SegundaOportunidad.Services.RedisService>();
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
     {

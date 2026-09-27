@@ -8,15 +8,28 @@
     ".NETCoreApp,Version=v10.0": {
       "SegundaOportunidad/1.0.0": {
         "dependencies": {
+          "Algolia.Search": "6.13.0",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "10.0.12",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "10.0.12",
           "Microsoft.AspNetCore.Identity.UI": "10.0.12",
           "Microsoft.EntityFrameworkCore.Design": "10.0.12",
           "Microsoft.EntityFrameworkCore.Sqlite": "10.0.12",
-          "Microsoft.VisualStudio.Web.CodeGeneration.Design": "10.0.2"
+          "Microsoft.VisualStudio.Web.CodeGeneration.Design": "10.0.2",
+          "StackExchange.Redis": "3.3.1"
         },
         "runtime": {
           "SegundaOportunidad.dll": {}
+        }
+      },
+      "Algolia.Search/6.13.0": {
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.4"
+        },
+        "runtime": {
+          "lib/netstandard2.1/Algolia.Search.dll": {
+            "assemblyVersion": "6.13.0.0",
+            "fileVersion": "6.13.0.0"
+          }
         }
       },
       "Humanizer/2.14.1": {
@@ -1546,6 +1559,14 @@
           }
         }
       },
+      "RESPite/3.3.1": {
+        "runtime": {
+          "lib/net10.0/RESPite.dll": {
+            "assemblyVersion": "3.0.0.0",
+            "fileVersion": "3.3.1.2706"
+          }
+        }
+      },
       "SQLitePCLRaw.bundle_e_sqlite3/2.1.12": {
         "dependencies": {
           "SQLitePCLRaw.lib.e_sqlite3": "2.1.12",
@@ -1691,6 +1712,18 @@
           }
         }
       },
+      "StackExchange.Redis/3.3.1": {
+        "dependencies": {
+          "RESPite": "3.3.1",
+          "System.IO.Hashing": "10.0.12"
+        },
+        "runtime": {
+          "lib/net10.0/StackExchange.Redis.dll": {
+            "assemblyVersion": "3.0.0.0",
+            "fileVersion": "3.3.1.2706"
+          }
+        }
+      },
       "System.CodeDom/6.0.0": {
         "runtime": {
           "lib/net6.0/System.CodeDom.dll": {
@@ -1770,6 +1803,14 @@
           }
         }
       },
+      "System.IO.Hashing/10.0.12": {
+        "runtime": {
+          "lib/net10.0/System.IO.Hashing.dll": {
+            "assemblyVersion": "10.0.0.12",
+            "fileVersion": "10.0.1226.42308"
+          }
+        }
+      },
       "System.Reflection.MetadataLoadContext/8.0.0": {
         "runtime": {
           "lib/net8.0/System.Reflection.MetadataLoadContext.dll": {
@@ -1793,6 +1834,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "Algolia.Search/6.13.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-O2urks+/IYyESAdgBWpEgOwcwaw9dZOiEHkJxy9YvoevAG+y427nxhNRI5H570a7buM+AWeeLC3S2oRWEaFZKA==",
+      "path": "algolia.search/6.13.0",
+      "hashPath": "algolia.search.6.13.0.nupkg.sha512"
     },
     "Humanizer/2.14.1": {
       "type": "package",
@@ -2466,6 +2514,13 @@
       "path": "nuget.versioning/6.12.1",
       "hashPath": "nuget.versioning.6.12.1.nupkg.sha512"
     },
+    "RESPite/3.3.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-1Ky6rOjP9YjA8eXWWSJDTSRgVQiRXwsKnET+X5hDuONJqq8KbYLQrTUjMg8gsdyKzwj74ivEioTuQd4mVhthdQ==",
+      "path": "respite/3.3.1",
+      "hashPath": "respite.3.3.1.nupkg.sha512"
+    },
     "SQLitePCLRaw.bundle_e_sqlite3/2.1.12": {
       "type": "package",
       "serviceable": true,
@@ -2493,6 +2548,13 @@
       "sha512": "sha512-W3oH4XIfCzFrgUSDKHhN6N+dgzA5YHOR2VxX8GB6Qy7CyrJJgxPEG8NirgYWlPQC5P2jz2knSsexWu4tDUL33g==",
       "path": "sqlitepclraw.provider.e_sqlite3/2.1.12",
       "hashPath": "sqlitepclraw.provider.e_sqlite3.2.1.12.nupkg.sha512"
+    },
+    "StackExchange.Redis/3.3.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-AnA3ZuYnOQl2Hh/PXqV+JagA6QO8hiHovHBOc0PKz+uafVSsI0lYPQy8D0rklCC5Wpmc9MznEw+Lpt8e+LaB9w==",
+      "path": "stackexchange.redis/3.3.1",
+      "hashPath": "stackexchange.redis.3.3.1.nupkg.sha512"
     },
     "System.CodeDom/6.0.0": {
       "type": "package",
@@ -2549,6 +2611,13 @@
       "sha512": "sha512-PdkuMrwDhXoKFo/JxISIi9E8L+QGn9Iquj2OKDWHB6Y/HnUOuBouF7uS3R4Hw3FoNmwwMo6hWgazQdyHIIs27A==",
       "path": "system.configuration.configurationmanager/9.0.0",
       "hashPath": "system.configuration.configurationmanager.9.0.0.nupkg.sha512"
+    },
+    "System.IO.Hashing/10.0.12": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-jDix4bBMYnpZdSPcnY+KDV6ik3SRMzpMKby/bZl/XUwIiflwRNAFZ0oOl61R/pSaveIJ8t1gs2BUlrGsPs/bcg==",
+      "path": "system.io.hashing/10.0.12",
+      "hashPath": "system.io.hashing.10.0.12.nupkg.sha512"
     },
     "System.Reflection.MetadataLoadContext/8.0.0": {
       "type": "package",

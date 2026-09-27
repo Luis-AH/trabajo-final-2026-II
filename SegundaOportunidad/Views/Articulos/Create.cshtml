@@ -1,0 +1,124 @@
+@model SegundaOportunidad.Models.Articulo
+@using SegundaOportunidad.Models
+
+@{
+    ViewData["Title"] = "Publicar Artículo";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            
+            <div class="mb-4">
+                <a asp-action="Index" class="text-decoration-none text-muted"><i class="bi bi-arrow-left me-1"></i> Volver al catálogo</a>
+            </div>
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-brand text-white p-4">
+                    <h3 class="mb-0 fw-bold">Publicar un Artículo</h3>
+                    <p class="mb-0 text-white-50">Completa los detalles para darle una segunda oportunidad a tu objeto.</p>
+                </div>
+                <div class="card-body p-5">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label fw-bold text-dark">Título del Artículo</label>
+                            <input asp-for="Title" class="form-control form-control-lg bg-light border-0" placeholder="Ej: Bicicleta Montañera en buen estado" />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="CategoriaId" class="form-label fw-bold text-dark">Categoría</label>
+                            <select asp-for="CategoriaId" class="form-select form-select-lg bg-light border-0" asp-items="ViewBag.CategoriaId">
+                                <option value="">Selecciona una categoría...</option>
+                            </select>
+                            <span asp-validation-for="CategoriaId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label fw-bold text-dark">Descripción</label>
+                            <textarea asp-for="Description" class="form-control bg-light border-0" rows="4" placeholder="Describe los detalles, uso y motivos por los que lo estás publicando..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label asp-for="Modalidad" class="form-label fw-bold text-dark">Modalidad</label>
+                                <select asp-for="Modalidad" class="form-select form-select-lg bg-light border-0" id="modalidadSelect">
+                                    <option value="@ModalidadArticulo.Venta">Venta</option>
+                                    <option value="@ModalidadArticulo.Intercambio">Trueque</option>
+                                    <option value="@ModalidadArticulo.Donacion">Donación</option>
+                                </select>
+                                <span asp-validation-for="Modalidad" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="EstadoFisico" class="form-label fw-bold text-dark">Estado Físico</label>
+                                <select asp-for="EstadoFisico" class="form-select form-select-lg bg-light border-0">
+                                    <option value="@EstadoFisico.Nuevo">Nuevo</option>
+                                    <option value="@EstadoFisico.ComoNuevo">Como Nuevo</option>
+                                    <option value="@EstadoFisico.BuenEstado">Buen Estado</option>
+                                    <option value="@EstadoFisico.Aceptable">Aceptable</option>
+                                </select>
+                                <span asp-validation-for="EstadoFisico" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4" id="precioContainer">
+                            <label asp-for="Price" class="form-label fw-bold text-dark">Precio Estimado (S/)</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-light border-0 text-muted">S/</span>
+                                <input asp-for="Price" type="number" step="0.10" class="form-control bg-light border-0" placeholder="0.00" />
+                            </div>
+                            <span asp-validation-for="Price" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4" id="exchangeContainer" style="display:none;">
+                            <label asp-for="ExchangeDetails" class="form-label fw-bold text-dark">¿Qué buscas a cambio?</label>
+                            <input asp-for="ExchangeDetails" class="form-control form-control-lg bg-light border-0" placeholder="Ej: Busco una guitarra acústica" />
+                            <span asp-validation-for="ExchangeDetails" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ImageUrl" class="form-label fw-bold text-dark">URL de Imagen (Opcional)</label>
+                            <input asp-for="ImageUrl" class="form-control form-control-lg bg-light border-0" placeholder="https://ejemplo.com/imagen.jpg" />
+                            <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                            <div class="form-text">Por el momento las imágenes se cargan mediante un enlace URL directo.</div>
+                        </div>
+
+                        <div class="d-grid mt-5">
+                            <button type="submit" class="btn btn-brand btn-lg rounded-pill shadow-sm py-3 fw-bold">Publicar Artículo</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function () {
+            function toggleFields() {
+                var modalidad = $('#modalidadSelect').val();
+                
+                // Venta = 0, Trueque = 1, Donacion = 2
+                if (modalidad === '0') {
+                    $('#precioContainer').slideDown();
+                    $('#exchangeContainer').slideUp();
+                } else if (modalidad === '1') {
+                    $('#precioContainer').slideUp();
+                    $('#exchangeContainer').slideDown();
+                } else {
+                    $('#precioContainer').slideUp();
+                    $('#exchangeContainer').slideUp();
+                }
+            }
+            
+            $('#modalidadSelect').change(toggleFields);
+            toggleFields();
+        });
+    </script>
+}

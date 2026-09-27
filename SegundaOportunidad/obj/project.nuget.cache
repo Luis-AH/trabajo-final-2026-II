@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "6ydiccANxOU=",
+  "dgSpecHash": "prhm8cR5x9w=",
   "success": true,
   "projectFilePath": "C:\\Users\\LUIS\\Documents\\proyectos Progra I\\Trabajo-final-2026-II\\SegundaOportunidad\\SegundaOportunidad.csproj",
   "expectedPackageFiles": [
@@ -105,6 +105,7 @@
     "C:\\Users\\LUIS\\.nuget\\packages\\nuget.projectmodel\\6.12.1\\nuget.projectmodel.6.12.1.nupkg.sha512",
     "C:\\Users\\LUIS\\.nuget\\packages\\nuget.protocol\\6.12.1\\nuget.protocol.6.12.1.nupkg.sha512",
     "C:\\Users\\LUIS\\.nuget\\packages\\nuget.versioning\\6.12.1\\nuget.versioning.6.12.1.nupkg.sha512",
+    "C:\\Users\\LUIS\\.nuget\\packages\\rabbitmq.client\\7.2.2\\rabbitmq.client.7.2.2.nupkg.sha512",
     "C:\\Users\\LUIS\\.nuget\\packages\\respite\\3.3.1\\respite.3.3.1.nupkg.sha512",
     "C:\\Users\\LUIS\\.nuget\\packages\\sqlitepclraw.bundle_e_sqlite3\\2.1.12\\sqlitepclraw.bundle_e_sqlite3.2.1.12.nupkg.sha512",
     "C:\\Users\\LUIS\\.nuget\\packages\\sqlitepclraw.core\\2.1.12\\sqlitepclraw.core.2.1.12.nupkg.sha512",

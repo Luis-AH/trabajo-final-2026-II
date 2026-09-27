@@ -15,6 +15,10 @@ builder.Services.AddDefaultIdentity<SegundaOportunidad.Models.ApplicationUser>(o
 
 builder.Services.AddSingleton<SegundaOportunidad.Services.AlgoliaService>();
 builder.Services.AddSingleton<SegundaOportunidad.Services.RedisService>();
+builder.Services.AddSingleton<SegundaOportunidad.Services.RabbitMqPublisher>();
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<SegundaOportunidad.Services.PieSocketService>();
+builder.Services.AddHostedService<SegundaOportunidad.Services.ChatBackgroundService>();
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
     {

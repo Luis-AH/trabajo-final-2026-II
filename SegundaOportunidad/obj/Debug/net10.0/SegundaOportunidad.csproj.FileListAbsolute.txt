@@ -399,3 +399,4 @@ C:\Users\LUIS\Documents\proyectos Progra I\Trabajo-final-2026-II\SegundaOportuni
 C:\Users\LUIS\Documents\proyectos Progra I\Trabajo-final-2026-II\SegundaOportunidad\bin\Debug\net10.0\StackExchange.Redis.dll
 C:\Users\LUIS\Documents\proyectos Progra I\Trabajo-final-2026-II\SegundaOportunidad\bin\Debug\net10.0\System.IO.Hashing.dll
 C:\Users\LUIS\Documents\proyectos Progra I\Trabajo-final-2026-II\SegundaOportunidad\obj\Debug\net10.0\compressed\4oxk5sfvxs-{0}-teqezgjitg-teqezgjitg.gz
+C:\Users\LUIS\Documents\proyectos Progra I\Trabajo-final-2026-II\SegundaOportunidad\bin\Debug\net10.0\RabbitMQ.Client.dll

@@ -1,0 +1,240 @@
+@model SegundaOportunidad.Controllers.HomeController.DashboardStats
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid py-4" style="background-color: #fcfcfc;">
+    <div class="row">
+        <!-- Sidebar Navigation (Only visible on larger screens) -->
+        <div class="col-lg-2 d-none d-lg-block border-end bg-white" style="min-height: 80vh;">
+            <div class="d-flex flex-column h-100 p-3">
+                <a asp-controller="Home" asp-action="Dashboard" class="d-flex align-items-center mb-4 text-dark text-decoration-none fw-bold fs-5">
+                    <i class="bi bi-bullseye text-brand me-2"></i> SegundaOportunidad
+                </a>
+                
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li class="nav-item mb-2">
+                        <a href="#" class="nav-link active bg-brand-light text-brand fw-bold rounded-3">
+                            <i class="bi bi-house-door me-3"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Articulos" asp-action="Index" class="nav-link text-dark">
+                            <i class="bi bi-search me-3 text-muted"></i> Explorar
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Articulos" asp-action="Create" class="nav-link text-dark">
+                            <i class="bi bi-plus-circle me-3 text-muted"></i> Publicar Artículo
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="#" class="nav-link text-dark">
+                            <i class="bi bi-heart me-3 text-muted"></i> Donaciones
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="#" class="nav-link text-dark">
+                            <i class="bi bi-arrow-left-right me-3 text-muted"></i> Intercambios
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="#" class="nav-link text-dark">
+                            <i class="bi bi-chat-dots me-3 text-muted"></i> Mensajes
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="#" class="nav-link text-dark">
+                            <i class="bi bi-folder me-3 text-muted"></i> Mis Publicaciones
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="#" class="nav-link text-dark">
+                            <i class="bi bi-person me-3 text-muted"></i> Mi Perfil
+                        </a>
+                    </li>
+                </ul>
+
+                <hr>
+                <div class="d-flex align-items-center mt-3">
+                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px;">
+                        @(string.IsNullOrEmpty(Model.FullName) ? "U" : Model.FullName.Substring(0,1).ToUpper())
+                    </div>
+                    <div class="ms-3">
+                        <strong class="d-block text-dark">@(string.IsNullOrEmpty(Model.FullName) ? "Usuario" : Model.FullName)</strong>
+                        <small class="text-muted">Lima, Perú</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-lg-10 p-4 p-lg-5">
+            <!-- Header section -->
+            <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1 d-flex align-items-center">
+                        ¡Hola de nuevo, @(string.IsNullOrEmpty(Model.FullName) ? "Usuario" : Model.FullName)!
+                        @if (Model.IsVerified) {
+                            <span class="badge bg-success-subtle text-success ms-3 fw-normal rounded-pill px-3 py-1 fs-6">
+                                <i class="bi bi-shield-check me-1"></i> Identidad Verificada
+                            </span>
+                        }
+                    </h2>
+                    <p class="text-muted">Hoy es un gran día para darle una nueva oportunidad a tus cosas.</p>
+                </div>
+                <div class="d-flex gap-3 mt-3 mt-sm-0">
+                    <a asp-controller="Articulos" asp-action="Index" class="btn btn-light border fw-bold text-dark px-4 py-2 rounded-pill shadow-sm">Explorar Catálogo</a>
+                    <a asp-controller="Articulos" asp-action="Create" class="btn btn-brand px-4 py-2 rounded-pill shadow-sm fw-bold">
+                        <i class="bi bi-plus me-1"></i> Publicar Artículo
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h6 class="text-muted fw-bold mb-0 text-uppercase" style="letter-spacing: 1px;">MIS VENTAS</h6>
+                            <div class="rounded-circle bg-warning-subtle text-warning d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="bi bi-tag-fill"></i>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-baseline mb-2">
+                            <h1 class="display-5 fw-bold text-dark mb-0 me-2">@Model.VentasActivas</h1>
+                            <span class="text-muted fs-5">Activas</span>
+                        </div>
+                        <p class="text-muted mb-0 small">Ganancias acumuladas: <strong class="text-warning">S/ 450</strong></p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h6 class="text-muted fw-bold mb-0 text-uppercase" style="letter-spacing: 1px;">MIS INTERCAMBIOS</h6>
+                            <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="bi bi-arrow-repeat"></i>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-baseline mb-2">
+                            <h1 class="display-5 fw-bold text-dark mb-0 me-2">@Model.IntercambiosRealizados</h1>
+                            <span class="text-muted fs-5">Realizados</span>
+                        </div>
+                        <p class="text-muted mb-0 small">Último: <strong class="text-muted">Hace 3 días con Ana F.</strong></p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h6 class="text-muted fw-bold mb-0 text-uppercase" style="letter-spacing: 1px;">MIS DONACIONES</h6>
+                            <div class="rounded-circle bg-danger-subtle text-danger d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="bi bi-heart"></i>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-baseline mb-2">
+                            <h1 class="display-5 fw-bold text-dark mb-0 me-2">@Model.DonacionesEntregadas</h1>
+                            <span class="text-muted fs-5">Entregadas</span>
+                        </div>
+                        <p class="text-muted mb-0 small">Ayudaste a 3 familias este mes</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Section -->
+            <div class="row g-4">
+                <!-- Impact Section -->
+                <div class="col-md-6">
+                    <div class="card bg-brand text-white border-0 shadow-sm rounded-4 h-100 p-5" style="background-image: linear-gradient(135deg, #1b533e 0%, #2a7a5d 100%);">
+                        <h4 class="fw-bold mb-2">Tu Impacto Ambiental y Comunitario</h4>
+                        <p class="text-white-50 mb-5">Gracias a que decides donar, vender o intercambiar en vez de desechar.</p>
+                        
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="rounded-3 bg-white bg-opacity-25 d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                <i class="bi bi-trash text-white fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0 fw-bold">@Model.ArticulosSalvados artículos salvados</h5>
+                                <small class="text-white-50">Evitaste que terminen en rellenos sanitarios de Lima</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="rounded-3 bg-white bg-opacity-25 d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                <i class="bi bi-journal-text text-white fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0 fw-bold">@Model.ArticulosPublicados artículos publicados</h5>
+                                <small class="text-white-50">Impacto directo en la economía circular de tu distrito</small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-3 bg-white bg-opacity-25 d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                <i class="bi bi-people text-white fs-4"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0 fw-bold">@Model.ConexionesLocales conexiones locales</h5>
+                                <small class="text-white-50">Personas de tu propio distrito que conociste hoy</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity & Chart placeholder -->
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 p-5">
+                        <h5 class="fw-bold mb-4">Actividad Reciente</h5>
+                        
+                        <div class="position-relative mb-5" style="border-left: 2px solid #e9ecef; margin-left: 10px; padding-left: 20px;">
+                            
+                            <div class="position-relative mb-4">
+                                <div class="position-absolute rounded-circle bg-danger" style="width: 12px; height: 12px; left: -27px; top: 5px;"></div>
+                                <h6 class="fw-bold mb-1">Donaste un set de vajilla de porcelana</h6>
+                                <small class="text-muted">Entregado ayer a Luis Torres (San Miguel)</small>
+                            </div>
+                            
+                            <div class="position-relative mb-4">
+                                <div class="position-absolute rounded-circle bg-warning" style="width: 12px; height: 12px; left: -27px; top: 5px;"></div>
+                                <h6 class="fw-bold mb-1">Vendiste una cómoda de madera vintage</h6>
+                                <small class="text-muted">S/ 350 recibidos de Rosa Huamán (Los Olivos)</small>
+                            </div>
+                            
+                            <div class="position-relative">
+                                <div class="position-absolute rounded-circle bg-primary" style="width: 12px; height: 12px; left: -27px; top: 5px;"></div>
+                                <h6 class="fw-bold mb-1">Intercambio propuesto recibido</h6>
+                                <small class="text-muted">Carlos Mendoza ofreció un Microondas por tu Bicicleta</small>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto bg-light rounded-3 p-4 text-center">
+                            <h6 class="text-muted fw-bold mb-3 text-uppercase small" style="letter-spacing: 1px;">Volumen de transacciones (Últimos 4 meses)</h6>
+                            <!-- Fake chart bars -->
+                            <div class="d-flex justify-content-around align-items-end" style="height: 100px;">
+                                <div class="bg-brand rounded-top" style="width: 30px; height: 30%;"></div>
+                                <div class="bg-brand rounded-top" style="width: 30px; height: 70%;"></div>
+                                <div class="bg-brand rounded-top" style="width: 30px; height: 90%;"></div>
+                                <div class="bg-brand rounded-top" style="width: 30px; height: 40%;"></div>
+                            </div>
+                            <div class="d-flex justify-content-around mt-2">
+                                <small class="text-muted">Ene</small>
+                                <small class="text-muted">Feb</small>
+                                <small class="text-muted">Mar</small>
+                                <small class="text-muted">Abr</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Override navbar globally just for this page to look closer to Figma, or hide it if you prefer */
+    header { display: none; }
+    footer { display: none; }
+    body { background-color: #fcfcfc; padding-bottom: 0 !important; }
+</style>

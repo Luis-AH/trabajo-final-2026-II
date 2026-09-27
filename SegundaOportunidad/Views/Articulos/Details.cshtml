@@ -1,0 +1,125 @@
+@model SegundaOportunidad.Models.Articulo
+@using SegundaOportunidad.Models
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = Model.Title;
+    var currentUser = await UserManager.GetUserAsync(User);
+    bool isOwner = currentUser != null && currentUser.Id == Model.UserId;
+}
+
+<div class="container py-5">
+    <div class="mb-4">
+        <a asp-action="Index" class="text-decoration-none text-muted"><i class="bi bi-arrow-left me-1"></i> Volver al catálogo</a>
+    </div>
+
+    <div class="row g-5">
+        <!-- Imagen y Detalles Visuales -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                @if (string.IsNullOrEmpty(Model.ImageUrl)) {
+                    <div class="bg-light text-center d-flex align-items-center justify-content-center text-muted" style="height: 400px;">
+                        <div>
+                            <i class="bi bi-image" style="font-size: 5rem;"></i>
+                            <p class="mt-2">Sin imagen disponible</p>
+                        </div>
+                    </div>
+                } else {
+                    <img src="@Model.ImageUrl" class="img-fluid w-100" alt="@Model.Title" style="object-fit: cover; max-height: 500px;" />
+                }
+            </div>
+
+            <!-- Impacto Ecológico -->
+            <div class="card bg-brand-light border-0 shadow-sm rounded-4 p-4 text-center">
+                <h6 class="text-brand fw-bold mb-3"><i class="bi bi-tree me-2"></i>Impacto de este artículo</h6>
+                <p class="text-muted small mb-0">
+                    Darle una segunda oportunidad a este objeto ayuda a reducir la huella de carbono y fomenta la economía circular.
+                </p>
+            </div>
+        </div>
+
+        <!-- Información del Artículo -->
+        <div class="col-lg-6">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="badge bg-brand-light text-brand rounded-pill px-3 py-2">@Model.Categoria?.Name</span>
+                <span class="text-muted small"><i class="bi bi-clock me-1"></i> Publicado el @Model.CreatedAt.ToString("dd MMM yyyy")</span>
+            </div>
+
+            <h1 class="display-5 fw-bold text-dark mb-4">@Model.Title</h1>
+
+            <div class="mb-4">
+                @if (Model.Modalidad == ModalidadArticulo.Venta) {
+                    <h2 class="text-brand fw-bold display-6 mb-0">S/ @Model.Price</h2>
+                    <span class="badge bg-secondary rounded-pill mt-2">Venta</span>
+                } else if (Model.Modalidad == ModalidadArticulo.Intercambio) {
+                    <div class="alert alert-warning border-0 d-inline-block rounded-pill px-4">
+                        <i class="bi bi-arrow-left-right me-2"></i> Busco Intercambio
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.ExchangeDetails)) {
+                        <p class="text-muted mt-2"><strong>Busca a cambio:</strong> @Model.ExchangeDetails</p>
+                    }
+                } else {
+                    <h2 class="text-success fw-bold display-6 mb-0">¡Gratis! (Donación)</h2>
+                }
+            </div>
+
+            <div class="mb-5">
+                <h5 class="fw-bold text-dark">Descripción</h5>
+                <p class="text-muted" style="white-space: pre-line;">@Model.Description</p>
+            </div>
+
+            <div class="mb-5">
+                <h5 class="fw-bold text-dark mb-3">Detalles</h5>
+                <ul class="list-unstyled text-muted">
+                    <li class="mb-2"><i class="bi bi-tag me-2"></i> <strong>Estado:</strong> @Model.EstadoFisico.ToString()</li>
+                    <li class="mb-2"><i class="bi bi-check-circle me-2"></i> <strong>Disponibilidad:</strong> @(Model.IsActive ? "Disponible" : "No disponible")</li>
+                </ul>
+            </div>
+
+            <!-- Perfil del Vendedor -->
+            <div class="card border-0 bg-light rounded-4 p-4 mb-4">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-white d-flex align-items-center justify-content-center shadow-sm me-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-person text-brand fs-3"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1 fw-bold text-dark">@Model.User?.FullName</h5>
+                        <div class="text-muted small">
+                            <i class="bi bi-star-fill text-warning"></i> @Model.User?.Rating / 5.0
+                            @if (Model.User?.IsVerified == true) {
+                                <span class="ms-2 text-success"><i class="bi bi-shield-check me-1"></i>DNI Verificado</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            @if (!isOwner) {
+                <div class="d-grid gap-3">
+                    @if (Model.Modalidad == ModalidadArticulo.Intercambio) {
+                        <button class="btn btn-warning btn-lg rounded-pill shadow-sm fw-bold py-3 text-dark">
+                            <i class="bi bi-arrow-left-right me-2"></i> Proponer Intercambio
+                        </button>
+                    } else if (Model.Modalidad == ModalidadArticulo.Venta) {
+                        <button class="btn btn-brand btn-lg rounded-pill shadow-sm fw-bold py-3">
+                            <i class="bi bi-bag me-2"></i> Comprar Artículo
+                        </button>
+                    } else {
+                        <button class="btn btn-success btn-lg rounded-pill shadow-sm fw-bold py-3">
+                            <i class="bi bi-heart me-2"></i> Solicitar Donación
+                        </button>
+                    }
+                    <button class="btn btn-outline-secondary rounded-pill fw-bold py-2">
+                        <i class="bi bi-chat-dots me-2"></i> Enviar Mensaje al Publicador
+                    </button>
+                </div>
+            } else {
+                <div class="alert alert-info border-0 rounded-4">
+                    <i class="bi bi-info-circle me-2"></i> Este es tu artículo. Puedes gestionarlo desde tu perfil.
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -6,9 +6,25 @@
 
 <div class="container-fluid py-4" style="background-color: #fcfcfc;">
     <div class="row">
-        <!-- Sidebar Navigation (Only visible on larger screens) -->
-        <div class="col-lg-2 d-none d-lg-block border-end bg-white" style="min-height: 80vh;">
-            <div class="d-flex flex-column h-100 p-3">
+        <!-- Mobile Header (Visible only on small screens) -->
+        <div class="d-lg-none d-flex justify-content-between align-items-center bg-white p-3 border-bottom sticky-top w-100 mb-3">
+            <a asp-controller="Home" asp-action="Dashboard" class="text-dark text-decoration-none fw-bold fs-5">
+                <i class="bi bi-bullseye text-brand me-2"></i> SegundaOportunidad
+            </a>
+            <button class="btn btn-brand text-white border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-2 border-end bg-white offcanvas-lg offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+            <!-- offcanvas header for mobile -->
+            <div class="offcanvas-header d-lg-none border-bottom">
+                <h5 class="offcanvas-title fw-bold" id="sidebarMenuLabel"><i class="bi bi-bullseye text-brand me-2"></i> SegundaOportunidad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
+            </div>
+            
+            <div class="offcanvas-body d-flex flex-column h-100 p-3">
                 <a asp-controller="Home" asp-action="Dashboard" class="d-flex align-items-center mb-4 text-dark text-decoration-none fw-bold fs-5">
                     <i class="bi bi-bullseye text-brand me-2"></i> SegundaOportunidad
                 </a>
@@ -40,7 +56,7 @@
                         </a>
                     </li>
                     <li class="nav-item mb-2">
-                        <a href="#" class="nav-link text-dark">
+                        <a asp-controller="Mensajes" asp-action="Index" class="nav-link text-dark">
                             <i class="bi bi-chat-dots me-3 text-muted"></i> Mensajes
                         </a>
                     </li>
@@ -65,6 +81,13 @@
                         <strong class="d-block text-dark">@(string.IsNullOrEmpty(Model.FullName) ? "Usuario" : Model.FullName)</strong>
                         <small class="text-muted">Lima, Perú</small>
                     </div>
+                </div>
+                <div class="mt-3">
+                    <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                        <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-pill">
+                            <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

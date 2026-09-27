@@ -1,0 +1,332 @@
+@{
+    ViewData["Title"] = "Mensajes";
+    var contacts = ViewBag.Contacts as List<SegundaOportunidad.Models.ApplicationUser>;
+    var messages = ViewBag.Messages as List<SegundaOportunidad.Models.Mensaje>;
+    var currentUserId = ViewBag.CurrentUserId as string;
+    var activeChatUserId = ViewBag.ActiveChatUserId as string;
+}
+
+<div class="container-fluid py-4" style="background-color: #fcfcfc;">
+    <div class="row">
+        <!-- Mobile Header (Visible only on small screens) -->
+        <div class="d-lg-none d-flex justify-content-between align-items-center bg-white p-3 border-bottom sticky-top w-100 mb-3">
+            <a asp-controller="Home" asp-action="Dashboard" class="text-dark text-decoration-none fw-bold fs-5">
+                <i class="bi bi-bullseye text-brand me-2"></i> SegundaOportunidad
+            </a>
+            <button class="btn btn-brand text-white border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-2 border-end bg-white offcanvas-lg offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+            <!-- offcanvas header for mobile -->
+            <div class="offcanvas-header d-lg-none border-bottom">
+                <h5 class="offcanvas-title fw-bold" id="sidebarMenuLabel"><i class="bi bi-bullseye text-brand me-2"></i> SegundaOportunidad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
+            </div>
+            
+            <div class="offcanvas-body d-flex flex-column h-100 p-3">
+                <a asp-controller="Home" asp-action="Dashboard" class="d-flex align-items-center mb-4 text-dark text-decoration-none fw-bold fs-5">
+                    <i class="bi bi-bullseye text-brand me-2"></i> SegundaOportunidad
+                </a>
+                
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Home" asp-action="Dashboard" class="nav-link text-dark">
+                            <i class="bi bi-house-door me-3 text-muted"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Articulos" asp-action="Index" class="nav-link text-dark">
+                            <i class="bi bi-search me-3 text-muted"></i> Explorar
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Articulos" asp-action="Create" class="nav-link text-dark">
+                            <i class="bi bi-plus-circle me-3 text-muted"></i> Publicar Artículo
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="#" class="nav-link text-dark">
+                            <i class="bi bi-heart me-3 text-muted"></i> Donaciones
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="#" class="nav-link text-dark">
+                            <i class="bi bi-arrow-left-right me-3 text-muted"></i> Intercambios
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Mensajes" asp-action="Index" class="nav-link active bg-brand-light text-brand fw-bold rounded-3">
+                            <i class="bi bi-chat-dots me-3"></i> Mensajes
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="#" class="nav-link text-dark">
+                            <i class="bi bi-folder me-3 text-muted"></i> Mis Publicaciones
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a href="#" class="nav-link text-dark">
+                            <i class="bi bi-person me-3 text-muted"></i> Mi Perfil
+                        </a>
+                    </li>
+                </ul>
+
+                <hr>
+                @{ var user = ViewBag.CurrentUser as SegundaOportunidad.Models.ApplicationUser; }
+                <div class="d-flex align-items-center mt-3">
+                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px;">
+                        @(user == null || string.IsNullOrEmpty(user.FullName) ? "U" : user.FullName.Substring(0,1).ToUpper())
+                    </div>
+                    <div class="ms-3">
+                        <strong class="d-block text-dark">@(user == null || string.IsNullOrEmpty(user.FullName) ? "Usuario" : user.FullName)</strong>
+                        <small class="text-muted">Lima, Perú</small>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                        <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-pill">
+                            <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="col-lg-10 p-4 p-lg-5 d-flex h-100" style="min-height: 80vh;">
+            <!-- Contacts -->
+            <div class="col-4 border-end bg-white rounded-start shadow-sm p-3 overflow-auto">
+                <h5 class="fw-bold mb-3">Conversaciones</h5>
+                
+                <!-- Search Bar -->
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 rounded-start-pill">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" id="contact-search" class="form-control bg-light border-start-0 rounded-end-pill" placeholder="Buscar chat...">
+                    </div>
+                </div>
+
+                <div class="list-group list-group-flush" id="contacts-list">
+                    @if(contacts != null)
+                    {
+                        foreach (var contact in contacts)
+                        {
+                            <a asp-action="Index" asp-route-userId="@contact.Id" class="contact-item list-group-item list-group-item-action border-0 @(activeChatUserId == contact.Id ? "bg-light" : "")">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <h6 class="mb-1">@contact.FullName</h6>
+                                </div>
+                                <small class="text-muted">Da click para chatear</small>
+                            </a>
+                        }
+                    }
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="col-8 bg-white rounded-end shadow-sm d-flex flex-column">
+                @if (string.IsNullOrEmpty(activeChatUserId))
+                {
+                    <div class="m-auto text-center text-muted">
+                        <i class="bi bi-chat-dots fs-1 mb-3 d-block"></i>
+                        <h5>Selecciona una conversación para empezar</h5>
+                    </div>
+                }
+                else
+                {
+                    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold">Chat con el usuario seleccionado</h6>
+                        <small id="ws-status" class="text-warning"><i class="bi bi-circle-fill"></i> Conectando...</small>
+                    </div>
+                    
+                    <div class="p-3 flex-grow-1 overflow-auto" id="chat-messages" style="height: 400px;">
+                        @if(messages != null)
+                        {
+                            foreach (var msg in messages)
+                            {
+                                if (msg.SenderId == currentUserId)
+                                {
+                                    <div class="d-flex justify-content-end mb-3">
+                                        <div class="bg-brand text-white p-2 rounded-3" style="max-width: 75%;">
+                                            @msg.Content
+                                            <div class="text-end text-white-50" style="font-size: 0.7rem;">@msg.SentAt.ToString("HH:mm")</div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="d-flex justify-content-start mb-3">
+                                        <div class="bg-light p-2 rounded-3 border" style="max-width: 75%;">
+                                            @msg.Content
+                                            <div class="text-end text-muted" style="font-size: 0.7rem;">@msg.SentAt.ToString("HH:mm")</div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        }
+                    </div>
+
+                    <div class="p-3 border-top bg-light mt-auto">
+                        <form id="chat-form" class="d-flex">
+                            <input type="text" id="chat-input" class="form-control me-2 rounded-pill" placeholder="Escribe un mensaje..." required />
+                            <button type="submit" class="btn btn-brand rounded-pill px-4 text-white d-flex align-items-center justify-content-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
+                                  <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    header { display: none; }
+    footer { display: none; }
+    body { background-color: #fcfcfc; padding-bottom: 0 !important; }
+</style>
+
+@section Scripts {
+    <script>
+        const activeUserId = '@activeChatUserId';
+        const currentUserId = '@currentUserId';
+        
+        if (activeUserId) {
+            const form = document.getElementById('chat-form');
+            const input = document.getElementById('chat-input');
+            
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const text = input.value;
+                if (!text) return;
+                
+                input.value = '';
+                
+                // Add optimistic UI message
+                addMessageToUI(text, true);
+
+                try {
+                    await fetch('/Mensajes/SendMessage', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            receiverId: activeUserId,
+                            content: text
+                        })
+                    });
+                } catch(err) {
+                    console.error('Error enviando mensaje', err);
+                }
+            });
+
+        // WebSocket/PieSocket simulation for receiving
+        const clusterId = 'free.blr2'; 
+        const apiKey = 'QJQg5C3y3tX745y7gypLKDnw6Q7CGVpT9n1d8V4n'; 
+        const channelId = `chat_${currentUserId}`;
+        
+        try {
+            const pieSocket = new WebSocket(`wss://${clusterId}.piesocket.com/v3/${channelId}?api_key=${apiKey}&notify_self=1`);
+            
+            pieSocket.onopen = function() {
+                const status = document.getElementById('ws-status');
+                if(status) {
+                    status.className = "text-success";
+                    status.innerHTML = '<i class="bi bi-circle-fill"></i> Conectado';
+                }
+            };
+            
+            pieSocket.onerror = function() {
+                const status = document.getElementById('ws-status');
+                if(status) {
+                    status.className = "text-danger";
+                    status.innerHTML = '<i class="bi bi-circle-fill"></i> Error conexión';
+                }
+            };
+
+            pieSocket.onclose = function() {
+                const status = document.getElementById('ws-status');
+                if(status) {
+                    status.className = "text-danger";
+                    status.innerHTML = '<i class="bi bi-circle-fill"></i> Desconectado';
+                }
+            };
+
+            pieSocket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                if (data.event === 'new_message' && data.data.senderId === activeUserId) {
+                    addMessageToUI(data.data.content, false);
+                }
+            };
+        } catch(e) {
+            console.error("PieSocket WebSocket error", e);
+            const status = document.getElementById('ws-status');
+            if(status) {
+                status.className = "text-danger";
+                status.innerHTML = '<i class="bi bi-circle-fill"></i> Falló PieSocket';
+            }
+        }
+
+        // FALLBACK: Auto-refrescar los mensajes cada 3 segundos en caso PieSocket falle (por credenciales o restricciones)
+        setInterval(async () => {
+            try {
+                const response = await fetch(window.location.href);
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newChat = doc.getElementById('chat-messages');
+                const currentChat = document.getElementById('chat-messages');
+                
+                if(newChat && currentChat) {
+                    // Solo actualizamos si la cantidad de mensajes cambió para no interferir con la escritura
+                    const currentMessagesCount = currentChat.children.length;
+                    const newMessagesCount = newChat.children.length;
+                    if(newMessagesCount > currentMessagesCount) {
+                        currentChat.innerHTML = newChat.innerHTML;
+                        currentChat.scrollTop = currentChat.scrollHeight;
+                    }
+                }
+            } catch(err) {}
+        }, 3000);
+        }
+
+        function addMessageToUI(content, isSent) {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = isSent ? 'd-flex justify-content-end mb-3' : 'd-flex justify-content-start mb-3';
+            
+            const innerDiv = document.createElement('div');
+            innerDiv.className = isSent ? 'bg-brand text-white p-2 rounded-3' : 'bg-light p-2 rounded-3 border';
+            innerDiv.style.maxWidth = '75%';
+            innerDiv.innerHTML = `${content} <div class="text-end ${isSent ? 'text-white-50' : 'text-muted'}" style="font-size: 0.7rem;">Ahora</div>`;
+            
+            div.appendChild(innerDiv);
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Lógica de búsqueda de contactos
+        const searchInput = document.getElementById('contact-search');
+        if(searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const term = e.target.value.toLowerCase();
+                const contacts = document.querySelectorAll('#contacts-list .contact-item');
+                contacts.forEach(contact => {
+                    const name = contact.querySelector('h6').textContent.toLowerCase();
+                    if(name.includes(term)) {
+                        contact.style.display = 'block';
+                    } else {
+                        contact.style.display = 'none';
+                    }
+                });
+            });
+        }
+    </script>
+}

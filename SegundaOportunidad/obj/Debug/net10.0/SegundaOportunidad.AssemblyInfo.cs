@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SegundaOportunidad")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b5ce784137278970e6e4e4bc26cfae9db307d499")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cb402d5f89e28e7c5032598bfa185fd19d370885")]
 [assembly: System.Reflection.AssemblyProductAttribute("SegundaOportunidad")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SegundaOportunidad")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

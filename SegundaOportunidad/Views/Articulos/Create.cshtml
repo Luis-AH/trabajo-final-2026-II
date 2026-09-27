@@ -3,9 +3,10 @@
 
 @{
     ViewData["Title"] = "Publicar Artículo";
+    Layout = "_DashboardLayout";
 }
 
-<div class="container py-5">
+<main class="p-4 p-md-5">
     <div class="row justify-content-center">
         <div class="col-lg-8">
             
@@ -94,31 +95,39 @@
             </div>
         </div>
     </div>
-</div>
+</main>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     
     <script>
-        $(document).ready(function () {
-            function toggleFields() {
-                var modalidad = $('#modalidadSelect').val();
-                
-                // Venta = 0, Trueque = 1, Donacion = 2
-                if (modalidad === '0') {
-                    $('#precioContainer').slideDown();
-                    $('#exchangeContainer').slideUp();
-                } else if (modalidad === '1') {
-                    $('#precioContainer').slideUp();
-                    $('#exchangeContainer').slideDown();
-                } else {
-                    $('#precioContainer').slideUp();
-                    $('#exchangeContainer').slideUp();
-                }
+        function toggleModalidadFields() {
+            var sel = document.getElementById('modalidadSelect');
+            if (!sel) return;
+            var val = sel.value;
+
+            var precio   = document.getElementById('precioContainer');
+            var exchange = document.getElementById('exchangeContainer');
+
+            if (val === 'Venta') {
+                precio.style.display   = '';
+                exchange.style.display = 'none';
+            } else if (val === 'Intercambio') {
+                precio.style.display   = 'none';
+                exchange.style.display = '';
+            } else {
+                precio.style.display   = 'none';
+                exchange.style.display = 'none';
             }
-            
-            $('#modalidadSelect').change(toggleFields);
-            toggleFields();
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var sel = document.getElementById('modalidadSelect');
+            if (sel) {
+                sel.addEventListener('change', toggleModalidadFields);
+                toggleModalidadFields();
+            }
         });
     </script>
 }
+

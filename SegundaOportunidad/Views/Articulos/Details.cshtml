@@ -5,11 +5,12 @@
 
 @{
     ViewData["Title"] = Model.Title;
+    Layout = "_DashboardLayout";
     var currentUser = await UserManager.GetUserAsync(User);
     bool isOwner = currentUser != null && currentUser.Id == Model.UserId;
 }
 
-<div class="container py-5">
+<main class="p-4 p-md-5">
     <div class="mb-4">
         <a asp-action="Index" class="text-decoration-none text-muted"><i class="bi bi-arrow-left me-1"></i> Volver al catálogo</a>
     </div>
@@ -122,4 +123,4 @@
             }
         </div>
     </div>
-</div>
+</main>

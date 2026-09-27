@@ -1,0 +1,122 @@
+@model List<SegundaOportunidad.Models.Articulo>
+@{
+    ViewData["Title"] = "Intercambios";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    var misIntercambios = ViewData["MisIntercambios"] as List<SegundaOportunidad.Models.Articulo> ?? new();
+}
+
+<div class="container-fluid py-4 px-4 px-lg-5">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold text-dark mb-1"><i class="bi bi-arrow-left-right text-info me-2"></i>Intercambios</h2>
+            <p class="text-muted mb-0">Artículos disponibles para intercambiar</p>
+        </div>
+        <a asp-controller="Articulos" asp-action="Create" class="btn btn-brand rounded-pill px-4">
+            <i class="bi bi-arrow-left-right me-2"></i>Publicar Intercambio
+        </a>
+    </div>
+
+    <!-- Mis intercambios -->
+    @if (misIntercambios.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-header bg-white border-0 p-4 pb-2">
+                <h5 class="fw-bold mb-0 text-info"><i class="bi bi-arrow-left-right me-2"></i>Mis Intercambios (@misIntercambios.Count)</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-2">
+                    @foreach (var a in misIntercambios)
+                    {
+                        <div class="col-12 col-sm-6 col-md-4">
+                            <div class="d-flex gap-3 align-items-center p-3 rounded-3" style="background: #f9fafb;">
+                                @if (!string.IsNullOrEmpty(a.ImageUrl))
+                                {
+                                    <img src="@a.ImageUrl" alt="@a.Title" class="rounded-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                }
+                                else
+                                {
+                                    <div class="rounded-3 bg-info-subtle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <i class="bi bi-arrow-left-right text-info"></i>
+                                    </div>
+                                }
+                                <div>
+                                    <div class="fw-semibold text-dark small text-truncate" style="max-width: 150px;">@a.Title</div>
+                                    <span class="badge bg-info-subtle text-info">Intercambio</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Intercambios disponibles -->
+    <h5 class="fw-bold text-dark mb-3">Artículos disponibles para intercambiar</h5>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <div class="rounded-circle bg-info-subtle d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+                <i class="bi bi-arrow-left-right text-info" style="font-size: 2rem;"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">No hay intercambios disponibles</h4>
+            <p class="text-muted mb-4">¡Publica un artículo para intercambiar con otros usuarios!</p>
+            <a asp-controller="Articulos" asp-action="Create" class="btn btn-brand rounded-pill px-5">
+                <i class="bi bi-arrow-left-right me-2"></i>Publicar intercambio
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var articulo in Model)
+            {
+                <div class="col-sm-6 col-lg-4 col-xl-3">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                        <div style="height: 160px; overflow: hidden; background: #f0f0f0;">
+                            @if (!string.IsNullOrEmpty(articulo.ImageUrl))
+                            {
+                                <img src="@articulo.ImageUrl" alt="@articulo.Title" class="w-100 h-100" style="object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-info-subtle">
+                                    <i class="bi bi-arrow-left-right text-info" style="font-size: 2.5rem;"></i>
+                                </div>
+                            }
+                        </div>
+                        <div class="card-body p-3">
+                            <span class="badge bg-brand-light text-brand rounded-pill small mb-2">@articulo.Categoria?.Name</span>
+                            <h6 class="fw-bold text-dark mb-1 text-truncate">@articulo.Title</h6>
+                            <p class="text-muted small mb-2 text-truncate">@articulo.Description</p>
+                            @if (!string.IsNullOrEmpty(articulo.ExchangeDetails))
+                            {
+                                <p class="small text-info mb-1"><i class="bi bi-info-circle me-1"></i>@articulo.ExchangeDetails</p>
+                            }
+                            else
+                            {
+                                <div class="fw-bold text-info">Busco intercambio</div>
+                            }
+                            <small class="text-muted">Por: @(articulo.User?.FullName ?? "Usuario")</small>
+                        </div>
+                        <div class="card-footer bg-white border-0 p-3 pt-0">
+                            <a asp-controller="Articulos" asp-action="Details" asp-route-id="@articulo.Id" class="btn btn-outline-brand btn-sm rounded-pill w-100">
+                                <i class="bi bi-eye me-1"></i>Ver Detalles
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .bg-brand-light { background-color: rgba(33, 115, 70, 0.1) !important; }
+    .text-brand { color: #217346 !important; }
+    .btn-brand { background-color: #217346; color: white; border-color: #217346; }
+    .btn-brand:hover { background-color: #1a5c38; color: white; }
+    .btn-outline-brand { color: #217346; border-color: #217346; }
+    .btn-outline-brand:hover { background-color: #217346; color: white; }
+</style>

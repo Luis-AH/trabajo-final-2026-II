@@ -1,0 +1,159 @@
+@model SegundaOportunidad.Models.ApplicationUser
+@{
+    ViewData["Title"] = "Mi Perfil";
+    Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    var articulos = ViewData["Articulos"] as List<SegundaOportunidad.Models.Articulo> ?? new();
+}
+
+<div class="container-fluid py-4 px-4 px-lg-5">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Mi Perfil</h2>
+            <p class="text-muted mb-0">Gestiona tu información personal</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Card de perfil -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4 text-center">
+                    <div class="rounded-circle bg-brand d-flex align-items-center justify-content-center text-white fw-bold mx-auto mb-3" 
+                         style="width: 80px; height: 80px; font-size: 2rem; background-color: #217346;">
+                        @(string.IsNullOrEmpty(Model.FullName) ? "U" : Model.FullName.Substring(0,1).ToUpper())
+                    </div>
+                    <h4 class="fw-bold text-dark mb-1">@(Model.FullName ?? "Usuario")</h4>
+                    <p class="text-muted mb-3">@(Model.Email ?? "")</p>
+
+                    @if (Model.IsVerified)
+                    {
+                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
+                            <i class="bi bi-shield-check me-1"></i> Identidad Verificada
+                        </span>
+                    }
+                    else if (!string.IsNullOrEmpty(Model.Dni))
+                    {
+                        <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2">
+                            <i class="bi bi-hourglass-split me-1"></i> Verificación Pendiente
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2">
+                            <i class="bi bi-person-x me-1"></i> Sin verificar
+                        </span>
+                    }
+
+                    <hr class="my-3">
+                    <div class="row g-2 text-center">
+                        <div class="col-4">
+                            <div class="fw-bold text-dark fs-5">@articulos.Count</div>
+                            <small class="text-muted">Artículos</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="fw-bold text-dark fs-5">@Model.Rating.ToString("0.0")</div>
+                            <small class="text-muted">Calificación</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="fw-bold text-dark fs-5">@Model.FamiliesHelped</div>
+                            <small class="text-muted">Familias</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats ecológicas -->
+            <div class="card border-0 shadow-sm rounded-4 mt-3">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold text-dark mb-3"><i class="bi bi-leaf text-success me-2"></i>Impacto Ecológico</h6>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">CO₂ Ahorrado</span>
+                        <span class="fw-bold text-success">@Model.Co2Saved kg</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Objetos Reutilizados</span>
+                        <span class="fw-bold text-brand">@Model.ObjectsReused</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Familias Ayudadas</span>
+                        <span class="fw-bold text-brand">@Model.FamiliesHelped</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Últimas publicaciones -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-0 p-4 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0">Mis Publicaciones Recientes</h5>
+                        <a asp-controller="Perfil" asp-action="MisPublicaciones" class="btn btn-sm btn-outline-brand rounded-pill">Ver todas</a>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    @if (!articulos.Any())
+                    {
+                        <div class="text-center py-4">
+                            <i class="bi bi-box-seam text-muted" style="font-size: 2.5rem;"></i>
+                            <p class="text-muted mt-2">Aún no has publicado artículos.</p>
+                            <a asp-controller="Articulos" asp-action="Create" class="btn btn-brand rounded-pill px-4">
+                                <i class="bi bi-plus-circle me-2"></i>Publicar artículo
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var articulo in articulos.Take(5))
+                            {
+                                <a asp-controller="Articulos" asp-action="Details" asp-route-id="@articulo.Id" class="list-group-item list-group-item-action border-0 rounded-3 mb-2 px-3 py-3" style="background: #f9fafb;">
+                                    <div class="d-flex align-items-center gap-3">
+                                        @if (!string.IsNullOrEmpty(articulo.ImageUrl))
+                                        {
+                                            <img src="@articulo.ImageUrl" alt="@articulo.Title" class="rounded-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                        }
+                                        else
+                                        {
+                                            <div class="rounded-3 bg-brand-light d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                <i class="bi bi-box-seam text-brand"></i>
+                                            </div>
+                                        }
+                                        <div class="flex-grow-1">
+                                            <div class="fw-semibold text-dark">@articulo.Title</div>
+                                            <small class="text-muted">@articulo.Categoria?.Name • @articulo.CreatedAt.ToString("dd MMM yyyy")</small>
+                                        </div>
+                                        <div class="text-end">
+                                            @if (articulo.Modalidad == ModalidadArticulo.Venta && articulo.Price.HasValue)
+                                            {
+                                                <span class="fw-bold text-brand">S/ @articulo.Price.Value.ToString("0.0")</span>
+                                            }
+                                            else if (articulo.Modalidad == ModalidadArticulo.Donacion)
+                                            {
+                                                <span class="badge bg-success-subtle text-success">Gratis</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-info-subtle text-info">Intercambio</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-brand-light { background-color: rgba(33, 115, 70, 0.1) !important; }
+    .text-brand { color: #217346 !important; }
+    .btn-brand { background-color: #217346; color: white; border-color: #217346; }
+    .btn-brand:hover { background-color: #1a5c38; color: white; }
+    .btn-outline-brand { color: #217346; border-color: #217346; }
+    .btn-outline-brand:hover { background-color: #217346; color: white; }
+</style>

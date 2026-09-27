@@ -44,5 +44,10 @@ namespace SegundaOportunidad.Services
 
             return JsonSerializer.Deserialize<T>(json.ToString(), options);
         }
+
+        public async Task RemoveCacheAsync(string key)
+        {
+            await _db.KeyDeleteAsync(key);
+        }
     }
 }

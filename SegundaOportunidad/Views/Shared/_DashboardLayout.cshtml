@@ -1,0 +1,208 @@
+@{
+    Layout = "_Layout";
+    ViewData["UseFluidLayout"] = true;
+    
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+
+    string GetActive(string c, string a = "Index") => 
+        (controller == c && action == a) ? "active bg-brand-light text-brand fw-bold rounded-3" : "text-dark";
+        
+    string GetActiveIcon(string c, string a = "Index") => 
+        (controller == c && action == a) ? "text-brand" : "text-muted";
+}
+
+<div class="container-fluid min-vh-100 p-0" style="background-color: #fcfcfc;">
+    <div class="row g-0 h-100">
+        
+        <!-- Mobile Header (Visible only on small screens) -->
+        <div class="d-lg-none d-flex justify-content-between align-items-center bg-white p-3 border-bottom sticky-top w-100 mb-3">
+            <a asp-controller="Home" asp-action="Dashboard" class="text-dark text-decoration-none fw-bold fs-5">
+                <i class="bi bi-bullseye text-brand me-2"></i> SegundaOportunidad
+            </a>
+            <button class="btn btn-brand text-white border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+        </div>
+
+        <!-- Sidebar (Hidden on small screens) -->
+        <div class="col-lg-2 bg-white border-end shadow-sm d-none d-lg-block position-fixed h-100">
+            <div class="d-flex flex-column h-100 p-4">
+                <a asp-controller="Home" asp-action="Dashboard" class="d-flex align-items-center mb-5 text-dark text-decoration-none fw-bold fs-4">
+                    <i class="bi bi-bullseye text-brand me-2"></i>
+                    <span>SegundaOportunidad</span>
+                </a>
+                
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Home" asp-action="Dashboard" class="nav-link @GetActive("Home", "Dashboard")">
+                            <i class="bi bi-house-door me-3 @GetActiveIcon("Home", "Dashboard")"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Articulos" asp-action="Index" class="nav-link @GetActive("Articulos", "Index")">
+                            <i class="bi bi-search me-3 @GetActiveIcon("Articulos", "Index")"></i> Explorar
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Articulos" asp-action="Create" class="nav-link @GetActive("Articulos", "Create")">
+                            <i class="bi bi-plus-circle me-3 @GetActiveIcon("Articulos", "Create")"></i> Publicar Artículo
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Perfil" asp-action="Donaciones" class="nav-link @GetActive("Perfil", "Donaciones")">
+                            <i class="bi bi-heart me-3 @GetActiveIcon("Perfil", "Donaciones")"></i> Donaciones
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Perfil" asp-action="Intercambios" class="nav-link @GetActive("Perfil", "Intercambios")">
+                            <i class="bi bi-arrow-left-right me-3 @GetActiveIcon("Perfil", "Intercambios")"></i> Intercambios
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Mensajes" asp-action="Index" class="nav-link @GetActive("Mensajes", "Index")">
+                            <i class="bi bi-chat-dots me-3 @GetActiveIcon("Mensajes", "Index")"></i> Mensajes
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Perfil" asp-action="MisPublicaciones" class="nav-link @GetActive("Perfil", "MisPublicaciones")">
+                            <i class="bi bi-folder me-3 @GetActiveIcon("Perfil", "MisPublicaciones")"></i> Mis Publicaciones
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Perfil" asp-action="Index" class="nav-link @GetActive("Perfil", "Index")">
+                            <i class="bi bi-person me-3 @GetActiveIcon("Perfil", "Index")"></i> Mi Perfil
+                        </a>
+                    </li>
+                    
+                    @if (User.Identity?.Name == "admin@segundaoportunidad.com")
+                    {
+                        <li class="nav-item mt-4 mb-2">
+                            <small class="text-muted fw-bold text-uppercase ms-3" style="font-size: 0.7rem; letter-spacing: 1px;">Admin</small>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a asp-controller="Supervisor" asp-action="Index" class="nav-link @GetActive("Supervisor", "Index")">
+                                <i class="bi bi-shield-lock-fill me-3 @GetActiveIcon("Supervisor", "Index")"></i> Panel Supervisor
+                            </a>
+                        </li>
+                    }
+                </ul>
+
+                <hr>
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="rounded-circle bg-brand text-white d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <strong>@User.Identity?.Name</strong>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                        <li>
+                            <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+                                <button type="submit" class="dropdown-item">Cerrar Sesión</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Offcanvas Sidebar (Mobile) -->
+        <div class="offcanvas offcanvas-start border-0" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title fw-bold" id="sidebarMenuLabel">
+                    <i class="bi bi-bullseye text-brand me-2"></i> SegundaOportunidad
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body p-4 d-flex flex-column">
+                <ul class="nav nav-pills flex-column mb-auto">
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Home" asp-action="Dashboard" class="nav-link @GetActive("Home", "Dashboard")">
+                            <i class="bi bi-house-door me-3 @GetActiveIcon("Home", "Dashboard")"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Articulos" asp-action="Index" class="nav-link @GetActive("Articulos", "Index")">
+                            <i class="bi bi-search me-3 @GetActiveIcon("Articulos", "Index")"></i>Explorar
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Articulos" asp-action="Create" class="nav-link @GetActive("Articulos", "Create")">
+                            <i class="bi bi-plus-circle me-3 @GetActiveIcon("Articulos", "Create")"></i>Publicar Artículo
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Perfil" asp-action="Donaciones" class="nav-link @GetActive("Perfil", "Donaciones")">
+                            <i class="bi bi-heart me-3 @GetActiveIcon("Perfil", "Donaciones")"></i>Donaciones
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Perfil" asp-action="Intercambios" class="nav-link @GetActive("Perfil", "Intercambios")">
+                            <i class="bi bi-arrow-left-right me-3 @GetActiveIcon("Perfil", "Intercambios")"></i>Intercambios
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Mensajes" asp-action="Index" class="nav-link @GetActive("Mensajes", "Index")">
+                            <i class="bi bi-chat-dots me-3 @GetActiveIcon("Mensajes", "Index")"></i>Mensajes
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Perfil" asp-action="MisPublicaciones" class="nav-link @GetActive("Perfil", "MisPublicaciones")">
+                            <i class="bi bi-folder me-3 @GetActiveIcon("Perfil", "MisPublicaciones")"></i>Mis Publicaciones
+                        </a>
+                    </li>
+                    <li class="nav-item mb-2">
+                        <a asp-controller="Perfil" asp-action="Index" class="nav-link @GetActive("Perfil", "Index")">
+                            <i class="bi bi-person me-3 @GetActiveIcon("Perfil", "Index")"></i>Mi Perfil
+                        </a>
+                    </li>
+                    @if (User.Identity?.Name == "admin@segundaoportunidad.com")
+                    {
+                        <li class="nav-item mb-2 mt-2 border-top pt-2">
+                            <a asp-controller="Supervisor" asp-action="Index" class="nav-link @GetActive("Supervisor", "Index")">
+                                <i class="bi bi-shield-lock-fill me-3 @GetActiveIcon("Supervisor", "Index")"></i>Panel Supervisor
+                            </a>
+                        </li>
+                    }
+                </ul>
+                <hr>
+                <div class="mt-auto">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-brand text-white d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <strong class="text-dark small">@User.Identity?.Name</strong>
+                    </div>
+                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+                        <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-pill">
+                            <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content (takes remaining width) -->
+        <div class="col-12 col-lg-10 offset-lg-2">
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Override navbar globally just for this layout to look closer to Figma */
+    header { display: none; }
+    footer { display: none; }
+    body { background-color: #fcfcfc; padding-bottom: 0 !important; }
+    .bg-brand-light { background-color: rgba(33, 115, 70, 0.1) !important; }
+    .btn-brand { background-color: #217346; color: white; border-color: #217346; }
+    .btn-brand:hover { background-color: #1a5c38; color: white; border-color: #1a5c38; }
+    .btn-outline-brand { color: #217346; border-color: #217346; }
+    .btn-outline-brand:hover { background-color: #217346; color: white; }
+    .text-brand { color: #217346 !important; }
+</style>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

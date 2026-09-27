@@ -43,6 +43,7 @@ public class HomeController : Controller
             {
                 FullName = user.FullName ?? user.UserName ?? "Usuario",
                 IsVerified = user.IsVerified,
+                Dni = user.Dni,
                 VentasActivas = articulos.Count(a => a.Modalidad == ModalidadArticulo.Venta && a.IsActive),
                 IntercambiosRealizados = articulos.Count(a => a.Modalidad == ModalidadArticulo.Intercambio), // asumiendo todos por ahora
                 DonacionesEntregadas = articulos.Count(a => a.Modalidad == ModalidadArticulo.Donacion),
@@ -57,10 +58,29 @@ public class HomeController : Controller
         return View(stats);
     }
 
+    [Microsoft.AspNetCore.Authorization.Authorize]
+    [HttpPost]
+    public async Task<IActionResult> SubmitDni(string dni)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user != null && !string.IsNullOrEmpty(dni))
+        {
+            user.Dni = dni;
+            user.IsVerified = false; // Requiere aprobación del supervisor
+            await _userManager.UpdateAsync(user);
+            
+            // Invalidar cache
+            var cacheKey = $"dashboard_stats_{user.Id}";
+            await _redisService.RemoveCacheAsync(cacheKey);
+        }
+        return RedirectToAction(nameof(Dashboard));
+    }
+
     public class DashboardStats
     {
         public string FullName { get; set; } = string.Empty;
         public bool IsVerified { get; set; }
+        public string? Dni { get; set; }
         public int VentasActivas { get; set; }
         public int IntercambiosRealizados { get; set; }
         public int DonacionesEntregadas { get; set; }

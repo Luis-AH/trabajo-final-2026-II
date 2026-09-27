@@ -1,3 +1,11 @@
 node_modules/
 .env
 .DS_Store
+
+# .NET Core
+bin/
+obj/
+*.db
+*.db-shm
+*.db-wal
+appsettings.Development.json

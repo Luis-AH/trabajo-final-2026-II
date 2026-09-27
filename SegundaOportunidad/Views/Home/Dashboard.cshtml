@@ -2,99 +2,11 @@
 
 @{
     ViewData["Title"] = "Dashboard";
+    Layout = "_DashboardLayout";
 }
 
-<div class="container-fluid py-4" style="background-color: #fcfcfc;">
-    <div class="row">
-        <!-- Mobile Header (Visible only on small screens) -->
-        <div class="d-lg-none d-flex justify-content-between align-items-center bg-white p-3 border-bottom sticky-top w-100 mb-3">
-            <a asp-controller="Home" asp-action="Dashboard" class="text-dark text-decoration-none fw-bold fs-5">
-                <i class="bi bi-bullseye text-brand me-2"></i> SegundaOportunidad
-            </a>
-            <button class="btn btn-brand text-white border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
-                <i class="bi bi-list fs-4"></i>
-            </button>
-        </div>
-
-        <!-- Sidebar Navigation -->
-        <div class="col-lg-2 border-end bg-white offcanvas-lg offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
-            <!-- offcanvas header for mobile -->
-            <div class="offcanvas-header d-lg-none border-bottom">
-                <h5 class="offcanvas-title fw-bold" id="sidebarMenuLabel"><i class="bi bi-bullseye text-brand me-2"></i> SegundaOportunidad</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
-            </div>
-            
-            <div class="offcanvas-body d-flex flex-column h-100 p-3">
-                <a asp-controller="Home" asp-action="Dashboard" class="d-flex align-items-center mb-4 text-dark text-decoration-none fw-bold fs-5">
-                    <i class="bi bi-bullseye text-brand me-2"></i> SegundaOportunidad
-                </a>
-                
-                <ul class="nav nav-pills flex-column mb-auto">
-                    <li class="nav-item mb-2">
-                        <a href="#" class="nav-link active bg-brand-light text-brand fw-bold rounded-3">
-                            <i class="bi bi-house-door me-3"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <a asp-controller="Articulos" asp-action="Index" class="nav-link text-dark">
-                            <i class="bi bi-search me-3 text-muted"></i> Explorar
-                        </a>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <a asp-controller="Articulos" asp-action="Create" class="nav-link text-dark">
-                            <i class="bi bi-plus-circle me-3 text-muted"></i> Publicar Artículo
-                        </a>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <a href="#" class="nav-link text-dark">
-                            <i class="bi bi-heart me-3 text-muted"></i> Donaciones
-                        </a>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <a href="#" class="nav-link text-dark">
-                            <i class="bi bi-arrow-left-right me-3 text-muted"></i> Intercambios
-                        </a>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <a asp-controller="Mensajes" asp-action="Index" class="nav-link text-dark">
-                            <i class="bi bi-chat-dots me-3 text-muted"></i> Mensajes
-                        </a>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <a href="#" class="nav-link text-dark">
-                            <i class="bi bi-folder me-3 text-muted"></i> Mis Publicaciones
-                        </a>
-                    </li>
-                    <li class="nav-item mb-2">
-                        <a href="#" class="nav-link text-dark">
-                            <i class="bi bi-person me-3 text-muted"></i> Mi Perfil
-                        </a>
-                    </li>
-                </ul>
-
-                <hr>
-                <div class="d-flex align-items-center mt-3">
-                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px;">
-                        @(string.IsNullOrEmpty(Model.FullName) ? "U" : Model.FullName.Substring(0,1).ToUpper())
-                    </div>
-                    <div class="ms-3">
-                        <strong class="d-block text-dark">@(string.IsNullOrEmpty(Model.FullName) ? "Usuario" : Model.FullName)</strong>
-                        <small class="text-muted">Lima, Perú</small>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                        <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-pill">
-                            <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Content Area -->
-        <div class="col-lg-10 p-4 p-lg-5">
-            <!-- Header section -->
+<div class="p-4 p-lg-5">
+    <!-- Header section -->
             <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap">
                 <div>
                     <h2 class="fw-bold text-dark mb-1 d-flex align-items-center">
@@ -103,6 +15,18 @@
                             <span class="badge bg-success-subtle text-success ms-3 fw-normal rounded-pill px-3 py-1 fs-6">
                                 <i class="bi bi-shield-check me-1"></i> Identidad Verificada
                             </span>
+                        }
+                        else if (!string.IsNullOrEmpty(Model.Dni))
+                        {
+                            <span class="badge bg-warning-subtle text-warning ms-3 fw-normal rounded-pill px-3 py-1 fs-6">
+                                <i class="bi bi-hourglass-split me-1"></i> Verificación Pendiente
+                            </span>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-sm btn-outline-brand ms-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#verificarDniModal">
+                                <i class="bi bi-shield-check"></i> Verificar Identidad
+                            </button>
                         }
                     </h2>
                     <p class="text-muted">Hoy es un gran día para darle una nueva oportunidad a tus cosas.</p>
@@ -252,12 +176,33 @@
                 </div>
             </div>
         </div>
+
+
+<!-- Modal Verificar DNI -->
+<div class="modal fade" id="verificarDniModal" tabindex="-1" aria-labelledby="verificarDniModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-bottom-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 p-md-5 text-center">
+                <div class="mb-4 text-brand">
+                    <i class="bi bi-shield-check" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="fw-bold mb-3" id="verificarDniModalLabel">Verifica tu identidad</h4>
+                <p class="text-muted mb-4">Para garantizar la seguridad de nuestra comunidad, necesitamos verificar tu identidad. Por favor ingresa tu número de DNI.</p>
+                
+                <form asp-controller="Home" asp-action="SubmitDni" method="post">
+                    <div class="form-floating mb-4">
+                        <input type="text" class="form-control rounded-pill text-center fs-5" id="dniInput" name="Dni" placeholder="DNI" required pattern="[0-9]{8}" maxlength="8">
+                        <label for="dniInput">Número de DNI (8 dígitos)</label>
+                    </div>
+                    <button type="submit" class="btn btn-brand w-100 rounded-pill py-3 fw-bold shadow-sm">
+                        Subir y Verificar
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
-<style>
-    /* Override navbar globally just for this page to look closer to Figma, or hide it if you prefer */
-    header { display: none; }
-    footer { display: none; }
-    body { background-color: #fcfcfc; padding-bottom: 0 !important; }
-</style>

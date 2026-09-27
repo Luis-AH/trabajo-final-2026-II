@@ -33,6 +33,7 @@ namespace SegundaOportunidad.Controllers
             {
                 // Búsqueda en Algolia
                 var ids = await _algoliaService.SearchArticulosIdsAsync(searchString);
+                Console.WriteLine($"[Algolia Search] Query: {searchString}, Found {ids.Count} hits. IDs: {string.Join(", ", ids)}");
                 query = query.Where(a => ids.Contains(a.Id));
             }
 

@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: segunda-oportunidad
+    env: docker
+    plan: free
+    dockerCommand: dotnet SegundaOportunidad.dll
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: PORT
+        value: 8080

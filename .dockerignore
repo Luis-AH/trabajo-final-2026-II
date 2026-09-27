@@ -1,0 +1,13 @@
+# Ignorar carpetas de build local
+**/bin/
+**/obj/
+.git/
+.vscode/
+.idea/
+.vs/
+.agents/
+node_modules/
+*.db
+*.db-shm
+*.db-wal
+appsettings.Development.json

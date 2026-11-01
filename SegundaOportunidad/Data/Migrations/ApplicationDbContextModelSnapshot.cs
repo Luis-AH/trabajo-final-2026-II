@@ -92,11 +92,9 @@ namespace SegundaOportunidad.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ProviderDisplayName")
@@ -134,11 +132,9 @@ namespace SegundaOportunidad.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Value")
@@ -149,6 +145,58 @@ namespace SegundaOportunidad.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("SegundaOportunidad.Models.AnalisisAdminGuard", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AdministradorId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ArticuloId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Completado")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Consulta")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreadoUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ImagenSha256")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Modelo")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReporteId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Resultado")
+                        .IsRequired()
+                        .HasMaxLength(8000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Tipo")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ImagenSha256");
+
+                    b.HasIndex("AdministradorId", "CreadoUtc");
+
+                    b.ToTable("AnalisisAdminGuard");
+                });
+
             modelBuilder.Entity("SegundaOportunidad.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -156,6 +204,9 @@ namespace SegundaOportunidad.Data.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("AccountSuspendedUntilUtc")
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("Co2Saved")
                         .HasColumnType("TEXT");
@@ -210,7 +261,18 @@ namespace SegundaOportunidad.Data.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime?>("PublishingSuspendedUntilUtc")
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("Rating")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("RegisteredAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SanctionVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SecurityStamp")
@@ -265,6 +327,14 @@ namespace SegundaOportunidad.Data.Migrations
                     b.Property<int>("Modalidad")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("Moderacion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ModeracionVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal?>("Price")
                         .HasColumnType("TEXT");
 
@@ -301,6 +371,43 @@ namespace SegundaOportunidad.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categorias");
+                });
+
+            modelBuilder.Entity("SegundaOportunidad.Models.DecisionReporte", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AdministradorId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Anterior")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("FechaUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Justificacion")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Nuevo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReporteId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdministradorId");
+
+                    b.HasIndex("ReporteId");
+
+                    b.ToTable("DecisionesReportes");
                 });
 
             modelBuilder.Entity("SegundaOportunidad.Models.Intercambio", b =>
@@ -378,6 +485,138 @@ namespace SegundaOportunidad.Data.Migrations
                     b.ToTable("Mensajes");
                 });
 
+            modelBuilder.Entity("SegundaOportunidad.Models.ModeracionPublicacion", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AdministradorId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Anterior")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ArticuloId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Motivo")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Nuevo")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdministradorId");
+
+                    b.HasIndex("ArticuloId", "FechaUtc");
+
+                    b.ToTable("ModeracionesPublicaciones");
+                });
+
+            modelBuilder.Entity("SegundaOportunidad.Models.Reporte", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ArticuloId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ClaveAbierta")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreadoUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DenunciadoId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DenuncianteId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Estado")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("EvidenciaUrl")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Motivo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Version")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArticuloId");
+
+                    b.HasIndex("ClaveAbierta")
+                        .IsUnique();
+
+                    b.HasIndex("DenunciadoId");
+
+                    b.HasIndex("DenuncianteId");
+
+                    b.HasIndex("Estado", "CreadoUtc");
+
+                    b.ToTable("Reportes");
+                });
+
+            modelBuilder.Entity("SegundaOportunidad.Models.SancionUsuario", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AdministradorId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("HastaUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Motivo")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Tipo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UsuarioId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdministradorId");
+
+                    b.HasIndex("UsuarioId", "FechaUtc");
+
+                    b.ToTable("SancionesUsuarios");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -429,6 +668,17 @@ namespace SegundaOportunidad.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SegundaOportunidad.Models.AnalisisAdminGuard", b =>
+                {
+                    b.HasOne("SegundaOportunidad.Models.ApplicationUser", "Administrador")
+                        .WithMany()
+                        .HasForeignKey("AdministradorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Administrador");
+                });
+
             modelBuilder.Entity("SegundaOportunidad.Models.Articulo", b =>
                 {
                     b.HasOne("SegundaOportunidad.Models.Categoria", "Categoria")
@@ -446,6 +696,25 @@ namespace SegundaOportunidad.Data.Migrations
                     b.Navigation("Categoria");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SegundaOportunidad.Models.DecisionReporte", b =>
+                {
+                    b.HasOne("SegundaOportunidad.Models.ApplicationUser", "Administrador")
+                        .WithMany()
+                        .HasForeignKey("AdministradorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SegundaOportunidad.Models.Reporte", "Reporte")
+                        .WithMany("Decisiones")
+                        .HasForeignKey("ReporteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Administrador");
+
+                    b.Navigation("Reporte");
                 });
 
             modelBuilder.Entity("SegundaOportunidad.Models.Intercambio", b =>
@@ -500,6 +769,75 @@ namespace SegundaOportunidad.Data.Migrations
                     b.Navigation("Receiver");
 
                     b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("SegundaOportunidad.Models.ModeracionPublicacion", b =>
+                {
+                    b.HasOne("SegundaOportunidad.Models.ApplicationUser", "Administrador")
+                        .WithMany()
+                        .HasForeignKey("AdministradorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SegundaOportunidad.Models.Articulo", "Articulo")
+                        .WithMany()
+                        .HasForeignKey("ArticuloId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Administrador");
+
+                    b.Navigation("Articulo");
+                });
+
+            modelBuilder.Entity("SegundaOportunidad.Models.Reporte", b =>
+                {
+                    b.HasOne("SegundaOportunidad.Models.Articulo", "Articulo")
+                        .WithMany()
+                        .HasForeignKey("ArticuloId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SegundaOportunidad.Models.ApplicationUser", "Denunciado")
+                        .WithMany()
+                        .HasForeignKey("DenunciadoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SegundaOportunidad.Models.ApplicationUser", "Denunciante")
+                        .WithMany()
+                        .HasForeignKey("DenuncianteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Articulo");
+
+                    b.Navigation("Denunciado");
+
+                    b.Navigation("Denunciante");
+                });
+
+            modelBuilder.Entity("SegundaOportunidad.Models.SancionUsuario", b =>
+                {
+                    b.HasOne("SegundaOportunidad.Models.ApplicationUser", "Administrador")
+                        .WithMany()
+                        .HasForeignKey("AdministradorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SegundaOportunidad.Models.ApplicationUser", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Administrador");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("SegundaOportunidad.Models.Reporte", b =>
+                {
+                    b.Navigation("Decisiones");
                 });
 #pragma warning restore 612, 618
         }

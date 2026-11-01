@@ -64,6 +64,21 @@ namespace SegundaOportunidad.Services
             }
         }
         
+        public async Task<List<string>> SearchAllArticulosIdsAsync(string query, CancellationToken ct)
+        {
+            var ids = new HashSet<string>();
+            var page = 0;
+            while (true)
+            {
+                ct.ThrowIfCancellationRequested();
+                var result = await _index.SearchAsync<AlgoliaArticuloRecord>(new Query(query) { HitsPerPage = 100, Page = page });
+                foreach (var hit in result.Hits) ids.Add(hit.ObjectID);
+                page++;
+                if (page >= result.NbPages) break;
+            }
+            return ids.ToList();
+        }
+
         private class AlgoliaArticuloRecord
         {
             [System.Text.Json.Serialization.JsonPropertyName("objectID")]

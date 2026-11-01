@@ -75,13 +75,13 @@
                         </a>
                     </li>
                     
-                    @if (User.Identity?.Name == "admin@segundaoportunidad.com")
+                    @if (User.IsInRole("Admin"))
                     {
                         <li class="nav-item mt-4 mb-2">
                             <small class="text-muted fw-bold text-uppercase ms-3" style="font-size: 0.7rem; letter-spacing: 1px;">Admin</small>
                         </li>
                         <li class="nav-item mb-2">
-                            <a asp-controller="Supervisor" asp-action="Index" class="nav-link @GetActive("Supervisor", "Index")">
+                            <a asp-controller="Admin" asp-action="Index" class="nav-link text-dark"><i class="bi bi-bar-chart me-3"></i>Administración</a><a asp-controller="Supervisor" asp-action="Index" class="nav-link @GetActive("Supervisor", "Index")">
                                 <i class="bi bi-shield-lock-fill me-3 @GetActiveIcon("Supervisor", "Index")"></i> Panel Supervisor
                             </a>
                         </li>
@@ -157,10 +157,10 @@
                             <i class="bi bi-person me-3 @GetActiveIcon("Perfil", "Index")"></i>Mi Perfil
                         </a>
                     </li>
-                    @if (User.Identity?.Name == "admin@segundaoportunidad.com")
+                    @if (User.IsInRole("Admin"))
                     {
                         <li class="nav-item mb-2 mt-2 border-top pt-2">
-                            <a asp-controller="Supervisor" asp-action="Index" class="nav-link @GetActive("Supervisor", "Index")">
+                            <a asp-controller="Admin" asp-action="Index" class="nav-link text-dark"><i class="bi bi-bar-chart me-3"></i>Administración</a><a asp-controller="Supervisor" asp-action="Index" class="nav-link @GetActive("Supervisor", "Index")">
                                 <i class="bi bi-shield-lock-fill me-3 @GetActiveIcon("Supervisor", "Index")"></i>Panel Supervisor
                             </a>
                         </li>

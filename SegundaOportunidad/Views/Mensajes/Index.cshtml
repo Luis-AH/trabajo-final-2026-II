@@ -6,6 +6,7 @@
     var activeChatUserId = ViewBag.ActiveChatUserId as string;
 }
 
+@if (!string.IsNullOrEmpty(activeChatUserId)) { <a asp-controller="Reportes" asp-action="Crear" asp-route-usuarioId="@activeChatUserId" class="btn btn-outline-secondary m-3">Reportar comportamiento del usuario</a> }
 <div class="container-fluid py-4" style="background-color: #fcfcfc;">
     <div class="row">
         <!-- Mobile Header (Visible only on small screens) -->

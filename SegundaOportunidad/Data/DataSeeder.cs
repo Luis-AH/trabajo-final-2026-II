@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using SegundaOportunidad.Models;
 
@@ -11,7 +12,7 @@ namespace SegundaOportunidad.Data
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-            context.Database.EnsureCreated();
+            await context.Database.MigrateAsync();
 
             // 1. Crear Categorías
             if (!context.Categorias.Any())
@@ -63,8 +64,23 @@ namespace SegundaOportunidad.Data
                 await userManager.CreateAsync(user, "User123!");
             }
 
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            if (!await roleManager.RoleExistsAsync("Admin"))
+            {
+                var roleResult = await roleManager.CreateAsync(new IdentityRole("Admin"));
+                if (!roleResult.Succeeded)
+                    throw new InvalidOperationException("No se pudo crear el rol Admin.");
+            }
+            var administrador = await userManager.FindByIdAsync(adminUserId);
+            if (administrador != null && !await userManager.IsInRoleAsync(administrador, "Admin"))
+            {
+                var roleResult = await userManager.AddToRoleAsync(administrador, "Admin");
+                if (!roleResult.Succeeded)
+                    throw new InvalidOperationException("No se pudo asignar el rol Admin.");
+            }
+
             // 3. Crear Artículos de Prueba
-            if (!context.Articulos.Any())
+            if (!context.Articulos.IgnoreQueryFilters().Any())
             {
                 var algolia = serviceProvider.GetRequiredService<SegundaOportunidad.Services.AlgoliaService>();
                 

@@ -5,6 +5,7 @@ namespace SegundaOportunidad.Models
 {
     public enum ModalidadArticulo { Venta, Intercambio, Donacion }
     public enum EstadoFisico { Nuevo, ComoNuevo, BuenEstado, Aceptable }
+    public enum EstadoModeracion { Visible, Oculta, Suspendida, Eliminada }
 
     public class Articulo
     {
@@ -28,6 +29,9 @@ namespace SegundaOportunidad.Models
         public string? ExchangeDetails { get; set; }
 
         public bool IsActive { get; set; } = true;
+        public EstadoModeracion Moderacion { get; set; } = EstadoModeracion.Visible;
+        [ConcurrencyCheck]
+        public string ModeracionVersion { get; set; } = Guid.NewGuid().ToString();
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Relaciones

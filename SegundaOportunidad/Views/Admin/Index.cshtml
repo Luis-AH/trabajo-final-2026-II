@@ -1,0 +1,73 @@
+@model SegundaOportunidad.Models.AdminDashboardViewModel
+@using System.Text.Json
+@{
+    Layout = "_DashboardLayout";
+    ViewData["Title"] = "Administración";
+    var indicadores = new[] {
+        ("Usuarios registrados · global", Model.Usuarios),
+        ("Reportes abiertos · global", Model.ReportesAbiertos),
+        ("Reportes resueltos · global", Model.ReportesResueltos),
+        ("Cuentas suspendidas · global", Model.UsuariosSuspendidos),
+        ("Cuentas sin suspensión · global", Model.Usuarios - Model.UsuariosSuspendidos),
+        ("Publicaciones activas", Model.PublicacionesActivas),
+        ("Publicaciones inactivas", Model.PublicacionesInactivas),
+        ("Publicaciones ocultas", Model.Ocultas),
+        ("Publicaciones suspendidas", Model.Suspendidas),
+        ("Publicaciones eliminadas lógicamente", Model.Eliminadas),
+        ("Intercambios pendientes", Model.Pendientes),
+        ("Intercambios aceptados", Model.Aceptados),
+        ("Intercambios completados", Model.Completados)
+    };
+}
+<main class="p-3 p-md-5"><a asp-controller="Seguridad" asp-action="Index" class="btn btn-outline-brand mb-3">Seguridad</a><a asp-controller="AdminGuard" asp-action="Index" class="btn btn-outline-brand mb-3">AdminGuard IA</a><a asp-controller="AdminReportes" asp-action="Index" class="btn btn-outline-brand mb-3">Reportes y moderación</a><a asp-controller="AdminUsuarios" asp-action="Index" class="btn btn-outline-brand mb-3">Administrar usuarios</a><a asp-controller="AdminPublicaciones" asp-action="Index" class="btn btn-outline-brand mb-3">Administrar publicaciones</a>
+    <div class="d-flex flex-wrap justify-content-between gap-3 mb-4">
+        <div><h1 class="h2 fw-bold text-brand">Centro de administración</h1><p class="text-muted mb-0">Actividad real de SegundaOportunidad · fechas UTC</p></div>
+        <a asp-controller="Supervisor" asp-action="Index" class="btn btn-outline-brand align-self-start">Verificaciones de identidad</a>
+    </div>
+    <form method="get" class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3"><label for="desde" class="form-label">Desde</label><input id="desde" name="desde" type="date" value="@Model.Desde.ToString("yyyy-MM-dd")" class="form-control" required /></div>
+            <div class="col-md-3"><label for="hasta" class="form-label">Hasta (inclusive)</label><input id="hasta" name="hasta" type="date" value="@Model.Hasta.ToString("yyyy-MM-dd")" class="form-control" required /></div>
+            <div class="col-md-4"><label for="categoriaId" class="form-label">Categoría</label><select id="categoriaId" name="categoriaId" class="form-select"><option value="">Todas</option>
+                @foreach (var categoria in Model.Categorias) { <option value="@categoria.Id" selected="@(categoria.Id == Model.CategoriaId)">@categoria.Name</option> }
+            </select></div>
+            <div class="col-md-2"><button class="btn btn-brand w-100">Aplicar</button></div>
+        </div>
+        <small class="text-muted mt-3">El período filtra por fecha de creación. En intercambios, la categoría corresponde al artículo solicitado. Los estados son los actuales; usuarios es un total global.</small>
+    </form>
+    <div class="row g-3 mb-4">
+        @foreach (var indicador in indicadores) {
+            <div class="col-sm-6 col-xl-4"><div class="card border-0 shadow-sm rounded-4 h-100 p-4"><span class="text-muted">@indicador.Item1</span><strong class="display-6 text-brand mt-2">@indicador.Item2</strong></div></div>
+        }
+    </div>
+    <div class="alert alert-light border rounded-4 mb-4">Los reportes abiertos incluyen pendientes y en revisión; sus totales son globales. Una cuenta sin suspensión no indica actividad reciente. Disponibilidad y moderación son dimensiones independientes: una publicación activa puede estar oculta. Los conteos no deben sumarse entre sí.</div>
+    <div class="row g-4">
+        <div class="col-xl-6"><section class="card border-0 shadow-sm rounded-4 p-4 h-100"><h2 class="h5">Publicaciones creadas por mes</h2><div style="height:280px"><canvas id="actividad" role="img" aria-label="Publicaciones creadas por mes"></canvas></div></section></div>
+        <div class="col-xl-6"><section class="card border-0 shadow-sm rounded-4 p-4 h-100"><h2 class="h5">Intercambios creados por mes</h2><div style="height:280px"><canvas id="evolucion" role="img" aria-label="Intercambios creados por mes"></canvas></div><small class="text-muted">No representa la fecha de aceptación o finalización.</small></section></div>
+        <div class="col-12"><section class="card border-0 shadow-sm rounded-4 p-4"><h2 class="h5">Categorías con más publicaciones · hasta 10</h2><div style="height:280px"><canvas id="categorias" role="img" aria-label="Publicaciones por categoría"></canvas></div>
+            @if (!Model.PorCategoria.Any()) { <p class="text-muted">No hay publicaciones para los filtros seleccionados.</p> }
+        </section></div>
+    </div>
+    <details class="mt-4"><summary>Consultar datos de las gráficas</summary><div class="table-responsive"><table class="table"><thead><tr><th>Mes</th><th>Publicaciones</th><th>Intercambios</th></tr></thead><tbody>
+        @for (var i = 0; i < Model.Actividad.Count; i++) { <tr><td>@Model.Actividad[i].Etiqueta</td><td>@Model.Actividad[i].Total</td><td>@Model.Evolucion[i].Total</td></tr> }
+    </tbody></table><table class="table"><thead><tr><th>Categoría</th><th>Publicaciones</th></tr></thead><tbody>@foreach (var item in Model.PorCategoria) { <tr><td>@item.Etiqueta</td><td>@item.Total</td></tr> }</tbody></table></div></details>
+    <p id="chart-error" class="text-muted mt-3" hidden>No se pudieron cargar las gráficas. Los datos están disponibles en las tablas.</p>
+</main>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <script>
+        (() => {
+            if (typeof Chart === 'undefined') { document.getElementById('chart-error').hidden = false; return; }
+            const series = {
+                actividad: @Html.Raw(JsonSerializer.Serialize(Model.Actividad)),
+                evolucion: @Html.Raw(JsonSerializer.Serialize(Model.Evolucion)),
+                categorias: @Html.Raw(JsonSerializer.Serialize(Model.PorCategoria))
+            };
+            Object.entries(series).forEach(([id, valores]) => new Chart(document.getElementById(id), {
+                type: id === 'evolucion' ? 'line' : 'bar',
+                data: { labels: valores.map(x => x.Etiqueta), datasets: [{ label: 'Cantidad', data: valores.map(x => x.Total), backgroundColor: '#21734699', borderColor: '#217346', borderWidth: 2 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+            }));
+        })();
+    </script>
+}

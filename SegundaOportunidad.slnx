@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="SegundaOportunidad/SegundaOportunidad.csproj" />
+  <Project Path="SegundaOportunidad.Checks/SegundaOportunidad.Checks.csproj" />
 </Solution>

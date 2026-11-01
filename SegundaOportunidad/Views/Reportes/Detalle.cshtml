@@ -1,0 +1,3 @@
+﻿@model SegundaOportunidad.Models.Reporte
+@{ Layout = "_DashboardLayout"; ViewData["Title"] = "Reporte enviado"; }
+<main class="p-3 p-md-5"><h1 class="h2 text-brand">Reporte registrado</h1><p>Referencia: @Model.Id</p><p>Estado: <strong>@Model.Estado</strong></p><p>Motivo: @Model.Motivo</p><p style="white-space:pre-wrap">@Model.Descripcion</p><p>Creación UTC: @Model.CreadoUtc.ToString("yyyy-MM-dd HH:mm")</p><a asp-controller="Articulos" asp-action="Index">Volver al catálogo</a></main>

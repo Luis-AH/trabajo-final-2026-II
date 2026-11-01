@@ -8,6 +8,7 @@
     Layout = "_DashboardLayout";
     var currentUser = await UserManager.GetUserAsync(User);
     bool isOwner = currentUser != null && currentUser.Id == Model.UserId;
+    var articulosParaIntercambio = ViewData["ArticulosParaIntercambio"] as List<Articulo> ?? new();
 }
 
 <main class="p-4 p-md-5">
@@ -96,13 +97,33 @@
                 </div>
             </div>
 
-            <!-- Acciones -->
+            @if (User.Identity?.IsAuthenticated == true && !isOwner) { <div class="d-flex gap-3 mb-3"><a asp-controller="Reportes" asp-action="Crear" asp-route-articuloId="@Model.Id">Reportar publicación</a><a asp-controller="Reportes" asp-action="Crear" asp-route-usuarioId="@Model.UserId">Reportar comportamiento del usuario</a></div> }
+<!-- Acciones -->
             @if (!isOwner) {
                 <div class="d-grid gap-3">
                     @if (Model.Modalidad == ModalidadArticulo.Intercambio) {
-                        <button class="btn btn-warning btn-lg rounded-pill shadow-sm fw-bold py-3 text-dark">
-                            <i class="bi bi-arrow-left-right me-2"></i> Proponer Intercambio
-                        </button>
+                        @if (!Model.IsActive) {
+                            <div class="alert alert-secondary border-0 rounded-4 mb-0">Este artículo ya no está disponible para intercambio.</div>
+                        } else if (User.Identity?.IsAuthenticated == true && articulosParaIntercambio.Any()) {
+                            <form asp-controller="Intercambios" asp-action="Proponer" method="post" class="d-grid gap-3">
+                                <input type="hidden" name="requestedArticleId" value="@Model.Id" />
+                                <label for="offeredArticleId" class="form-label fw-bold mb-0">Elige un artículo activo para ofrecer</label>
+                                <select id="offeredArticleId" name="offeredArticleId" class="form-select form-select-lg" required>
+                                    @foreach (var articulo in articulosParaIntercambio) {
+                                        <option value="@articulo.Id">@articulo.Title</option>
+                                    }
+                                </select>
+                                <button type="submit" class="btn btn-warning btn-lg rounded-pill shadow-sm fw-bold py-3 text-dark">
+                                    <i class="bi bi-arrow-left-right me-2"></i> Proponer Intercambio
+                                </button>
+                            </form>
+                        } else if (User.Identity?.IsAuthenticated != true) {
+                            <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Context.Request.Path" class="btn btn-warning btn-lg rounded-pill shadow-sm fw-bold py-3 text-dark">
+                                <i class="bi bi-arrow-left-right me-2"></i> Inicia sesión para proponer
+                            </a>
+                        } else {
+                            <div class="alert alert-info border-0 rounded-4 mb-0">Necesitas tener al menos un artículo activo para proponer un intercambio.</div>
+                        }
                     } else if (Model.Modalidad == ModalidadArticulo.Venta) {
                         <button class="btn btn-brand btn-lg rounded-pill shadow-sm fw-bold py-3">
                             <i class="bi bi-bag me-2"></i> Comprar Artículo

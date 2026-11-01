@@ -5,6 +5,10 @@ namespace SegundaOportunidad.Models
     public class ApplicationUser : IdentityUser
     {
         public string FullName { get; set; } = string.Empty;
+        public DateTime? RegisteredAtUtc { get; set; }
+        public DateTime? AccountSuspendedUntilUtc { get; set; }
+        public DateTime? PublishingSuspendedUntilUtc { get; set; }
+        public string SanctionVersion { get; set; } = Guid.NewGuid().ToString();
         public string? Dni { get; set; }
         public bool IsVerified { get; set; } = false;
         

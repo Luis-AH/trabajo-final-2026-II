@@ -1,0 +1,2 @@
+﻿@{ Layout="_AuthLayout"; ViewData["Title"]="Seguridad de cuenta"; }
+<div class="p-4"><h1 class="h3 text-brand">Seguridad de cuenta</h1>@if((string?)ViewBag.Operacion=="solicitud") { <p>Si la cuenta existe, su correo está confirmado y el servicio de correo está disponible, recibirás un enlace. Revisa también spam.</p> } else { <p>Operación completada. Puedes iniciar sesión con tu contraseña actualizada.</p> }<a asp-area="Identity" asp-page="/Account/Login" class="btn btn-brand">Ir al login</a></div>

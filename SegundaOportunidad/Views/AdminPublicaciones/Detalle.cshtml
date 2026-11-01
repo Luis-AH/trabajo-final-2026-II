@@ -1,0 +1,15 @@
+@model SegundaOportunidad.Models.Articulo
+@{ Layout = "_DashboardLayout"; ViewData["Title"] = "Revisión de publicación"; var historial = (List<ModeracionPublicacion>)ViewBag.Historial; }
+<main class="p-3 p-md-5"><a asp-action="Index">Volver a publicaciones</a>
+<a asp-controller="AdminGuard" asp-action="Index" asp-route-tipo="Publicacion" asp-route-objetivoId="@Model.Id" class="btn btn-outline-brand m-2">Analizar con AdminGuard</a><h1 class="h2 mt-3">@Model.Title</h1><p>@Model.User?.FullName · @Model.User?.Email · @Model.Categoria?.Name</p>
+<span class="badge bg-secondary">@Model.Moderacion</span>
+@if(Uri.TryCreate(Model.ImageUrl, UriKind.Absolute, out var imagen) && (imagen.Scheme == "https" || imagen.Scheme == "http")) { <div class="my-3"><img src="@imagen" alt="Fotografía de la publicación" referrerpolicy="no-referrer" class="img-fluid rounded-4" style="max-height:400px" /></div> }
+<p class="my-3" style="white-space:pre-wrap">@Model.Description</p>
+<section class="card p-4 rounded-4"><h2 class="h5">Aplicar decisión</h2><p>La decisión se registra con tu usuario y fecha. Restaurar conserva la disponibilidad original del artículo.</p>
+<form asp-action="Cambiar" method="post" onsubmit="return confirm('¿Confirmas esta decisión de moderación? Quedará registrada en el historial.');">
+<input type="hidden" name="id" value="@Model.Id" /><input type="hidden" name="version" value="@Model.ModeracionVersion" />
+<label for="estado" class="form-label">Acción</label><select id="estado" name="estado" class="form-select mb-3" required>
+<option value="">Selecciona una acción</option>
+@foreach(var e in Enum.GetValues<EstadoModeracion>().Where(e => e != Model.Moderacion && (Model.Moderacion != EstadoModeracion.Eliminada || e == EstadoModeracion.Visible))) { <option value="@e">@(e == EstadoModeracion.Visible ? "Restaurar" : e == EstadoModeracion.Eliminada ? "Eliminar lógicamente" : e == EstadoModeracion.Oculta ? "Ocultar" : "Suspender publicación")</option> }
+</select><label for="motivo" class="form-label">Motivo obligatorio</label><textarea id="motivo" name="motivo" required minlength="5" maxlength="1000" class="form-control mb-3"></textarea><button class="btn btn-brand">Confirmar decisión</button></form></section>
+<h2 class="h5 mt-4">Historial · últimas 100 decisiones</h2><div class="table-responsive"><table class="table"><thead><tr><th>Fecha UTC</th><th>Administrador</th><th>Cambio</th><th>Motivo</th></tr></thead><tbody>@foreach(var m in historial) { <tr><td>@m.FechaUtc.ToString("yyyy-MM-dd HH:mm")</td><td>@m.Administrador.FullName</td><td>@m.Anterior → @m.Nuevo</td><td>@m.Motivo</td></tr> }</tbody></table></div></main>

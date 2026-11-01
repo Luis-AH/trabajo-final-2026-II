@@ -6,7 +6,8 @@ using SegundaOportunidad.Models;
 
 namespace SegundaOportunidad.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
+    [AutoValidateAntiforgeryToken]
     public class SupervisorController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -21,7 +22,7 @@ namespace SegundaOportunidad.Controllers
         public async Task<IActionResult> Index()
         {
             // Autorización simple basada en email para el administrador/supervisor
-            if (User.Identity?.Name != "admin@segundaoportunidad.com")
+            if (!User.IsInRole("Admin"))
             {
                 return RedirectToAction("Dashboard", "Home");
             }
@@ -37,7 +38,7 @@ namespace SegundaOportunidad.Controllers
         [HttpPost]
         public async Task<IActionResult> Approve(string id)
         {
-            if (User.Identity?.Name != "admin@segundaoportunidad.com") return Forbid();
+            if (!User.IsInRole("Admin")) return Forbid();
 
             var user = await _userManager.FindByIdAsync(id);
             if (user != null)
@@ -54,7 +55,7 @@ namespace SegundaOportunidad.Controllers
         [HttpPost]
         public async Task<IActionResult> Reject(string id)
         {
-            if (User.Identity?.Name != "admin@segundaoportunidad.com") return Forbid();
+            if (!User.IsInRole("Admin")) return Forbid();
 
             var user = await _userManager.FindByIdAsync(id);
             if (user != null)

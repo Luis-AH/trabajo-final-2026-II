@@ -1,0 +1,6 @@
+﻿@model SegundaOportunidad.Models.AnalisisAdminGuard
+@{ Layout = "_DashboardLayout"; ViewData["Title"] = "Resultado AdminGuard"; }
+<main class="p-3 p-md-5"><a asp-action="Index">Volver a AdminGuard</a><h1 class="h2 text-brand mt-3">Resultado de revisión asistida</h1><p>@Model.Tipo · @Model.CreadoUtc.ToString("yyyy-MM-dd HH:mm") UTC · modelo @Model.Modelo</p><p>Consulta: @Model.Consulta</p><div class="alert alert-warning">Sugerencia de IA, no decisión administrativa. Verifica las observaciones con evidencia. No se aplicó ninguna sanción.</div><section class="card p-4 rounded-4" style="white-space:pre-wrap">@Model.Resultado</section>
+@if(Model.ImagenSha256 != null) { <p class="mt-3">SHA-256 de los bytes analizados: <code class="text-break">@Model.ImagenSha256</code></p><p class="text-muted">Solo permite comprobar coincidencias exactas con análisis históricos. No detecta recortes ni demuestra engaño.</p> }
+@if(Model.ArticuloId != null) { <a asp-controller="AdminPublicaciones" asp-action="Detalle" asp-route-id="@Model.ArticuloId" class="btn btn-outline-brand mt-3">Revisar publicación y decidir manualmente</a> }
+@if(Model.ReporteId != null) { <a asp-controller="AdminReportes" asp-action="Detalle" asp-route-id="@Model.ReporteId" class="btn btn-outline-brand mt-3">Revisar reporte y decidir manualmente</a> }</main>

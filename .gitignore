@@ -9,3 +9,4 @@ obj/
 *.db-shm
 *.db-wal
 appsettings.Development.json
+*.backup-*.sqlite

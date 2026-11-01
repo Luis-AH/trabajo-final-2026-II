@@ -93,7 +93,17 @@ namespace SegundaOportunidad.Controllers
                 .OrderByDescending(a => a.CreatedAt)
                 .ToListAsync();
 
+            var solicitudesIntercambio = await _context.Intercambios.IgnoreQueryFilters()
+                .Include(i => i.Proposer)
+                .Include(i => i.Receiver)
+                .Include(i => i.OfferedArticle)
+                .Include(i => i.RequestedArticle)
+                .Where(i => i.ProposerId == user.Id || i.ReceiverId == user.Id)
+                .OrderByDescending(i => i.CreatedAt)
+                .ToListAsync();
+
             ViewData["MisIntercambios"] = misintercambios;
+            ViewData["SolicitudesIntercambio"] = solicitudesIntercambio;
             return View(articulos);
         }
     }

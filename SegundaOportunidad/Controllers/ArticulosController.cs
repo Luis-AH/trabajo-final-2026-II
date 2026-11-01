@@ -65,6 +65,15 @@ namespace SegundaOportunidad.Controllers
                 return NotFound();
             }
 
+            var userId = _userManager.GetUserId(User);
+            if (!string.IsNullOrEmpty(userId) && userId != articulo.UserId)
+            {
+                ViewData["ArticulosParaIntercambio"] = await _context.Articulos
+                    .Where(a => a.UserId == userId && a.IsActive)
+                    .OrderBy(a => a.Title)
+                    .ToListAsync();
+            }
+
             return View(articulo);
         }
 

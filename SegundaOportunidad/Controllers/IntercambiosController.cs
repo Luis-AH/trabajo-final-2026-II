@@ -51,6 +51,9 @@ namespace SegundaOportunidad.Controllers
             if (offered == null || requested == null)
                 return BadRequest("Los artículos no están disponibles.");
 
+            if (requested.Modalidad != ModalidadArticulo.Intercambio)
+                return BadRequest("Solo puedes solicitar artículos publicados para intercambio.");
+
             if (requested.UserId == userId)
                 return BadRequest("No puedes solicitar tus propios artículos.");
 
@@ -98,6 +101,8 @@ namespace SegundaOportunidad.Controllers
             if (intercambio.Estado != EstadoIntercambio.Pendiente)
                 return BadRequest("La solicitud ya fue procesada.");
 
+            if (!await _context.Articulos.AnyAsync(a => a.Id == intercambio.OfferedArticleId && a.IsActive) || !await _context.Articulos.AnyAsync(a => a.Id == intercambio.RequestedArticleId && a.IsActive))
+                return BadRequest("Una publicación no está disponible o fue moderada.");
             intercambio.Estado = EstadoIntercambio.Aceptado;
 
             await _context.SaveChangesAsync();
@@ -153,6 +158,8 @@ namespace SegundaOportunidad.Controllers
             if (intercambio.Estado != EstadoIntercambio.Aceptado)
                 return BadRequest("El intercambio debe estar aceptado.");
 
+            if (!await _context.Articulos.AnyAsync(a => a.Id == intercambio.OfferedArticleId && a.IsActive) || !await _context.Articulos.AnyAsync(a => a.Id == intercambio.RequestedArticleId && a.IsActive))
+                return BadRequest("Una publicación no está disponible o fue moderada.");
             intercambio.Estado = EstadoIntercambio.Completado;
 
             await _context.SaveChangesAsync();

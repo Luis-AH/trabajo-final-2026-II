@@ -19,10 +19,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Reporte> Reportes { get; set; }
     public DbSet<DecisionReporte> DecisionesReportes { get; set; }
     public DbSet<AnalisisAdminGuard> AnalisisAdminGuard { get; set; }
+    public DbSet<EstadoSistema> EstadosSistema { get; set; }
+    public DbSet<FotoArticulo> FotosArticulos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        builder.Entity<FotoArticulo>().HasKey(f => f.ArticuloId);
+        builder.Entity<FotoArticulo>().HasOne(f => f.Articulo).WithOne().HasForeignKey<FotoArticulo>(f => f.ArticuloId).OnDelete(DeleteBehavior.Restrict);
+        builder.Entity<ApplicationUser>().HasOne<ApplicationUser>().WithMany().HasForeignKey(u => u.VerifiedByAdminId).OnDelete(DeleteBehavior.Restrict);
         builder.Entity<AnalisisAdminGuard>().HasOne(a => a.Administrador).WithMany().HasForeignKey(a => a.AdministradorId).OnDelete(DeleteBehavior.Restrict);
         builder.Entity<AnalisisAdminGuard>().HasIndex(a => new { a.AdministradorId, a.CreadoUtc });
         builder.Entity<AnalisisAdminGuard>().HasIndex(a => a.ImagenSha256);

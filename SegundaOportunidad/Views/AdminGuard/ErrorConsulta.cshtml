@@ -1,0 +1,3 @@
+﻿@model SegundaOportunidad.Models.PanelAdminGuardViewModel
+@{ Layout="_DashboardLayout"; ViewData["Title"]="Seleccionar elemento para revisar"; }
+<main class="p-3 p-md-5 guard-page"><partial name="_GuardNav" /><div class="guard-empty"><span aria-hidden="true">↗</span><h1 class="h3">Volvamos a encontrar el elemento.</h1><p role="alert">@(Model.Error ?? "La publicación o el reporte no están disponibles.")</p><div class="d-flex justify-content-center gap-3 flex-wrap"><a asp-action="Publicaciones" class="btn btn-brand">Buscar publicaciones</a><a asp-action="Reportes" class="btn btn-outline-brand">Buscar reportes</a><a asp-action="Datos" class="btn btn-outline-brand">Consultar datos</a></div></div></main>

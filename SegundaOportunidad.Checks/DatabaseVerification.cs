@@ -18,5 +18,6 @@ internal static class DatabaseVerification
         var admins = await (from role in db.Roles join userRole in db.UserRoles on role.Id equals userRole.RoleId where role.Name == "Admin" select userRole.UserId).CountAsync();
         if (admins == 0) throw new Exception("No hay administradores con rol asignado");
         Console.WriteLine($"OK BASE LOCAL (solo lectura): integridad, relaciones, modelo y migraciones. Usuarios={await db.Users.CountAsync()}, administradores={admins}, artículos={await db.Articulos.IgnoreQueryFilters().CountAsync()}, intercambios={await db.Intercambios.CountAsync()}");
+        Console.WriteLine($"Catálogo visible={await db.Articulos.CountAsync()}, mensajes={await db.Mensajes.CountAsync()}, cuentas con aprobación registrada={await db.Users.CountAsync(u => u.IsVerified && u.VerifiedAtUtc!=null && u.VerifiedByAdminId!=null)}.");
     }
 }

@@ -15,6 +15,7 @@
     </li>
 </ul>
 
+<span class="login-kicker">Tu comunidad te espera</span><h2 class="login-heading">Qué bueno verte de nuevo.</h2><p class="login-description">Ingresa y encuentra tu próxima oportunidad de hacer la diferencia.</p>
 <form id="account" method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
     
@@ -26,8 +27,8 @@
     
     <div class="mb-4">
         <label asp-for="Input.Password" class="form-label">Contraseña</label>
-        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="••••••••" />
-        <span asp-validation-for="Input.Password" class="text-danger"></span>
+        <div class="auth-password-wrap"><input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="••••••••" />
+        <button type="button" class="auth-password-toggle" id="password-toggle" aria-controls="Input_Password" aria-pressed="false" hidden>Mostrar</button></div><p id="caps-warning" class="auth-caps" role="status" hidden>Bloq Mayús está activado.</p><span asp-validation-for="Input.Password" class="text-danger"></span>
     </div>
     
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -40,9 +41,10 @@
         <a id="forgot-password" asp-area="" asp-controller="Seguridad" asp-action="Recuperar" class="text-decoration-none" style="color: #1b4332;">¿Olvidaste tu contraseña?</a>
     </div>
     
-    <button id="login-submit" type="submit" class="btn-brand">Ingresar a SegundaOportunidad</button>
-</form>
+    <button id="login-submit" type="submit" class="btn-brand"><span id="login-label">Ingresar a SegundaOportunidad</span><span class="ms-2" aria-hidden="true">→</span></button>
+</form><div class="login-trust"><span aria-hidden="true">◇</span>Tu cuenta, tus objetos, nuevas historias.</div><a class="login-home" asp-area="" asp-controller="Articulos" asp-action="Index">Explorar la comunidad primero ↗</a>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/auth.js" asp-append-version="true" defer></script>
 }

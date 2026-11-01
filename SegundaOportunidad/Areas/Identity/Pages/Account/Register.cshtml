@@ -17,6 +17,11 @@
 
 <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+    <div class="mb-3">
+        <label asp-for="Input.FullName" class="form-label">Nombres y apellidos completos</label>
+        <input asp-for="Input.FullName" class="form-control" autocomplete="name" required maxlength="150" minlength="3" placeholder="Ej.: Ana María Torres López" />
+        <span asp-validation-for="Input.FullName" class="text-danger"></span>
+    </div>
 
     <div class="mb-3">
         <label asp-for="Input.Email" class="form-label">Correo electrónico</label>

@@ -55,26 +55,15 @@ public class HomeController : Controller
             await _redisService.SetCacheAsync(cacheKey, stats, TimeSpan.FromHours(1));
         }
 
+        stats.IsVerified = User.IsInRole("Admin") || (user.IsVerified && user.VerifiedAtUtc != null && user.VerifiedByAdminId != null);
+        stats.Dni = user.Dni;
         return View(stats);
     }
 
     [Microsoft.AspNetCore.Authorization.Authorize]
     [HttpPost]
-    public async Task<IActionResult> SubmitDni(string dni)
-    {
-        var user = await _userManager.GetUserAsync(User);
-        if (user != null && !string.IsNullOrEmpty(dni))
-        {
-            user.Dni = dni;
-            user.IsVerified = false; // Requiere aprobación del supervisor
-            await _userManager.UpdateAsync(user);
-            
-            // Invalidar cache
-            var cacheKey = $"dashboard_stats_{user.Id}";
-            await _redisService.RemoveCacheAsync(cacheKey);
-        }
-        return RedirectToAction(nameof(Dashboard));
-    }
+    [ValidateAntiForgeryToken]
+    public IActionResult SubmitDni(string dni) => RedirectToAction("Index", "Verificacion");
 
     public class DashboardStats
     {

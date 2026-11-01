@@ -1,0 +1,4 @@
+﻿@model SegundaOportunidad.Models.PanelAdminGuardViewModel
+<section class="mt-5"><div class="d-flex justify-content-between align-items-center gap-2 mb-3"><h2 class="h5 mb-0">Tus consultas registradas</h2><span class="guard-micro">Últimas 20 de este contexto · UTC</span></div>
+@if(Model.Historial.Count==0) { <div class="guard-empty"><span aria-hidden="true">↗</span><h3>Aquí comienza tu historial</h3><p>Cuando realices una consulta, podrás volver a su resultado desde este espacio.</p></div> } else { <div class="guard-history-grid">@foreach(var a in Model.Historial) { <a asp-action="Resultado" asp-route-id="@a.Id" class="guard-history-card"><span class="guard-pill">@(a.Completado ? "Completado" : "No completado")</span><h3>@a.Tipo</h3><p class="guard-clamp">@a.Consulta</p><span class="guard-micro">@a.CreadoUtc.ToString("yyyy-MM-dd HH:mm") · Ver resultado →</span></a> }</div> }
+</section>

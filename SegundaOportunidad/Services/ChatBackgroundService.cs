@@ -77,6 +77,12 @@ namespace SegundaOportunidad.Services
                     {
                         using var scope = _serviceProvider.CreateScope();
                         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                        if (!await context.ChatAllowedAsync(msgDto.SenderId,msgDto.ReceiverId,msgDto.SentAt,stoppingToken))
+                        {
+                            _logger.LogInformation("Mensaje anterior a la limpieza o con participantes no habilitados; no se persiste.");
+                            await _channel.BasicAckAsync(ea.DeliveryTag, false, stoppingToken);
+                            return;
+                        }
 
                         // Idempotency check
                         var exists = await context.Mensajes.AnyAsync(m => m.RabbitMqMessageId == msgDto.RabbitMqMessageId, stoppingToken);

@@ -34,7 +34,7 @@ builder.Services.AddSingleton<SegundaOportunidad.Services.RabbitMqPublisher>();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<SegundaOportunidad.Services.PieSocketService>();
 builder.Services.AddHostedService<SegundaOportunidad.Services.ChatBackgroundService>();
-builder.Services.AddControllersWithViews()
+builder.Services.AddControllersWithViews(options => options.Filters.Add<VerifiedAccessFilter>())
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;

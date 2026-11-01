@@ -20,7 +20,7 @@
                     <p class="mb-0 text-white-50">Completa los detalles para darle una segunda oportunidad a tu objeto.</p>
                 </div>
                 <div class="card-body p-5">
-                    <form asp-action="Create">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                         
                         <div class="mb-4">
@@ -81,11 +81,13 @@
                         </div>
 
                         <div class="mb-4">
-                            <label asp-for="ImageUrl" class="form-label fw-bold text-dark">URL de Imagen (Opcional)</label>
-                            <input asp-for="ImageUrl" class="form-control form-control-lg bg-light border-0" placeholder="https://ejemplo.com/imagen.jpg" />
-                            <span asp-validation-for="ImageUrl" class="text-danger small"></span>
-                            <div class="form-text">Por el momento las imágenes se cargan mediante un enlace URL directo.</div>
-                        </div>
+    <label for="imagen" class="form-label fw-bold text-dark">Fotografía del artículo <span class="text-danger">*</span></label>
+    <input id="imagen" name="imagen" type="file" accept="image/jpeg,image/png" required class="form-control form-control-lg bg-light border-0" aria-describedby="imagen-ayuda" />
+    @Html.ValidationMessage("imagen", new { @class = "text-danger small" })
+    <div id="imagen-ayuda" class="form-text">Sube una foto real en PNG o JPEG, hasta 4 MB. El administrador podrá contrastarla con el título y la descripción mediante AdminGuard.</div>
+    <img id="imagen-preview" alt="Vista previa de la fotografía seleccionada" hidden class="img-fluid rounded-4 border mt-3" style="max-height:280px;object-fit:contain" />
+    <p id="imagen-error" class="text-danger small mt-2" role="alert" hidden></p>
+</div>
 
                         <div class="d-grid mt-5">
                             <button type="submit" class="btn btn-brand btn-lg rounded-pill shadow-sm py-3 fw-bold">Publicar Artículo</button>
@@ -128,6 +130,22 @@
                 toggleModalidadFields();
             }
         });
+        (() => {
+            const input=document.getElementById('imagen'), preview=document.getElementById('imagen-preview'), error=document.getElementById('imagen-error');
+            let url;
+            if(!input) return;
+            input.addEventListener('change',() => {
+                if(url) URL.revokeObjectURL(url);
+                preview.hidden=true; error.hidden=true; input.setCustomValidity('');
+                const file=input.files[0]; if(!file) return;
+                if(file.size>4*1024*1024 || !['image/png','image/jpeg'].includes(file.type)) {
+                    input.setCustomValidity('Selecciona PNG o JPEG de hasta 4 MB.');
+                    error.textContent=input.validationMessage; error.hidden=false; return;
+                }
+                url=URL.createObjectURL(file); preview.src=url; preview.hidden=false;
+            });
+            window.addEventListener('pagehide',() => { if(url) URL.revokeObjectURL(url); });
+        })();
     </script>
 }
 

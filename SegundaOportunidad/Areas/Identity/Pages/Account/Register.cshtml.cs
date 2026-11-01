@@ -70,6 +70,11 @@ namespace SegundaOportunidad.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
+            [Required(ErrorMessage="Introduce tus nombres y apellidos completos.")]
+            [StringLength(150,MinimumLength=3)]
+            [SegundaOportunidad.Models.NombreCompleto]
+            [Display(Name="Nombres y apellidos completos")]
+            public string FullName { get; set; }
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -109,11 +114,13 @@ namespace SegundaOportunidad.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
+            ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
                 user.RegisteredAtUtc = DateTime.UtcNow;
+                user.FullName = SegundaOportunidad.Models.NombreCompletoAttribute.Normalizar(Input.FullName);
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);

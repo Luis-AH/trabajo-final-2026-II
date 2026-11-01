@@ -192,13 +192,13 @@
                 <h4 class="fw-bold mb-3" id="verificarDniModalLabel">Verifica tu identidad</h4>
                 <p class="text-muted mb-4">Para garantizar la seguridad de nuestra comunidad, necesitamos verificar tu identidad. Por favor ingresa tu número de DNI.</p>
                 
-                <form asp-controller="Home" asp-action="SubmitDni" method="post">
+                <form asp-controller="Verificacion" asp-action="Solicitar" method="post"><label for="verification-name" class="form-label">Nombres y apellidos completos</label><input id="verification-name" name="nombreCompleto" value="@Model.FullName" autocomplete="name" required minlength="3" maxlength="150" class="form-control mb-3" />
                     <div class="form-floating mb-4">
                         <input type="text" class="form-control rounded-pill text-center fs-5" id="dniInput" name="Dni" placeholder="DNI" required pattern="[0-9]{8}" maxlength="8">
                         <label for="dniInput">Número de DNI (8 dígitos)</label>
                     </div>
                     <button type="submit" class="btn btn-brand w-100 rounded-pill py-3 fw-bold shadow-sm">
-                        Subir y Verificar
+                        Enviar solicitud al administrador
                     </button>
                 </form>
             </div>

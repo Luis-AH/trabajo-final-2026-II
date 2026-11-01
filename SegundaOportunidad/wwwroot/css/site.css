@@ -42,3 +42,7 @@ body {
 .btn-brand:hover { background-color: #12382a; color: white; }
 .btn-outline-brand { color: var(--bs-brand); border-color: var(--bs-brand); }
 .btn-outline-brand:hover { background-color: var(--bs-brand); color: white; }
+/* La cuenta y el cierre de sesión deben seguir accesibles con menús largos. */
+.dashboard-side-scroll{overflow-y:auto;overscroll-behavior:contain;}
+.dashboard-account-card{padding:14px;border:1px solid #dce7dc;border-radius:14px;background:#f7faf4;flex-shrink:0;}
+.dashboard-side-scroll .nav{flex-shrink:0;}

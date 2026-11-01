@@ -20,7 +20,7 @@ namespace SegundaOportunidad.Services
             _index = _client.InitIndex("articulos");
         }
 
-        public async Task IndexArticuloAsync(Articulo articulo)
+        public virtual async Task IndexArticuloAsync(Articulo articulo)
         {
             try
             {

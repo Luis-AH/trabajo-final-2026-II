@@ -24,12 +24,15 @@ internal static class GuardLiveChecks
         await db.Database.MigrateAsync();
         db.Users.Add(new ApplicationUser { Id = "test-admin", UserName = "test-admin" });
         db.Categorias.Add(new Categoria { Id = 1, Name = "Deportes" });
+        var remoteReader=new AdminGuardImageReader(imageHttp,options);
+        var photo=await remoteReader.LeerAsync("https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=320&q=70",default);
         db.Articulos.Add(new Articulo { Id = "test-bicicleta", UserId = "test-admin", CategoriaId = 1,
             Title = "Bicicleta de ejemplo", Description = "Fotografía pública para comprobar el análisis visual; estado y propiedad no verificados.",
-            ImageUrl = "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=320&q=70" });
+            ImageUrl = "/Articulos/Imagen/test-bicicleta" });
+        db.FotosArticulos.Add(new FotoArticulo { ArticuloId="test-bicicleta",Contenido=photo.Bytes,Mime=photo.Mime });
         await db.SaveChangesAsync();
         var client = new AdminGuardClient(http,options);
-        var service = new AdminGuardService(db,client,new AdminGuardImageReader(imageHttp,options),TimeProvider.System,new AdminGuardGate());
+        var service = new AdminGuardService(db,client,new AdminGuardImageReader(imageHttp,options,db),TimeProvider.System,new AdminGuardGate());
         var id = await service.ConsultarAsync("test-admin",new() { Tipo=TipoConsultaAdminGuard.Publicacion,ObjetivoId="test-bicicleta",
             Pregunta="Describe brevemente qué ves en la fotografía y si coincide con el título. No determines autenticidad ni culpabilidad." },default);
         var analysis = await db.AnalisisAdminGuard.SingleAsync(a => a.Id == id);

@@ -37,7 +37,7 @@ public sealed class AdminPublicacionesController(ApplicationDbContext db, Algoli
         model.Pagina = Math.Min(pagina, model.Paginas);
         model.Publicaciones = await query.Include(a => a.User).Include(a => a.Categoria)
             .OrderByDescending(a => a.CreatedAt).ThenBy(a => a.Id).Skip((model.Pagina - 1) * 20).Take(20).ToListAsync(ct);
-        model.Categorias = await db.Categorias.AsNoTracking().OrderBy(c => c.Name).ToListAsync(ct);
+        model.Categorias = await db.Categorias.AsNoTracking().OrderBy(c => c.Name=="Otros...").ThenBy(c => c.Name).ToListAsync(ct);
         return View(model);
     }
 

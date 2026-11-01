@@ -42,7 +42,7 @@ namespace SegundaOportunidad.Controllers
                 query = query.Where(a => a.CategoriaId == categoriaId.Value);
             }
 
-            ViewData["Categorias"] = new SelectList(_context.Categorias, "Id", "Name");
+            ViewData["Categorias"] = new SelectList(_context.Categorias.OrderBy(c => c.Name=="Otros...").ThenBy(c => c.Name), "Id", "Name");
             return View(await query.ToListAsync());
         }
 
@@ -80,14 +80,15 @@ namespace SegundaOportunidad.Controllers
         // GET: Articulos/Create
         public IActionResult Create()
         {
-            ViewData["CategoriaId"] = new SelectList(_context.Categorias, "Id", "Name");
+            ViewData["CategoriaId"] = new SelectList(_context.Categorias.OrderBy(c => c.Name=="Otros...").ThenBy(c => c.Name), "Id", "Name");
             return View();
         }
 
         // POST: Articulos/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Title,Description,ImageUrl,Modalidad,EstadoFisico,Price,ExchangeDetails,CategoriaId")] Articulo articulo)
+        [RequestSizeLimit(5*1024*1024)]
+        public async Task<IActionResult> Create([Bind("Title,Description,Modalidad,EstadoFisico,Price,ExchangeDetails,CategoriaId")] Articulo articulo,IFormFile? imagen,CancellationToken ct)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -98,6 +99,10 @@ namespace SegundaOportunidad.Controllers
             ModelState.Remove("UserId");
             ModelState.Remove("User");
             ModelState.Remove("Categoria");
+            FotoArticulo? foto=null;
+            try { foto=await ArticuloPhotoService.LeerAsync(imagen,ct); }
+            catch(ArgumentException ex) { ModelState.AddModelError("imagen",ex.Message); }
+            if(!await _context.Categorias.AnyAsync(c => c.Id==articulo.CategoriaId,ct)) ModelState.AddModelError("CategoriaId","Selecciona una categoría válida.");
 
             if (ModelState.IsValid)
             {
@@ -105,8 +110,11 @@ namespace SegundaOportunidad.Controllers
                 articulo.UserId = user.Id;
                 articulo.CreatedAt = DateTime.UtcNow;
                 articulo.IsActive = true;
+                articulo.ImageUrl = "/Articulos/Imagen/"+articulo.Id;
+                foto!.ArticuloId=articulo.Id;
 
                 _context.Add(articulo);
+                _context.FotosArticulos.Add(foto);
                 await _context.SaveChangesAsync();
 
                 // Indexar en Algolia
@@ -122,8 +130,20 @@ namespace SegundaOportunidad.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoriaId"] = new SelectList(_context.Categorias, "Id", "Name", articulo.CategoriaId);
+            ViewData["CategoriaId"] = new SelectList(_context.Categorias.OrderBy(c => c.Name=="Otros...").ThenBy(c => c.Name), "Id", "Name", articulo.CategoriaId);
             return View(articulo);
+        }
+
+        [AllowAnonymous,HttpGet]
+        public async Task<IActionResult> Imagen(string id,CancellationToken ct)
+        {
+            var articles=User.IsInRole("Admin") ? _context.Articulos.IgnoreQueryFilters() : _context.Articulos;
+            if(!await articles.AnyAsync(a => a.Id==id,ct)) return NotFound();
+            var foto=await _context.FotosArticulos.AsNoTracking().SingleOrDefaultAsync(f => f.ArticuloId==id,ct);
+            if(foto==null) return NotFound();
+            Response.Headers["X-Content-Type-Options"]="nosniff";
+            Response.Headers.CacheControl="no-store";
+            return File(foto.Contenido,foto.Mime);
         }
     }
 }

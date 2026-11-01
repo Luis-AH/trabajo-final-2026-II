@@ -1,13 +1,24 @@
 using System.Net;
 using System.Net.Sockets;
 using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
+using SegundaOportunidad.Data;
 
 namespace SegundaOportunidad.Services;
 public interface IAdminGuardImageReader { Task<(byte[] Bytes, string Mime)> LeerAsync(string url, CancellationToken ct); }
-public sealed class AdminGuardImageReader(HttpClient http, IOptions<AdminGuardOptions> options) : IAdminGuardImageReader
+public sealed class AdminGuardImageReader(HttpClient http, IOptions<AdminGuardOptions> options, ApplicationDbContext? db = null) : IAdminGuardImageReader
 {
     public async Task<(byte[] Bytes, string Mime)> LeerAsync(string url, CancellationToken ct)
     {
+        const string prefix="/Articulos/Imagen/";
+        if(url.StartsWith(prefix,StringComparison.Ordinal))
+        {
+            if(db==null) throw new InvalidOperationException("No está disponible el almacén local de fotografías.");
+            var id=url[prefix.Length..];
+            var local=await db.FotosArticulos.IgnoreQueryFilters().AsNoTracking().SingleOrDefaultAsync(f => f.ArticuloId==id,ct);
+            if(local==null) throw new InvalidOperationException("La fotografía local no existe.");
+            return (local.Contenido,local.Mime);
+        }
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme != "https" || !uri.IsDefaultPort || !string.IsNullOrEmpty(uri.UserInfo)
             || !options.Value.ImageHosts.Contains(uri.IdnHost, StringComparer.OrdinalIgnoreCase))
             throw new InvalidOperationException("La imagen debe usar HTTPS y un dominio autorizado en AdminGuard:ImageHosts.");

@@ -43,8 +43,12 @@ namespace SegundaOportunidad.Controllers
             var user = await _userManager.FindByIdAsync(id);
             if (user != null)
             {
+                if (string.IsNullOrWhiteSpace(user.Dni) || !System.Text.RegularExpressions.Regex.IsMatch(user.Dni,"^[0-9]{8}$"))
+                    return BadRequest("El usuario debe enviar una solicitud con DNI válido antes de aprobarlo.");
                 user.IsVerified = true;
-                await _userManager.UpdateAsync(user);
+                user.VerifiedAtUtc = DateTime.UtcNow;
+                user.VerifiedByAdminId = _userManager.GetUserId(User);
+                if (!(await _userManager.UpdateAsync(user)).Succeeded) return Conflict("La cuenta cambió; recarga antes de decidir.");
                 
                 // Invalidar caché del dashboard para que el usuario vea el cambio
                 await _redisService.RemoveCacheAsync($"dashboard_stats_{user.Id}");
@@ -62,6 +66,9 @@ namespace SegundaOportunidad.Controllers
             {
                 // Al rechazar, limpiamos el DNI para que pueda volver a enviarlo
                 user.Dni = null; 
+                user.IsVerified = false;
+                user.VerifiedAtUtc = null;
+                user.VerifiedByAdminId = null;
                 await _userManager.UpdateAsync(user);
                 
                 await _redisService.RemoveCacheAsync($"dashboard_stats_{user.Id}");

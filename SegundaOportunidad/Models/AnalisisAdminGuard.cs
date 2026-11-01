@@ -29,4 +29,27 @@ public sealed class PanelAdminGuardViewModel
     public string? Error { get; set; }
     public ConsultaAdminGuardViewModel Consulta { get; set; } = new();
     public List<AnalisisAdminGuard> Historial { get; set; } = [];
+    public Articulo? Publicacion { get; set; }
+    public Reporte? ReporteActual { get; set; }
+    public int Antecedentes { get; set; }
+    public int DecisionesSanciones { get; set; }
+}
+public sealed class GuardGalleryViewModel
+{
+    public string? Busqueda { get; set; }
+    public EstadoModeracion? Estado { get; set; }
+    public int Pagina { get; set; }
+    public int Total { get; set; }
+    public int Paginas => Math.Max(1,(Total+11)/12);
+    public List<GuardPublicationCard> Publicaciones { get; set; } = [];
+}
+public sealed record GuardPublicationCard(string Id,string Titulo,string Descripcion,string? Imagen,string Categoria,EstadoModeracion Estado,DateTime CreadoUtc);
+public sealed class GuardReportsViewModel
+{
+    public string? Busqueda { get; set; }
+    public EstadoReporte? Estado { get; set; }
+    public int Pagina { get; set; }
+    public int Total { get; set; }
+    public int Paginas => Math.Max(1,(Total+11)/12);
+    public List<Reporte> Reportes { get; set; } = [];
 }

@@ -7,6 +7,7 @@
 }
 
 @if (!string.IsNullOrEmpty(activeChatUserId)) { <a asp-controller="Reportes" asp-action="Crear" asp-route-usuarioId="@activeChatUserId" class="btn btn-outline-secondary m-3">Reportar comportamiento del usuario</a> }
+@Html.AntiForgeryToken()
 <div class="container-fluid py-4" style="background-color: #fcfcfc;">
     <div class="row">
         <!-- Mobile Header (Visible only on small screens) -->
@@ -216,7 +217,8 @@
                     await fetch('/Mensajes/SendMessage', {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
                         },
                         body: JSON.stringify({
                             receiverId: activeUserId,
@@ -306,7 +308,7 @@
             const innerDiv = document.createElement('div');
             innerDiv.className = isSent ? 'bg-brand text-white p-2 rounded-3' : 'bg-light p-2 rounded-3 border';
             innerDiv.style.maxWidth = '75%';
-            innerDiv.innerHTML = `${content} <div class="text-end ${isSent ? 'text-white-50' : 'text-muted'}" style="font-size: 0.7rem;">Ahora</div>`;
+            innerDiv.textContent = content;
             
             div.appendChild(innerDiv);
             container.appendChild(div);

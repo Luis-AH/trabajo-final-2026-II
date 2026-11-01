@@ -11,6 +11,8 @@ namespace SegundaOportunidad.Models
         public string SanctionVersion { get; set; } = Guid.NewGuid().ToString();
         public string? Dni { get; set; }
         public bool IsVerified { get; set; } = false;
+        public DateTime? VerifiedAtUtc { get; set; }
+        public string? VerifiedByAdminId { get; set; }
         
         // Estadísticas de impacto
         public decimal Co2Saved { get; set; } = 0;

@@ -45,7 +45,7 @@ public sealed class AdminDashboardService(ApplicationDbContext db)
             Pendientes = estados.Where(x => x.Estado == EstadoIntercambio.Pendiente).Sum(x => x.Total),
             Aceptados = estados.Where(x => x.Estado == EstadoIntercambio.Aceptado).Sum(x => x.Total),
             Completados = estados.Where(x => x.Estado == EstadoIntercambio.Completado).Sum(x => x.Total),
-            Categorias = await db.Categorias.AsNoTracking().OrderBy(c => c.Name).ToListAsync(ct),
+            Categorias = await db.Categorias.AsNoTracking().OrderBy(c => c.Name=="Otros...").ThenBy(c => c.Name).ToListAsync(ct),
             PorCategoria = categorias.Select(x => new DashboardSerie(x.Nombre, x.Total)).ToList()
         };
         for (var mes = new DateTime(desde.Year, desde.Month, 1); mes <= hasta; mes = mes.AddMonths(1))

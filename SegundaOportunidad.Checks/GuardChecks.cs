@@ -35,6 +35,10 @@ internal static class GuardChecks
         var page = await admin.GetAsync("/AdminGuard");
         Check(page.IsSuccessStatusCode,"Panel Razor renderizado");
         var token = WebUtility.HtmlDecode(Regex.Match(await page.Content.ReadAsStringAsync(),"name=\"__RequestVerificationToken\"[^>]*value=\"([^\"]+)\"").Groups[1].Value);
+        var direct=await admin.GetAsync("/AdminGuard/Consultar?tipo=Publicacion&objetivoId=art");
+        Check(direct.StatusCode==HttpStatusCode.Redirect && direct.Headers.Location!.ToString().Contains("AdminGuard"),"Acceso GET a Consultar redirige al panel");
+        var invalid=await admin.PostAsync("/AdminGuard/Consultar",new FormUrlEncodedContent(new Dictionary<string,string> { ["Tipo"]="Publicacion",["ObjetivoId"]="no-existe",["Pregunta"]="Analizar una publicación",["__RequestVerificationToken"]=token }));
+        Check(invalid.IsSuccessStatusCode && (await invalid.Content.ReadAsStringAsync()).Contains("El elemento no"),"Referencia inexistente muestra error en panel, no 404");
         Check((await admin.PostAsync("/AdminGuard/Consultar",new FormUrlEncodedContent(new Dictionary<string,string>()))).StatusCode == HttpStatusCode.BadRequest,"IA exige antiforgery");
         var sent = await admin.PostAsync("/AdminGuard/Consultar",new FormUrlEncodedContent(new Dictionary<string,string> { ["Tipo"]="Estadisticas", ["Pregunta"]="Qué revisión conviene priorizar", ["__RequestVerificationToken"]=token }));
         Check(sent.StatusCode == HttpStatusCode.Redirect,"Consulta HTTP con proveedor simulado");
@@ -52,6 +56,10 @@ internal static class GuardChecks
         article.Description = "contacto private@example.com password=SECRETTEST teléfono 999888777";
         db.Articulos.Add(new Articulo { Id="twin", UserId="member", CategoriaId=1, ImageUrl=article.ImageUrl, Title="Otro artículo" });
         await db.SaveChangesAsync();
+        var selected=await admin.GetStringAsync("/AdminGuard/Analizar?id=art");
+        Check(selected.Contains("name=\"ObjetivoId\"") && selected.Contains("value=\"art\""),"Publicación seleccionada en página de análisis dedicada");
+        var publication=await admin.PostAsync("/AdminGuard/Consultar",new FormUrlEncodedContent(new Dictionary<string,string> { ["Tipo"]="Publicacion",["ObjetivoId"]="art",["Pregunta"]="Contrasta foto y descripción",["__RequestVerificationToken"]=token }));
+        Check(publication.StatusCode==HttpStatusCode.Redirect && (await admin.GetAsync(publication.Headers.Location)).IsSuccessStatusCode,"Análisis de publicación por formulario llega a resultado");
         var one = await service.ConsultarAsync("admin",new() { Tipo=TipoConsultaAdminGuard.Publicacion,ObjetivoId="art",Pregunta="Comparar fotografía y descripción" },default);
         Check(!fake.LastData.Contains("private@example.com") && !fake.LastData.Contains("SECRETTEST") && !fake.LastData.Contains("999888777"),"Redacción de contactos y secretos en texto");
         Check(!fake.LastData.Contains("PasswordHash") && !fake.LastData.Contains("SecurityStamp"),"No se envían entidades Identity");

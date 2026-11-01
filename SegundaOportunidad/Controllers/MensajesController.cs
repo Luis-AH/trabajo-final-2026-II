@@ -26,9 +26,11 @@ namespace SegundaOportunidad.Controllers
         {
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null) return Challenge();
+            if (!string.IsNullOrEmpty(userId) && !await _context.ApprovedParticipants().AnyAsync(u => u.Id == userId))
+                return BadRequest("Solo puedes conversar con usuarios aprobados.");
 
             // Lista de contactos (usuarios con los que se ha intercambiado o algo así)
-            var users = await _context.Users
+            var users = await _context.ApprovedParticipants()
                 .Where(u => u.Id != currentUser.Id)
                 .ToListAsync();
 
@@ -52,10 +54,14 @@ namespace SegundaOportunidad.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SendMessage([FromBody] SendMessageDto dto)
         {
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null) return Unauthorized();
+            var ahora = DateTime.UtcNow;
+            if (dto.ReceiverId == currentUser.Id || !await _context.ApprovedParticipants().AnyAsync(u => u.Id == dto.ReceiverId && (u.AccountSuspendedUntilUtc == null || u.AccountSuspendedUntilUtc <= ahora)))
+                return BadRequest("El destinatario debe estar aprobado y sin suspensión de cuenta.");
 
             if (string.IsNullOrEmpty(dto.ReceiverId) || string.IsNullOrEmpty(dto.Content))
             {

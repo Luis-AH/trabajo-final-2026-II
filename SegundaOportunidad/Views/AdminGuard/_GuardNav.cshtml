@@ -1,0 +1,2 @@
+﻿@{ var current=ViewContext.RouteData.Values["action"]?.ToString(); }
+<nav class="guard-nav" aria-label="Tareas de AdminGuard"><a asp-action="Index" aria-current="@(current=="Index" ? "page" : null)">AdminGuard</a><a asp-action="Datos" aria-current="@(current=="Datos" ? "page" : null)">Consultar datos</a><a asp-action="Publicaciones" aria-current="@(current is "Publicaciones" or "Analizar" ? "page" : null)">Publicaciones</a><a asp-action="Reportes" aria-current="@(current is "Reportes" or "Resumen" ? "page" : null)">Reportes</a></nav>

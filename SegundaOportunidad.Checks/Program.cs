@@ -21,6 +21,12 @@ using SegundaOportunidad.Services;
 if (args.Length == 2 && args[0] == "--upgrade-db") { await DatabaseUpgrade.Run(args[1]); return; }
 if (args.Length == 2 && args[0] == "--verify-db") { await DatabaseVerification.Run(args[1]); return; }
 if (args.Length == 2 && args[0] == "--bootstrap-admin") { await AdminBootstrap.Run(args[1]); return; }
+if (args.Length == 2 && args[0] == "--reset-content")
+{
+    try { await ResetContent.Run(args[1]); }
+    catch(Exception ex) { Console.Error.WriteLine("No se completó la limpieza: "+ex.Message); Environment.ExitCode=1; }
+    return;
+}
 if (args.Length == 1 && args[0] == "--smtp-live")
 {
     try { await SmtpLiveChecks.Run(); }

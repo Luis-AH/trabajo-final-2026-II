@@ -14,7 +14,7 @@ internal static class LegacyTokensChecks
         await using var db = new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(connection).Options);
         var previous = db.Database.GetMigrations().Single(m => m.EndsWith("GestionUsuariosSanciones"));
         await db.GetService<IMigrator>().MigrateAsync(previous);
-        db.Users.Add(new ApplicationUser { Id = "legacy", SanctionVersion = "" });
+        await db.Database.ExecuteSqlRawAsync("INSERT INTO AspNetUsers (Id,FullName,IsVerified,Co2Saved,ObjectsReused,FamiliesHelped,Rating,EmailConfirmed,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnabled,AccessFailedCount,SanctionVersion) VALUES ('legacy','',0,'0',0,0,'0',0,0,0,0,0,'');");
         db.Categorias.Add(new Categoria { Id = 1, Name = "Prueba" });
         db.Articulos.AddRange(new Articulo { Id = "old1", UserId = "legacy", CategoriaId = 1, ModeracionVersion = "" }, new Articulo { Id = "old2", UserId = "legacy", CategoriaId = 1, ModeracionVersion = "" });
         await db.SaveChangesAsync();

@@ -97,9 +97,9 @@
                 </div>
             </div>
 
-            @if (User.Identity?.IsAuthenticated == true && !isOwner) { <div class="d-flex gap-3 mb-3"><a asp-controller="Reportes" asp-action="Crear" asp-route-articuloId="@Model.Id">Reportar publicación</a><a asp-controller="Reportes" asp-action="Crear" asp-route-usuarioId="@Model.UserId">Reportar comportamiento del usuario</a></div> }
+            @if (User.Identity?.IsAuthenticated == true && !isOwner && Context.Items["CanParticipate"] as bool? == true) { <div class="d-flex gap-3 mb-3"><a asp-controller="Reportes" asp-action="Crear" asp-route-articuloId="@Model.Id">Reportar publicación</a><a asp-controller="Reportes" asp-action="Crear" asp-route-usuarioId="@Model.UserId">Reportar comportamiento del usuario</a></div> }
 <!-- Acciones -->
-            @if (!isOwner) {
+            @if (User.Identity?.IsAuthenticated == true && Context.Items["CanParticipate"] as bool? != true) { <div class="alert alert-warning">Necesitas aprobación del administrador para participar. <a asp-controller="Verificacion" asp-action="Index">Verificar mi cuenta</a></div> } else if (!isOwner) {
                 <div class="d-grid gap-3">
                     @if (Model.Modalidad == ModalidadArticulo.Intercambio) {
                         @if (!Model.IsActive) {

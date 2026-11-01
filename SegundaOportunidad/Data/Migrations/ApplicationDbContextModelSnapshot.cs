@@ -285,6 +285,12 @@ namespace SegundaOportunidad.Data.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("VerifiedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("VerifiedByAdminId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -293,6 +299,8 @@ namespace SegundaOportunidad.Data.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
+
+                    b.HasIndex("VerifiedByAdminId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -408,6 +416,37 @@ namespace SegundaOportunidad.Data.Migrations
                     b.HasIndex("ReporteId");
 
                     b.ToTable("DecisionesReportes");
+                });
+
+            modelBuilder.Entity("SegundaOportunidad.Models.EstadoSistema", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaUtc")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EstadosSistema");
+                });
+
+            modelBuilder.Entity("SegundaOportunidad.Models.FotoArticulo", b =>
+                {
+                    b.Property<string>("ArticuloId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("Contenido")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("Mime")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ArticuloId");
+
+                    b.ToTable("FotosArticulos");
                 });
 
             modelBuilder.Entity("SegundaOportunidad.Models.Intercambio", b =>
@@ -679,6 +718,14 @@ namespace SegundaOportunidad.Data.Migrations
                     b.Navigation("Administrador");
                 });
 
+            modelBuilder.Entity("SegundaOportunidad.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("SegundaOportunidad.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("VerifiedByAdminId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
             modelBuilder.Entity("SegundaOportunidad.Models.Articulo", b =>
                 {
                     b.HasOne("SegundaOportunidad.Models.Categoria", "Categoria")
@@ -715,6 +762,17 @@ namespace SegundaOportunidad.Data.Migrations
                     b.Navigation("Administrador");
 
                     b.Navigation("Reporte");
+                });
+
+            modelBuilder.Entity("SegundaOportunidad.Models.FotoArticulo", b =>
+                {
+                    b.HasOne("SegundaOportunidad.Models.Articulo", "Articulo")
+                        .WithOne()
+                        .HasForeignKey("SegundaOportunidad.Models.FotoArticulo", "ArticuloId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Articulo");
                 });
 
             modelBuilder.Entity("SegundaOportunidad.Models.Intercambio", b =>

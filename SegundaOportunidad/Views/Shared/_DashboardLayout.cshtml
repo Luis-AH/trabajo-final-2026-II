@@ -4,6 +4,8 @@
     
     var controller = ViewContext.RouteData.Values["controller"]?.ToString();
     var action = ViewContext.RouteData.Values["action"]?.ToString();
+    var adminWorkspace = controller is "Admin" or "AdminPublicaciones" or "AdminUsuarios" or "AdminReportes" or "AdminGuard" or "Seguridad" or "Supervisor" or "Reportes" or "Verificacion";
+    var adminLinks = new[] { ("Admin", "Resumen"), ("AdminPublicaciones", "Publicaciones"), ("AdminUsuarios", "Usuarios"), ("AdminReportes", "Reportes"), ("AdminGuard", "AdminGuard IA"), ("Seguridad", "Seguridad"), ("Supervisor", "Verificaciones") };
 
     string GetActive(string c, string a = "Index") => 
         (controller == c && action == a) ? "active bg-brand-light text-brand fw-bold rounded-3" : "text-dark";
@@ -12,7 +14,7 @@
         (controller == c && action == a) ? "text-brand" : "text-muted";
 }
 
-<div class="container-fluid min-vh-100 p-0" style="background-color: #fcfcfc;">
+<div class="container-fluid min-vh-100 p-0 @(adminWorkspace ? "admin-shell" : "")" style="background-color: #fcfcfc;">
     <div class="row g-0 h-100">
         
         <!-- Mobile Header (Visible only on small screens) -->
@@ -26,7 +28,7 @@
         </div>
 
         <!-- Sidebar (Hidden on small screens) -->
-        <div class="col-lg-2 bg-white border-end shadow-sm d-none d-lg-block position-fixed h-100">
+        <div class="col-lg-2 bg-white border-end shadow-sm d-none d-lg-block position-fixed h-100 dashboard-side-scroll">
             <div class="d-flex flex-column h-100 p-4">
                 <a asp-controller="Home" asp-action="Dashboard" class="d-flex align-items-center mb-5 text-dark text-decoration-none fw-bold fs-4">
                     <i class="bi bi-bullseye text-brand me-2"></i>
@@ -89,20 +91,15 @@
                 </ul>
 
                 <hr>
-                <div class="dropdown">
-                    <a href="#" class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="rounded-circle bg-brand text-white d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
-                            <i class="bi bi-person-fill"></i>
-                        </div>
-                        <strong>@User.Identity?.Name</strong>
+                <div class="dashboard-account-card">
+                    <a asp-controller="Perfil" asp-action="Index" class="d-flex align-items-center text-dark text-decoration-none mb-2">
+                        <span class="rounded-circle bg-brand text-white d-inline-flex align-items-center justify-content-center me-2" style="width:32px;height:32px;flex-shrink:0" aria-hidden="true">●</span>
+                        <span class="small text-break">Mi cuenta<br /><strong>@User.Identity?.Name</strong></span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                        <li>
-                            <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
-                                <button type="submit" class="dropdown-item">Cerrar Sesión</button>
-                            </form>
-                        </li>
-                    </ul>
+                    <a asp-controller="Perfil" asp-action="Index" class="d-block small mb-2">Ver mi perfil</a>
+                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post">
+                        <button type="submit" class="btn btn-outline-danger btn-sm w-100">Cerrar sesión</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -184,7 +181,27 @@
         </div>
 
         <!-- Main Content (takes remaining width) -->
-        <div class="col-12 col-lg-10 offset-lg-2">
+        <div class="col-12 col-lg-10 offset-lg-2 @(adminWorkspace ? "admin-workspace" : "")">
+            @if (adminWorkspace)
+            {
+                <div class="admin-topbar">
+                    <div class="admin-hero">
+                        <div class="admin-eyebrow">SegundaOportunidad · @(User.IsInRole("Admin") ? "Administración" : "Comunidad")</div>
+                        <p class="admin-hero-title">@(controller == "AdminGuard" ? "Una mirada más, una mejor decisión." : "Cuidamos lo que vuelve a empezar.")</p>
+                        <p class="admin-hero-subtitle">@(User.IsInRole("Admin") ? "Gestiona tu comunidad con información real, criterio y confianza." : "Tu participación ayuda a construir una comunidad más segura.")</p>
+                    </div>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <nav class="admin-section-nav" aria-label="Secciones de administración">
+                            @foreach (var link in adminLinks)
+                            {
+                                <a asp-controller="@link.Item1" asp-action="Index" aria-current="@(controller == link.Item1 ? "page" : null)">@link.Item2</a>
+                            }
+                        </nav>
+                    }
+                </div>
+            }
+            @if (User.Identity?.IsAuthenticated == true && !User.IsInRole("Admin") && Context.Items["CanParticipate"] as bool? != true) { <div class="alert alert-warning m-3 mb-0">Tu cuenta está en modo exploración. <a asp-controller="Verificacion" asp-action="Index">Solicita o consulta tu aprobación</a> para publicar, conversar, intercambiar y reportar.</div> }
             @RenderBody()
         </div>
     </div>
@@ -202,6 +219,7 @@
     .btn-outline-brand:hover { background-color: #217346; color: white; }
     .text-brand { color: #217346 !important; }
 </style>
+<link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
 
 @section Scripts {
     @RenderSection("Scripts", required: false)

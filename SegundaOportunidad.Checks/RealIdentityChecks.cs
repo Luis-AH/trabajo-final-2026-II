@@ -43,10 +43,11 @@ internal static class RealIdentityChecks
         builder.Services.AddSingleton<AdminGuardGate>();
         builder.Services.AddScoped<AdminGuardService>();
         builder.Services.AddSingleton<RedisService>();
-        builder.Services.AddSingleton(new AlgoliaService(new Microsoft.Extensions.Configuration.ConfigurationBuilder().Build()));
-        builder.Services.AddControllersWithViews();
+        builder.Services.AddSingleton<AlgoliaService,PublicationChecks.TestAlgolia>();
+        builder.Services.AddControllersWithViews(o => o.Filters.Add<VerifiedAccessFilter>());
         builder.Services.AddAccountSecurity(builder.Configuration);
         builder.Services.AddSingleton<IRecoveryEmailService,SecurityChecks.Mailbox>();
+        builder.Services.AddSingleton<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender,RegistrationChecks.TestEmailSender>();
         await using var app = builder.Build();
         app.UseAuthentication();
         app.UseRateLimiter();
@@ -63,7 +64,7 @@ internal static class RealIdentityChecks
             var users = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             foreach (var id in new[] { "admin", "member" })
             {
-                var u = new ApplicationUser { Id = id, UserName = id + "@checks.local", Email = id + "@checks.local", EmailConfirmed = true };
+                var u = new ApplicationUser { Id = id, UserName = id + "@checks.local", Email = id + "@checks.local", EmailConfirmed = true, IsVerified=true, VerifiedAtUtc=DateTime.UtcNow, VerifiedByAdminId="admin" };
                 Check((await users.CreateAsync(u, "Checks123!" )).Succeeded, "Cuenta temporal " + id);
                 if (id == "admin") await users.AddToRoleAsync(u, "Admin");
             }
@@ -130,8 +131,12 @@ internal static class RealIdentityChecks
         var restored = await admin.PostAsync("/AdminPublicaciones/Cambiar", new FormUrlEncodedContent(new Dictionary<string,string> { ["id"]="art", ["estado"]="Visible", ["motivo"]="Restauración de prueba", ["version"]=version, ["__RequestVerificationToken"]=tokenModeracion }));
         Check(restored.StatusCode == HttpStatusCode.Redirect && (await member.GetAsync("/Articulos/Details/art")).StatusCode == HttpStatusCode.OK, "Restauración devuelve detalle público");
         await ReportChecks.Run(admin, member, app.Services);
+        await GuardWorkspaceChecks.Run(admin,member,app.Services);
         await GuardChecks.Run(admin,member,app.Services);
+        await VerificationChecks.Run(admin,app.Services);
         await SecurityChecks.Run(admin,member,app.Services);
+        await RegistrationChecks.Run(services:app.Services,address:admin.BaseAddress!);
+        await PublicationChecks.Run(admin,app.Services);
         await app.StopAsync();
     }
 }

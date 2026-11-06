@@ -1,160 +1,77 @@
-using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using System.Text;
 using System.Text.Json;
 using SegundaOportunidad.Data;
 using SegundaOportunidad.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace SegundaOportunidad.Services
+namespace SegundaOportunidad.Services;
+
+public class ChatBackgroundService(IConfiguration configuration,IServiceProvider services,PieSocketService pieSocket,ILogger<ChatBackgroundService> logger):BackgroundService
 {
-    public class ChatBackgroundService : BackgroundService
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        private readonly IConfiguration _configuration;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly PieSocketService _pieSocketService;
-        private readonly ILogger<ChatBackgroundService> _logger;
-        private IConnection? _connection;
-        private IChannel? _channel;
-        private const string QueueName = "chat_messages";
-
-        public ChatBackgroundService(IConfiguration configuration, IServiceProvider serviceProvider, PieSocketService pieSocketService, ILogger<ChatBackgroundService> logger)
+        var uri=configuration["RabbitMQ:ConnectionString"];
+        if(string.IsNullOrWhiteSpace(uri)) {logger.LogWarning("RabbitMQ no configurado; mensajería pendiente de configuración.");return;}
+        while(!stoppingToken.IsCancellationRequested)
         {
-            _configuration = configuration;
-            _serviceProvider = serviceProvider;
-            _pieSocketService = pieSocketService;
-            _logger = logger;
-        }
-
-        public override async Task StartAsync(CancellationToken cancellationToken)
-        {
-            var connectionString = _configuration["RabbitMQ:ConnectionString"];
-            if (string.IsNullOrEmpty(connectionString)) return;
-
             try
             {
-                var factory = new ConnectionFactory
-                {
-                    Uri = new Uri(connectionString)
-                };
-
-                _connection = await factory.CreateConnectionAsync(cancellationToken);
-                _channel = await _connection.CreateChannelAsync(cancellationToken: cancellationToken);
-
-                await _channel.QueueDeclareAsync(
-                    queue: QueueName,
-                    durable: true,
-                    exclusive: false,
-                    autoDelete: false,
-                    arguments: null,
-                    cancellationToken: cancellationToken);
-
-                _logger.LogInformation("RabbitMQ conectado y cola declarada.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error conectando a RabbitMQ en ChatBackgroundService.");
-            }
-
-            await base.StartAsync(cancellationToken);
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            if (_channel == null) return;
-
-            var consumer = new AsyncEventingBasicConsumer(_channel);
-            consumer.ReceivedAsync += async (model, ea) =>
-            {
-                var body = ea.Body.ToArray();
-                var messageJson = Encoding.UTF8.GetString(body);
-                
-                try
-                {
-                    var msgDto = JsonSerializer.Deserialize<MessageDto>(messageJson, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
-                    if (msgDto != null)
+                var factory=new ConnectionFactory {Uri=new Uri(uri),RequestedConnectionTimeout=TimeSpan.FromSeconds(5),AutomaticRecoveryEnabled=false};
+                await using var connection=await factory.CreateConnectionAsync(stoppingToken);
+                await using var channel=await connection.CreateChannelAsync(cancellationToken:stoppingToken);
+                await channel.QueueDeclareAsync("chat_messages",durable:true,exclusive:false,autoDelete:false,arguments:null,cancellationToken:stoppingToken);
+                await channel.BasicQosAsync(0,10,false,stoppingToken);
+                var consumer=new AsyncEventingBasicConsumer(channel);
+                consumer.ReceivedAsync+=async (_,ea)=> {
+                    try
                     {
-                        using var scope = _serviceProvider.CreateScope();
-                        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                        if (!await context.ChatAllowedAsync(msgDto.SenderId,msgDto.ReceiverId,msgDto.SentAt,stoppingToken))
+                        var message=JsonSerializer.Deserialize<MessageDto>(ea.Body.Span,new JsonSerializerOptions {PropertyNameCaseInsensitive=true});
+                        if(message==null || string.IsNullOrWhiteSpace(message.RabbitMqMessageId) || string.IsNullOrWhiteSpace(message.Content))
+                            throw new JsonException("Mensaje no válido.");
+                        using var scope=services.CreateScope();
+                        var db=scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                        if(await db.ChatAllowedAsync(message.SenderId,message.ReceiverId,message.SentAt,stoppingToken))
                         {
-                            _logger.LogInformation("Mensaje anterior a la limpieza o con participantes no habilitados; no se persiste.");
-                            await _channel.BasicAckAsync(ea.DeliveryTag, false, stoppingToken);
-                            return;
-                        }
-
-                        // Idempotency check
-                        var exists = await context.Mensajes.AnyAsync(m => m.RabbitMqMessageId == msgDto.RabbitMqMessageId, stoppingToken);
-                        
-                        if (!exists)
-                        {
-                            var newMsg = new Mensaje
+                            if(!await db.Mensajes.AnyAsync(m=>m.RabbitMqMessageId==message.RabbitMqMessageId,stoppingToken))
                             {
-                                RabbitMqMessageId = msgDto.RabbitMqMessageId,
-                                Content = msgDto.Content,
-                                SenderId = msgDto.SenderId,
-                                ReceiverId = msgDto.ReceiverId,
-                                SentAt = msgDto.SentAt,
-                                IsRead = false
-                            };
-                            
-                            context.Mensajes.Add(newMsg);
-                            await context.SaveChangesAsync(stoppingToken);
-                            
-                            _logger.LogInformation("Mensaje guardado exitosamente: {MsgId}", newMsg.Id);
-                            
-                            // Broadcast to PieSocket
-                            var channelId = $"chat_{msgDto.ReceiverId}";
-                            await _pieSocketService.PublishMessageAsync(channelId, "new_message", msgDto);
+                                db.Mensajes.Add(new Mensaje {RabbitMqMessageId=message.RabbitMqMessageId,Content=message.Content,SenderId=message.SenderId,ReceiverId=message.ReceiverId,SentAt=message.SentAt});
+                                await db.SaveChangesAsync(stoppingToken);
+                                await pieSocket.PublishMessageAsync("chat_"+message.ReceiverId,"new_message",new {refresh=true});
+                            }
                         }
-                        else
-                        {
-                            _logger.LogInformation("Mensaje duplicado detectado (idempotencia), se omite: {RabbitMsgId}", msgDto.RabbitMqMessageId);
-                        }
+                        await channel.BasicAckAsync(ea.DeliveryTag,false,stoppingToken);
                     }
-
-                    // Acknowledge the message
-                    await _channel.BasicAckAsync(deliveryTag: ea.DeliveryTag, multiple: false, cancellationToken: stoppingToken);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error procesando mensaje. Nack.");
-                    // In real world, maybe nack or send to DLQ. 
-                    // For now, we ack to avoid infinite loop of poison messages, or nack with requeue=false.
-                    await _channel.BasicNackAsync(deliveryTag: ea.DeliveryTag, multiple: false, requeue: false, cancellationToken: stoppingToken);
-                }
-            };
-
-            await _channel.BasicConsumeAsync(
-                queue: QueueName,
-                autoAck: false,
-                consumer: consumer,
-                cancellationToken: stoppingToken);
-        }
-
-        public override async Task StopAsync(CancellationToken cancellationToken)
-        {
-            if (_channel != null)
-            {
-                await _channel.CloseAsync(cancellationToken: cancellationToken);
-                await _channel.DisposeAsync();
+                    catch(OperationCanceledException) when(stoppingToken.IsCancellationRequested) { }
+                    catch(JsonException)
+                    {
+                        logger.LogWarning("RabbitMQ recibió un mensaje inválido; se rechaza sin registrar contenido.");
+                        await channel.BasicNackAsync(ea.DeliveryTag,false,false,stoppingToken);
+                    }
+                    catch(Exception ex)
+                    {
+                        logger.LogWarning("No se pudo persistir mensaje ({Type}); se reencolará.",ex.GetType().Name);
+                        await Task.Delay(TimeSpan.FromSeconds(2),stoppingToken);
+                        await channel.BasicNackAsync(ea.DeliveryTag,false,true,stoppingToken);
+                    }
+                };
+                await channel.BasicConsumeAsync("chat_messages",false,consumer,stoppingToken);
+                logger.LogInformation("RabbitMQ conectado; consumidor de chat activo.");
+                while(connection.IsOpen && channel.IsOpen && !stoppingToken.IsCancellationRequested)
+                    await Task.Delay(TimeSpan.FromSeconds(1),stoppingToken);
             }
-            if (_connection != null)
-            {
-                await _connection.CloseAsync(cancellationToken: cancellationToken);
-                await _connection.DisposeAsync();
-            }
-            await base.StopAsync(cancellationToken);
+            catch(OperationCanceledException) when(stoppingToken.IsCancellationRequested) {break;}
+            catch(Exception ex) {logger.LogWarning("RabbitMQ no disponible ({Type}); próximo intento en 10 segundos.",ex.GetType().Name);}
+            try {await Task.Delay(TimeSpan.FromSeconds(10),stoppingToken);}
+            catch(OperationCanceledException) when(stoppingToken.IsCancellationRequested) {break;}
         }
-
-        private class MessageDto
-        {
-            public string RabbitMqMessageId { get; set; } = string.Empty;
-            public string Content { get; set; } = string.Empty;
-            public string SenderId { get; set; } = string.Empty;
-            public string ReceiverId { get; set; } = string.Empty;
-            public DateTime SentAt { get; set; }
-        }
+    }
+    private sealed class MessageDto
+    {
+        public string RabbitMqMessageId {get;set;}="";
+        public string Content {get;set;}="";
+        public string SenderId {get;set;}="";
+        public string ReceiverId {get;set;}="";
+        public DateTime SentAt {get;set;}
     }
 }

@@ -31,10 +31,10 @@ namespace SegundaOportunidad.Controllers
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                // Búsqueda en Algolia
+                // Algolia es una optimización; no depender de su disponibilidad para buscar.
                 var ids = await _algoliaService.SearchArticulosIdsAsync(searchString);
-                Console.WriteLine($"[Algolia Search] Query: {searchString}, Found {ids.Count} hits. IDs: {string.Join(", ", ids)}");
-                query = query.Where(a => ids.Contains(a.Id));
+                var term=searchString.Trim().ToLower();
+                query = query.Where(a => ids.Contains(a.Id) || a.Title.ToLower().Contains(term) || a.Description.ToLower().Contains(term));
             }
 
             if (categoriaId.HasValue)

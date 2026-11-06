@@ -1,11 +1,33 @@
+# Plantilla para SQLite persistente: requiere un plan de pago. No crea servicios por sí sola.
 services:
   - type: web
     name: segunda-oportunidad
-    env: docker
-    plan: free
-    dockerCommand: dotnet SegundaOportunidad.dll
+    runtime: docker
+    branch: feature/reciclaje-ronaldo
+    plan: 0.5c-512mb
+    autoDeployTrigger: "off"
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    disk:
+      name: segunda-datos
+      mountPath: /var/data
+      sizeGB: 1
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: PORT
         value: 8080
+      - key: ConnectionStrings__DefaultConnection
+        value: Data Source=/var/data/app.db;Cache=Shared
+      - key: DataProtection__KeyPath
+        value: /var/data/keys
+      - key: Gemini__Model
+        value: gemini-3.1-flash-lite
+      - key: Gemini__ApiKey
+        sync: false
+      - key: BootstrapAdmin__Email
+        sync: false
+      - key: BootstrapAdmin__Password
+        sync: false
+# Las demás integraciones se configuran en Environment según docs/auditoria-render.md.

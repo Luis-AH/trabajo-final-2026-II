@@ -19,36 +19,34 @@ namespace SegundaOportunidad.Services
 
         public async Task<string> GetCompletionAsync(string systemPrompt, string userMessage, CancellationToken cancellationToken = default)
         {
-            var apiKey = _configuration["Gemini:ApiKey"]
-                ?? _configuration["GEMINI_API_KEY"]
-                ?? _configuration["GOOGLE_API_KEY"];
+            var apiKey = Setting("Gemini:ApiKey", "GEMINI_API_KEY", "GOOGLE_API_KEY");
             if (string.IsNullOrWhiteSpace(apiKey))
             {
                 _logger.LogError("Gemini no está configurado. Defina Gemini:ApiKey o la variable GEMINI_API_KEY en el entorno.");
                 return "El asistente no está configurado. Contacta al administrador de la plataforma.";
             }
 
-            var model = _configuration["Gemini:Model"] ?? "gemini-3.8-flash";
-            var fallbackModel = _configuration["Gemini:FallbackModel"] ?? "gemini-3.7-flash";
+            var model = NormalizeModel(Setting("Gemini:Model", "GEMINI_MODEL") ?? "gemini-3.1-flash-lite");
+            var fallbackModel = NormalizeModel(Setting("Gemini:FallbackModel", "GEMINI_FALLBACK_MODEL") ?? model);
 
             var requestBody = new
             {
                 system_instruction = new { parts = new[] { new { text = systemPrompt } } },
                 contents = new[] { new { parts = new[] { new { text = userMessage } } } },
-                generationConfig = new { maxOutputTokens = 256, temperature = 0.5 }
+                generationConfig = new { maxOutputTokens = 2048, temperature = 0.5 }
             };
             var serializedRequest = JsonSerializer.Serialize(requestBody);
 
             try
             {
-                var response = await SendRequestAsync(apiKey, model, serializedRequest, cancellationToken);
+                var response = await SendWithRetriesAsync(apiKey, model, serializedRequest, cancellationToken);
                 if (response.StatusCode == HttpStatusCode.ServiceUnavailable &&
                     !string.Equals(model, fallbackModel, StringComparison.OrdinalIgnoreCase))
                 {
                     var initialError = await response.Content.ReadAsStringAsync(cancellationToken);
-                    _logger.LogWarning("Gemini model {Model} está temporalmente no disponible (503). Se reintentará con {FallbackModel}. Detalle: {ErrorBody}", model, fallbackModel, initialError);
+                    _logger.LogWarning("Gemini model {Model} no disponible (503). Reintentando con {FallbackModel}. Código: {ErrorCode}", model, fallbackModel, ErrorCode(initialError));
                     response.Dispose();
-                    response = await SendRequestAsync(apiKey, fallbackModel, serializedRequest, cancellationToken);
+                    response = await SendWithRetriesAsync(apiKey, fallbackModel, serializedRequest, cancellationToken);
                 }
 
                 using (response)
@@ -56,7 +54,7 @@ namespace SegundaOportunidad.Services
                 if (!response.IsSuccessStatusCode)
                 {
                     var errorBody = await response.Content.ReadAsStringAsync(cancellationToken);
-                    _logger.LogError("Gemini devolvió HTTP {StatusCode}: {ErrorBody}", (int)response.StatusCode, errorBody);
+                    _logger.LogError("Gemini POST {Endpoint} devolvió HTTP {StatusCode}. Cuerpo seguro: {ErrorBody}", response.RequestMessage?.RequestUri?.GetLeftPart(UriPartial.Path), (int)response.StatusCode, SafeErrorBody(errorBody));
                     return response.StatusCode switch
                     {
                         HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => "El asistente no pudo autenticarse con Gemini. Contacta al administrador.",
@@ -80,7 +78,7 @@ namespace SegundaOportunidad.Services
                     if (!string.IsNullOrWhiteSpace(text)) return text;
                 }
 
-                _logger.LogWarning("Gemini respondió correctamente sin texto utilizable. Respuesta: {Response}", root.ToString());
+                _logger.LogWarning("Gemini respondió sin texto utilizable (posible bloqueo o límite de generación).");
                 return "No pude generar una respuesta para esa consulta. Inténtalo de otra forma.";
                 }
             }
@@ -98,6 +96,64 @@ namespace SegundaOportunidad.Services
             {
                 _logger.LogError(ex, "Gemini devolvió una respuesta JSON inválida.");
                 return "El servicio del asistente devolvió una respuesta inválida. Inténtalo más tarde.";
+            }
+        }
+
+        // Los valores vacíos no deben ocultar otra variable válida.
+        private string? Setting(params string[] names) => names.Select(name => _configuration[name])
+            .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value))?.Trim();
+
+        private static string ErrorCode(string body)
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(body);
+                if (doc.RootElement.TryGetProperty("error", out var error) && error.TryGetProperty("status", out var status))
+                    return status.GetString() ?? "UNKNOWN";
+            }
+            catch (JsonException) { }
+            return "UNKNOWN";
+        }
+
+        private static string NormalizeModel(string model) => model.StartsWith("models/", StringComparison.Ordinal)
+            ? model["models/".Length..] : model;
+
+        // Proyección permitida del cuerpo: nunca registrar message/details originales,
+        // porque Google puede incluir valores de la solicitud o identificadores privados.
+        internal static string SafeErrorBody(string body)
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(body);
+                var error = doc.RootElement.GetProperty("error");
+                var code = error.TryGetProperty("code", out var c) && c.TryGetInt32(out var n) ? n : 0;
+                var status = ErrorCode(body);
+                status = status is "NOT_FOUND" or "INVALID_ARGUMENT" or "PERMISSION_DENIED" or "UNAUTHENTICATED"
+                    or "RESOURCE_EXHAUSTED" or "UNAVAILABLE" or "INTERNAL" ? status : "UNKNOWN";
+                var message = error.TryGetProperty("message", out var m) ? m.GetString() ?? "" : "";
+                var reason = message.Contains("no longer available to new users", StringComparison.OrdinalIgnoreCase)
+                    ? "MODEL_UNAVAILABLE_TO_NEW_USERS"
+                    : "MESSAGE_OMITTED_FOR_PRIVACY";
+                return JsonSerializer.Serialize(new { error = new { code, status, message = reason } });
+            }
+            catch (Exception ex) when (ex is JsonException or InvalidOperationException or KeyNotFoundException)
+            {
+                return "{\"error\":\"UNREADABLE_BODY_OMITTED\"}";
+            }
+        }
+
+        private async Task<HttpResponseMessage> SendWithRetriesAsync(string apiKey, string model, string body, CancellationToken cancellationToken)
+        {
+            // Tres intentos por modelo, con esperas de 1 y 2 segundos; nunca reintentar
+            // errores de configuración/autenticación ni cuotas agotadas.
+            for (var attempt = 1; ; attempt++)
+            {
+                var response = await SendRequestAsync(apiKey, model, body, cancellationToken);
+                if (response.StatusCode != HttpStatusCode.ServiceUnavailable || attempt == 3)
+                    return response;
+                response.Dispose();
+                _logger.LogWarning("Gemini modelo {Model}: HTTP 503, intento {Attempt}/3; reintentando", model, attempt);
+                await Task.Delay(TimeSpan.FromSeconds(attempt), cancellationToken);
             }
         }
 

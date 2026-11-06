@@ -1,54 +1,34 @@
-using RabbitMQ.Client;
+﻿using RabbitMQ.Client;
 using System.Text.Json;
 using System.Text;
 
-namespace SegundaOportunidad.Services
+namespace SegundaOportunidad.Services;
+
+public sealed class MessagingUnavailableException : Exception
 {
-    public class RabbitMqPublisher
+    public MessagingUnavailableException():base("La mensajería no está disponible temporalmente.") { }
+}
+public class RabbitMqPublisher(IConfiguration configuration)
+{
+    public async Task PublishMessageAsync<T>(string queueName,T message)
     {
-        private readonly IConfiguration _configuration;
-        private readonly string _connectionString;
-
-        public RabbitMqPublisher(IConfiguration configuration)
+        var uri=configuration["RabbitMQ:ConnectionString"];
+        if(string.IsNullOrWhiteSpace(uri)) throw new MessagingUnavailableException();
+        using var timeout=new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        try
         {
-            _configuration = configuration;
-            _connectionString = _configuration["RabbitMQ:ConnectionString"] ?? throw new ArgumentNullException("RabbitMQ:ConnectionString");
+            var factory=new ConnectionFactory {Uri=new Uri(uri),RequestedConnectionTimeout=TimeSpan.FromSeconds(5)};
+            await using var connection=await factory.CreateConnectionAsync(timeout.Token);
+            var options=new CreateChannelOptions(publisherConfirmationsEnabled:true,publisherConfirmationTrackingEnabled:true);
+            await using var channel=await connection.CreateChannelAsync(options,timeout.Token);
+            await channel.QueueDeclareAsync(queue:queueName,durable:true,exclusive:false,autoDelete:false,arguments:null,cancellationToken:timeout.Token);
+            var body=Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message,new JsonSerializerOptions {PropertyNamingPolicy=JsonNamingPolicy.CamelCase}));
+            await channel.BasicPublishAsync(exchange:"",routingKey:queueName,mandatory:true,basicProperties:new BasicProperties {Persistent=true},body:body,cancellationToken:timeout.Token);
         }
-
-        public async Task PublishMessageAsync<T>(string queueName, T message)
+        catch(Exception ex) when(ex is not MessagingUnavailableException)
         {
-            var factory = new ConnectionFactory
-            {
-                Uri = new Uri(_connectionString)
-            };
-
-            await using var connection = await factory.CreateConnectionAsync();
-            await using var channel = await connection.CreateChannelAsync();
-
-            await channel.QueueDeclareAsync(
-                queue: queueName,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null);
-
-            var messageJson = JsonSerializer.Serialize(message, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
-            var body = Encoding.UTF8.GetBytes(messageJson);
-
-            var properties = new BasicProperties
-            {
-                Persistent = true
-            };
-
-            await channel.BasicPublishAsync(
-                exchange: "",
-                routingKey: queueName,
-                mandatory: true,
-                basicProperties: properties,
-                body: body);
+            // No propagar excepción del proveedor: puede contener host/URI o credenciales.
+            throw new MessagingUnavailableException();
         }
     }
 }

@@ -11,3 +11,14 @@ node_modules/
 *.db-shm
 *.db-wal
 appsettings.Development.json
+*.sqlite
+**/*.sqlite
+**/secrets.json
+.env
+.env.*
+.codex/
+**/.codex/
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/appsettings.Development.json

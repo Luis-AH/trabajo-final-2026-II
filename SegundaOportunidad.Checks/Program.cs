@@ -18,6 +18,14 @@ using SegundaOportunidad.Data;
 using SegundaOportunidad.Models;
 using SegundaOportunidad.Services;
 
+if (args.Length == 1 && args[0] == "--production-smoke") { await ProductionSmokeChecks.Run(); return; }
+if (args.Length == 1 && args[0] == "--integration-read") { await IntegrationReadChecks.Run(); return; }
+if (args.Length == 1 && args[0] == "--deployment-checks") { await DeploymentChecks.Run(); return; }
+if (args.Length == 2 && args[0] == "--chat-catalog-live") { await GeminiLiveChecks.Run(args[1]); return; }
+if (args.Length == 1 && args[0] == "--chat-catalog-checks") { await ChatCatalogChecks.Run(); return; }
+if (args.Length == 1 && args[0] == "--gemini-live") { await GeminiLiveChecks.Run(); return; }
+if (args.Length == 1 && args[0] == "--gemini-checks") { await GeminiChatChecks.Run(); return; }
+if (args.Length == 2 && args[0] == "--seed-demo-publicaciones") { await DemoPublicaciones.Run(args[1]); return; }
 if (args.Length == 2 && args[0] == "--upgrade-db") { await DatabaseUpgrade.Run(args[1]); return; }
 if (args.Length == 2 && args[0] == "--verify-db") { await DatabaseVerification.Run(args[1]); return; }
 if (args.Length == 2 && args[0] == "--bootstrap-admin") { await AdminBootstrap.Run(args[1]); return; }
@@ -144,6 +152,8 @@ Check((await client.PostAsync("/AdminPublicaciones/Cambiar", new FormUrlEncodedC
 await UserChecks.Run(client, options, app.Services);
 await app.StopAsync();
 await RealIdentityChecks.Run();
+await ChatCatalogChecks.Run();
+await DeploymentChecks.Run();
 await LegacyTokensChecks.Run();
 Console.WriteLine("Todas las comprobaciones pasaron. No se utilizó app.db ni servicios externos.");
 }

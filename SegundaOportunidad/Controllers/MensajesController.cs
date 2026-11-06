@@ -77,7 +77,8 @@ namespace SegundaOportunidad.Controllers
                 SentAt = DateTime.UtcNow
             };
 
-            await _rabbitMqPublisher.PublishMessageAsync("chat_messages", messageDto);
+            try { await _rabbitMqPublisher.PublishMessageAsync("chat_messages", messageDto); }
+            catch (MessagingUnavailableException) { return StatusCode(503, new { error = "La mensajería no está disponible temporalmente. Inténtalo más tarde." }); }
 
             return Ok(new { success = true, messageId = messageDto.RabbitMqMessageId });
         }

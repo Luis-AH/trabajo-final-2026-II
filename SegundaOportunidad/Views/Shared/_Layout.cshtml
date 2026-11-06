@@ -107,10 +107,19 @@
                     body: JSON.stringify({ mensajeUsuario: texto })
                 });
                 const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || `Error HTTP ${response.status}`);
+                }
 
-                messagesContainer.innerHTML += `<div style="background: #e9ecef; color: #333; padding: 8px 12px; border-radius: 8px; align-self: flex-start; max-width: 80%;">${data.respuesta}</div>`;
+                const reply = document.createElement('div');
+                reply.style.cssText = 'background: #e9ecef; color: #333; padding: 8px 12px; border-radius: 8px; align-self: flex-start; max-width: 80%; white-space: pre-wrap;';
+                reply.textContent = data.respuesta || data.error || 'El asistente no devolvió una respuesta.';
+                messagesContainer.appendChild(reply);
             } catch (error) {
-                messagesContainer.innerHTML += `<div style="color: red; font-size: 0.8rem;">Error al conectar con el asistente.</div>`;
+                const errorMessage = document.createElement('div');
+                errorMessage.style.cssText = 'color: #b02a37; font-size: 0.8rem;';
+                errorMessage.textContent = error.message || 'Error al conectar con el asistente.';
+                messagesContainer.appendChild(errorMessage);
             }
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
@@ -120,3 +129,4 @@
     </script>
 </body>
 </html>
+

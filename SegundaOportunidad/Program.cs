@@ -30,7 +30,7 @@ builder.Services.AddHttpClient<SegundaOportunidad.Services.IAdminGuardClient, Se
 builder.Services.AddHttpClient<SegundaOportunidad.Services.IAdminGuardImageReader, SegundaOportunidad.Services.AdminGuardImageReader>(client => client.Timeout = TimeSpan.FromSeconds(15))
     .ConfigurePrimaryHttpMessageHandler(SegundaOportunidad.Services.AdminGuardImageReader.Handler);
 
-builder.Services.AddHttpClient<AiSearchService>();
+builder.Services.AddHttpClient<AiSearchService>(client => client.Timeout = TimeSpan.FromSeconds(25));
 
 builder.Services.AddSingleton<SegundaOportunidad.Services.RedisService>();
 builder.Services.AddSingleton<SegundaOportunidad.Services.RabbitMqPublisher>();

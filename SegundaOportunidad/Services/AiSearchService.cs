@@ -36,7 +36,8 @@ namespace SegundaOportunidad.Services
             var requestBody = new
             {
                 system_instruction = new { parts = new[] { new { text = systemPrompt } } },
-                contents = new[] { new { parts = new[] { new { text = userMessage } } } }
+                contents = new[] { new { parts = new[] { new { text = userMessage } } } },
+                generationConfig = new { maxOutputTokens = 256, temperature = 0.5 }
             };
             request.Content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
 
@@ -89,3 +90,4 @@ namespace SegundaOportunidad.Services
         }
     }
 }
+

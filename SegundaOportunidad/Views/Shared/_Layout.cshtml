@@ -93,11 +93,19 @@
         };
 
         async function enviarMensaje() {
+            if (sendBtn.disabled) return;
             const texto = inputField.value.trim();
             if (!texto) return;
 
             messagesContainer.innerHTML += `<div style="background: #0d6efd; color: white; padding: 8px 12px; border-radius: 8px; align-self: flex-end; max-width: 80%;">${texto}</div>`;
             inputField.value = '';
+            const previousButtonText = sendBtn.textContent;
+            sendBtn.disabled = true;
+            sendBtn.textContent = '...';
+            const waiting = document.createElement('div');
+            waiting.style.cssText = 'color: #6c757d; font-size: 0.85rem;';
+            waiting.textContent = 'Pensando…';
+            messagesContainer.appendChild(waiting);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
             try {
@@ -120,6 +128,10 @@
                 errorMessage.style.cssText = 'color: #b02a37; font-size: 0.8rem;';
                 errorMessage.textContent = error.message || 'Error al conectar con el asistente.';
                 messagesContainer.appendChild(errorMessage);
+            } finally {
+                waiting.remove();
+                sendBtn.disabled = false;
+                sendBtn.textContent = previousButtonText;
             }
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
@@ -129,4 +141,5 @@
     </script>
 </body>
 </html>
+
 

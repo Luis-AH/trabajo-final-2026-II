@@ -29,6 +29,9 @@ builder.Services.AddHttpClient<SegundaOportunidad.Services.IAdminGuardClient, Se
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
 builder.Services.AddHttpClient<SegundaOportunidad.Services.IAdminGuardImageReader, SegundaOportunidad.Services.AdminGuardImageReader>(client => client.Timeout = TimeSpan.FromSeconds(15))
     .ConfigurePrimaryHttpMessageHandler(SegundaOportunidad.Services.AdminGuardImageReader.Handler);
+
+builder.Services.AddHttpClient<AiSearchService>();
+
 builder.Services.AddSingleton<SegundaOportunidad.Services.RedisService>();
 builder.Services.AddSingleton<SegundaOportunidad.Services.RabbitMqPublisher>();
 builder.Services.AddHttpClient();
@@ -65,7 +68,6 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

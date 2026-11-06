@@ -24,7 +24,7 @@
                             <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white fw-bold" asp-area="" asp-controller="Articulos" asp-action="Index">Explorar</a>
+                            <a class="nav-link text-white fw-bold" asp-area="" asp-controller="Articulos" asp-action="Explorar">Explorar</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-white fw-bold" asp-area="" asp-controller="Articulos" asp-action="Create">Publicar</a>
@@ -57,5 +57,66 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- WIDGET FLOTANTE DE CHAT CON IA -->
+    <div id="chat-widget" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: sans-serif;">
+        <button id="chat-toggle" style="background: #0d6efd; color: white; border: none; border-radius: 50px; width: 55px; height: 55px; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;">💬</button>
+        
+        <div id="chat-box" style="display: none; position: absolute; bottom: 70px; right: 0; width: 320px; height: 420px; background: white; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); flex-direction: column; overflow: hidden;">
+            <div style="background: #0d6efd; color: white; padding: 12px; display: flex; justify-content: space-between; align-items: center; font-weight: bold;">
+                <span>Asistente Virtual</span>
+                <button id="chat-close" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">&times;</button>
+            </div>
+            <div id="chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; font-size: 0.9rem; display: flex; flex-direction: column; gap: 8px; background: #f8f9fa;">
+                <div style="background: #e9ecef; color: #333; padding: 8px 12px; border-radius: 8px; max-width: 80%;">¡Hola! ¿Qué artículo estás buscando hoy?</div>
+            </div>
+            <div style="padding: 10px; background: white; border-top: 1px solid #dee2e6; display: flex; gap: 6px;">
+                <input type="text" id="chat-input" placeholder="Ej: ¿Qué productos hay disponibles?" style="flex: 1; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.85rem; outline: none;">
+                <button id="chat-send" style="background: #0d6efd; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const toggleBtn = document.getElementById('chat-toggle');
+        const closeBtn = document.getElementById('chat-close');
+        const chatBox = document.getElementById('chat-box');
+        const sendBtn = document.getElementById('chat-send');
+        const inputField = document.getElementById('chat-input');
+        const messagesContainer = document.getElementById('chat-messages');
+
+        toggleBtn.onclick = () => {
+            chatBox.style.display = chatBox.style.display === 'none' ? 'flex' : 'none';
+        };
+        closeBtn.onclick = () => {
+            chatBox.style.display = 'none';
+        };
+
+        async function enviarMensaje() {
+            const texto = inputField.value.trim();
+            if (!texto) return;
+
+            messagesContainer.innerHTML += `<div style="background: #0d6efd; color: white; padding: 8px 12px; border-radius: 8px; align-self: flex-end; max-width: 80%;">${texto}</div>`;
+            inputField.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mensajeUsuario: texto })
+                });
+                const data = await response.json();
+
+                messagesContainer.innerHTML += `<div style="background: #e9ecef; color: #333; padding: 8px 12px; border-radius: 8px; align-self: flex-start; max-width: 80%;">${data.respuesta}</div>`;
+            } catch (error) {
+                messagesContainer.innerHTML += `<div style="color: red; font-size: 0.8rem;">Error al conectar con el asistente.</div>`;
+            }
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        sendBtn.onclick = enviarMensaje;
+        inputField.onkeypress = (e) => { if (e.key === 'Enter') enviarMensaje(); };
+    </script>
 </body>
 </html>

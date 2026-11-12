@@ -18,6 +18,12 @@ namespace SegundaOportunidad.Data
 
             // En Production no se crean cuentas con contraseñas de demostración.
             var environment=scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
+            var demoConfiguration=scope.ServiceProvider.GetRequiredService<IConfiguration>();
+            if(environment.IsDevelopment() && demoConfiguration.GetValue<bool>("Demo:UseDataset"))
+            {
+                if(!await context.Users.AnyAsync(u=>u.Id.StartsWith("demo-ml-user-"))) throw new InvalidOperationException("Prepara primero una base DEMO mediante --demo-setup; no se crean cuentas con claves fijas.");
+                return;
+            }
             if(!environment.IsDevelopment())
             {
                 var roles=scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();

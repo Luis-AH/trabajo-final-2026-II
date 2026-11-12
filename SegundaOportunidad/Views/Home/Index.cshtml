@@ -1,30 +1,6 @@
-@{
-    ViewData["Title"] = "Inicio";
-}
-
-<div class="text-center mt-5">
-    <h1 class="display-4 fw-bold" style="color: #1b4332;">Bienvenido a SegundaOportunidad 🍃</h1>
-    <p class="lead mt-3">
-        Dale una segunda vida a lo que ya no usas. Únete a nuestra comunidad en Lima para vender, intercambiar (trueque) y donar artículos de forma segura.
-    </p>
-    
-    <div class="mt-5">
-        <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-lg text-white" style="background-color: #1b4332; padding: 10px 30px;">Crear mi Cuenta</a>
-        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-lg btn-outline-secondary ms-3" style="padding: 10px 30px;">Iniciar Sesión</a>
-    </div>
-    
-    <div class="row mt-5 pt-5 text-start">
-        <div class="col-md-4">
-            <h3 style="color: #2d6a4f;">Identidad Verificada</h3>
-            <p>Comunidad segura con verificación de DNI para todos nuestros usuarios.</p>
-        </div>
-        <div class="col-md-4">
-            <h3 style="color: #2d6a4f;">Impacto Ecológico</h3>
-            <p>Mide cuántos kilogramos de CO2 ahorras al darle una segunda vida a las cosas.</p>
-        </div>
-        <div class="col-md-4">
-            <h3 style="color: #2d6a4f;">Encuentros Seguros</h3>
-            <p>Promovemos espacios y pautas seguras para que concretes tus entregas presencialmente.</p>
-        </div>
-    </div>
-</div>
+﻿@{ViewData["Title"]="Una segunda vida empieza aquí";}
+<section class="home-hero"><div><span class="eyebrow">Conecta. Reutiliza. Comparte.</span><h1>Lo que ya no usas,<br><em>alguien lo está buscando.</em></h1><p class="hero-lead">Encuentra nuevas posibilidades en objetos con historia. Compra, intercambia o dona con tu comunidad en el Perú.</p><div class="hero-actions"><a asp-controller="Articulos" asp-action="Index" class="btn btn-brand btn-lg">Explorar artículos →</a><a asp-controller="Articulos" asp-action="Create" class="btn btn-outline-brand btn-lg">Dar otra oportunidad</a></div><p class="experience-help">La verificación y los acuerdos claros ayudan a participar con más información. Ninguna señal garantiza una operación.</p></div>
+<div class="hero-mosaic" aria-hidden="true"><div class="hero-tile"><span class="tile-symbol">▤</span><strong>Historias por descubrir</strong><span class="tile-note">Libros y aprendizaje</span></div><div class="hero-tile"><span class="tile-symbol">⌁</span><strong>Otra vuelta al camino</strong><span class="tile-note">Deporte y movimiento</span></div><div class="hero-tile"><span class="tile-symbol">⌂</span><strong>Espacio para una nueva vida</strong><span class="tile-note">Hogar y decoración</span></div><div class="hero-tile"><span class="tile-symbol">↗</span><strong>Pequeñas grandes ideas</strong><span class="tile-note">Tecnología y estudio</span></div></div></section>
+<section class="home-values" aria-label="Cómo funciona"><article class="value-card"><span class="value-number">01 / DESCUBRE</span><h2>Busca algo para ti</h2><p>Explora por categoría y encuentra recomendaciones por afinidad de contenido.</p></article><article class="value-card"><span class="value-number">02 / CONECTA</span><h2>Conversa con claridad</h2><p>Las cuentas aprobadas pueden publicar y coordinar con otros participantes.</p></article><article class="value-card"><span class="value-number">03 / REUTILIZA</span><h2>Acuerda tu siguiente paso</h2><p>Elige un punto de encuentro privado y aprovecha lo que todavía tiene mucho por dar.</p></article></section>
+<section class="ml-recommendations"><div class="section-heading"><div><span class="eyebrow">Una selección para empezar</span><h2>Descubre nuevas posibilidades</h2></div><a asp-controller="Articulos" asp-action="Index">Ver todo el catálogo →</a></div><p class="ml-status" role="status">Buscando afinidades en el catálogo…</p><div class="recommendation-grid"></div></section>
+<section class="card p-4 p-md-5 my-5"><span class="eyebrow">Tu comunidad, tus oportunidades</span><h2>Un pequeño cambio puede empezar contigo.</h2><p class="text-muted">Crea una cuenta, completa tu perfil y solicita tu aprobación para participar.</p><div class="d-flex gap-3 flex-wrap"><a asp-area="Identity" asp-page="/Account/Register" class="btn btn-brand">Crear mi cuenta</a><a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-brand">Ya tengo una cuenta</a></div></section>

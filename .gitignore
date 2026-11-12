@@ -10,3 +10,10 @@ obj/
 *.db-wal
 appsettings.Development.json
 *.backup-*.sqlite
+# Herramientas locales y resultados privados de entrenamiento/demo
+.tools/
+.venv/
+.demo/
+ml/artifacts/
+__pycache__/
+*.joblib

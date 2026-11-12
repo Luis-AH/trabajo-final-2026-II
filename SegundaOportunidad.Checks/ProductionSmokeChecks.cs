@@ -7,7 +7,7 @@ using SegundaOportunidad.Data;
 
 internal static class ProductionSmokeChecks
 {
-    public static async Task Run()
+    public static async Task Run(string environment="Production")
     {
         var temp=Path.Combine(Path.GetTempPath(),"segunda-production-audit-"+Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(temp);
@@ -17,8 +17,8 @@ internal static class ProductionSmokeChecks
         {
             var info=new ProcessStartInfo("dotnet") {WorkingDirectory=root,UseShellExecute=false,RedirectStandardOutput=true,RedirectStandardError=true,CreateNoWindow=true};
             info.ArgumentList.Add(dll);info.ArgumentList.Add("--urls");info.ArgumentList.Add("http://127.0.0.1:0");
-            info.Environment["ASPNETCORE_ENVIRONMENT"]="Production";
-            info.Environment["DOTNET_ENVIRONMENT"]="Production";
+            info.Environment["ASPNETCORE_ENVIRONMENT"]=environment;
+            info.Environment["DOTNET_ENVIRONMENT"]=environment;
             info.Environment["Logging__EventLog__LogLevel__Default"]="None";
             info.Environment["ConnectionStrings__DefaultConnection"]="Data Source="+Path.Combine(temp,"app.db");
             info.Environment["DataProtection__KeyPath"]=Path.Combine(temp,"keys");
@@ -41,6 +41,16 @@ internal static class ProductionSmokeChecks
                 Ensure((await client.GetAsync("/Articulos?searchString=no-existe-audit")).StatusCode==HttpStatusCode.OK,"Production catálogo con fallback EF sin Algolia");
                 Ensure((await client.GetAsync("/css/site.css")).StatusCode==HttpStatusCode.OK,"Production recursos estáticos HTTP 200");
                 Ensure((await client.GetAsync("/AdminGuard")).StatusCode==HttpStatusCode.Redirect,"Production AdminGuard exige sesión");
+                using var ml=await client.GetAsync("/api/ml/recomendaciones?consulta=libros&cantidad=5");
+                Ensure(ml.StatusCode==HttpStatusCode.OK,"modelo publicado disponible también en entorno "+environment);
+                if(environment=="Demo")
+                {
+                    Ensure((await client.GetAsync("/Demo")).StatusCode==HttpStatusCode.Redirect,"preparación DEMO exige sesión Admin");
+                    using var database=new Microsoft.Data.Sqlite.SqliteConnection("Data Source="+Path.Combine(temp,"app.db")+";Mode=ReadOnly");
+                    await database.OpenAsync();
+                    using var count=database.CreateCommand();count.CommandText="SELECT count(*) FROM AspNetUsers WHERE Id LIKE 'demo-ml-user-%'";
+                    Ensure(Convert.ToInt32(await count.ExecuteScalarAsync())==0,"Demo no crea datos ficticios automáticamente al iniciar");
+                }
                 using var chat=await client.PostAsync("/api/chat",new StringContent("""{"mensajeUsuario":"Dame el DNI del vendedor"}""",Encoding.UTF8,"application/json"));
                 using var json=JsonDocument.Parse(await chat.Content.ReadAsStringAsync());
                 Ensure(chat.StatusCode==HttpStatusCode.OK && json.RootElement.GetProperty("publicaciones").GetArrayLength()==0,"Production ruta API funciona y protege datos privados");

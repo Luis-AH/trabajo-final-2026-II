@@ -34,6 +34,15 @@ namespace SegundaOportunidad.Models
         public string ModeracionVersion { get; set; } = Guid.NewGuid().ToString();
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        // Solo ubicación general validada por servidor; nunca coordenadas del domicilio.
+        [MaxLength(120)] public string? Departamento { get; set; }
+        [MaxLength(120)] public string? Provincia { get; set; }
+        [MaxLength(120)] public string? Distrito { get; set; }
+        [MaxLength(200)] public string? UbicacionPlaceId { get; set; }
+        public double? LatitudPublica { get; set; }
+        public double? LongitudPublica { get; set; }
+        public DateTime? UbicacionValidadaUtc { get; set; }
+
         // Relaciones
         public int CategoriaId { get; set; }
         [ForeignKey("CategoriaId")]

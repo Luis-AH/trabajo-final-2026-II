@@ -18,7 +18,12 @@ using SegundaOportunidad.Data;
 using SegundaOportunidad.Models;
 using SegundaOportunidad.Services;
 
+if (args.Length == 1 && args[0] == "--demo-ui-checks") { await DemoUiChecks.Run(); return; }
+if (args.Length == 1 && args[0] == "--demo-safety-checks") { await DemoSafetyChecks.Run(); return; }
+if (args.Length == 2 && args[0] == "--demo-setup") { await DemoSetupChecks.Run(args[1]); return; }
+if (args.Length == 1 && args[0] == "--ml-checks") { await MlChecks.Run(); return; }
 if (args.Length == 1 && args[0] == "--production-smoke") { await ProductionSmokeChecks.Run(); return; }
+if (args.Length == 1 && args[0] == "--demo-smoke") { await ProductionSmokeChecks.Run("Demo"); return; }
 if (args.Length == 1 && args[0] == "--integration-read") { await IntegrationReadChecks.Run(); return; }
 if (args.Length == 1 && args[0] == "--deployment-checks") { await DeploymentChecks.Run(); return; }
 if (args.Length == 2 && args[0] == "--chat-catalog-live") { await GeminiLiveChecks.Run(args[1]); return; }
@@ -154,6 +159,8 @@ await app.StopAsync();
 await RealIdentityChecks.Run();
 await ChatCatalogChecks.Run();
 await DeploymentChecks.Run();
+await MlChecks.Run();
+await DemoSafetyChecks.Run();
 await LegacyTokensChecks.Run();
 Console.WriteLine("Todas las comprobaciones pasaron. No se utilizó app.db ni servicios externos.");
 }

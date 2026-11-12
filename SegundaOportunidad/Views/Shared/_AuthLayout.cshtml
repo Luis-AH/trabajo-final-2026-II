@@ -1,3 +1,5 @@
+@inject IConfiguration Configuration
+@inject IWebHostEnvironment HostEnvironment
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -43,8 +45,11 @@
         }
     </style>
     <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/experience.css" asp-append-version="true" />
 </head>
 <body>
+@if(HostEnvironment.IsEnvironment("Demo")||(HostEnvironment.IsDevelopment()&&Configuration.GetValue<bool>("Demo:UseDataset"))){<aside class="demo-banner">ENTORNO DEMO · Cuentas ficticias y datos de ensayo</aside>}
     <div class="auth-container">
         <div class="auth-brand-panel">
             <a class="auth-logo" asp-area="" asp-controller="Home" asp-action="Index"><span class="auth-logo-mark" aria-hidden="true">↻</span>SegundaOportunidad</a>

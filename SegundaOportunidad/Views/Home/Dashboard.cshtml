@@ -13,7 +13,7 @@
                         ¡Hola de nuevo, @(string.IsNullOrEmpty(Model.FullName) ? "Usuario" : Model.FullName)!
                         @if (Model.IsVerified) {
                             <span class="badge bg-success-subtle text-success ms-3 fw-normal rounded-pill px-3 py-1 fs-6">
-                                <i class="bi bi-shield-check me-1"></i> Identidad Verificada
+                                <i class="bi bi-shield-check me-1"></i> @(Model.FullName.StartsWith("[DEMO]")?"Cuenta ficticia DEMO":"Identidad Verificada")
                             </span>
                         }
                         else if (!string.IsNullOrEmpty(Model.Dni))

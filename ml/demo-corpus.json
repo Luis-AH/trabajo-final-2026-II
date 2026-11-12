@@ -1,0 +1,482 @@
+[
+  {
+    "id": "demo-ml-art-001",
+    "title": "[DEMO] Laptop para clases",
+    "description": "Computación para estudiar, clases virtuales y tareas universitarias. Equipo portátil, accesorios y escritorio de trabajo. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Computación y accesorios",
+    "mode": "Venta",
+    "condition": "Nuevo",
+    "price": 42.0,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-002",
+    "title": "[DEMO] Teclado mecánico",
+    "description": "Computación para estudiar, clases virtuales y tareas universitarias. Equipo portátil, accesorios y escritorio de trabajo. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Computación y accesorios",
+    "mode": "Intercambio",
+    "condition": "ComoNuevo",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-003",
+    "title": "[DEMO] Mouse inalámbrico",
+    "description": "Computación para estudiar, clases virtuales y tareas universitarias. Equipo portátil, accesorios y escritorio de trabajo. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Computación y accesorios",
+    "mode": "Donacion",
+    "condition": "BuenEstado",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-004",
+    "title": "[DEMO] Monitor para escritorio",
+    "description": "Computación para estudiar, clases virtuales y tareas universitarias. Equipo portátil, accesorios y escritorio de trabajo. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Computación y accesorios",
+    "mode": "Venta",
+    "condition": "Aceptable",
+    "price": 78.0,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-005",
+    "title": "[DEMO] Tablet para apuntes",
+    "description": "Computación para estudiar, clases virtuales y tareas universitarias. Equipo portátil, accesorios y escritorio de trabajo. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Computación y accesorios",
+    "mode": "Intercambio",
+    "condition": "Nuevo",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-006",
+    "title": "[DEMO] Memoria USB",
+    "description": "Computación para estudiar, clases virtuales y tareas universitarias. Equipo portátil, accesorios y escritorio de trabajo. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Computación y accesorios",
+    "mode": "Donacion",
+    "condition": "ComoNuevo",
+    "price": null,
+    "available": false
+  },
+  {
+    "id": "demo-ml-art-007",
+    "title": "[DEMO] Casaca de abrigo",
+    "description": "Ropa cómoda, abrigo para invierno y prendas para uso diario. Tallas variadas y material de algodón. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Ropa",
+    "mode": "Venta",
+    "condition": "BuenEstado",
+    "price": 114.0,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-008",
+    "title": "[DEMO] Polo de algodón",
+    "description": "Ropa cómoda, abrigo para invierno y prendas para uso diario. Tallas variadas y material de algodón. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Ropa",
+    "mode": "Intercambio",
+    "condition": "Aceptable",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-009",
+    "title": "[DEMO] Chompa para invierno",
+    "description": "Ropa cómoda, abrigo para invierno y prendas para uso diario. Tallas variadas y material de algodón. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Ropa",
+    "mode": "Donacion",
+    "condition": "Nuevo",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-010",
+    "title": "[DEMO] Pantalón cómodo",
+    "description": "Ropa cómoda, abrigo para invierno y prendas para uso diario. Tallas variadas y material de algodón. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Ropa",
+    "mode": "Venta",
+    "condition": "ComoNuevo",
+    "price": 150.0,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-011",
+    "title": "[DEMO] Camisa de vestir",
+    "description": "Ropa cómoda, abrigo para invierno y prendas para uso diario. Tallas variadas y material de algodón. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Ropa",
+    "mode": "Intercambio",
+    "condition": "BuenEstado",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-012",
+    "title": "[DEMO] Buzo deportivo",
+    "description": "Ropa cómoda, abrigo para invierno y prendas para uso diario. Tallas variadas y material de algodón. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Ropa",
+    "mode": "Donacion",
+    "condition": "Aceptable",
+    "price": null,
+    "available": false
+  },
+  {
+    "id": "demo-ml-art-013",
+    "title": "[DEMO] Silla de escritorio",
+    "description": "Mueble de madera para organizar el hogar. Escritorio, silla y espacio para estudiar o trabajar. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Muebles",
+    "mode": "Venta",
+    "condition": "Nuevo",
+    "price": 186.0,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-014",
+    "title": "[DEMO] Mesa de estudio",
+    "description": "Mueble de madera para organizar el hogar. Escritorio, silla y espacio para estudiar o trabajar. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Muebles",
+    "mode": "Intercambio",
+    "condition": "ComoNuevo",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-015",
+    "title": "[DEMO] Estante para libros",
+    "description": "Mueble de madera para organizar el hogar. Escritorio, silla y espacio para estudiar o trabajar. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Muebles",
+    "mode": "Donacion",
+    "condition": "BuenEstado",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-016",
+    "title": "[DEMO] Escritorio compacto",
+    "description": "Mueble de madera para organizar el hogar. Escritorio, silla y espacio para estudiar o trabajar. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Muebles",
+    "mode": "Venta",
+    "condition": "Aceptable",
+    "price": 222.0,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-017",
+    "title": "[DEMO] Sillón de sala",
+    "description": "Mueble de madera para organizar el hogar. Escritorio, silla y espacio para estudiar o trabajar. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Muebles",
+    "mode": "Intercambio",
+    "condition": "Nuevo",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-018",
+    "title": "[DEMO] Repisa de madera",
+    "description": "Mueble de madera para organizar el hogar. Escritorio, silla y espacio para estudiar o trabajar. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Muebles",
+    "mode": "Donacion",
+    "condition": "ComoNuevo",
+    "price": null,
+    "available": false
+  },
+  {
+    "id": "demo-ml-art-019",
+    "title": "[DEMO] Bicicleta urbana",
+    "description": "Artículos deportivos para entrenar y pasear al aire libre. Bicicleta, deporte, ejercicio y protección. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Deportes",
+    "mode": "Venta",
+    "condition": "BuenEstado",
+    "price": 258.0,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-020",
+    "title": "[DEMO] Pelota de fútbol",
+    "description": "Artículos deportivos para entrenar y pasear al aire libre. Bicicleta, deporte, ejercicio y protección. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Deportes",
+    "mode": "Intercambio",
+    "condition": "Aceptable",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-021",
+    "title": "[DEMO] Casco para bicicleta",
+    "description": "Artículos deportivos para entrenar y pasear al aire libre. Bicicleta, deporte, ejercicio y protección. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Deportes",
+    "mode": "Donacion",
+    "condition": "Nuevo",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-022",
+    "title": "[DEMO] Mancuernas ligeras",
+    "description": "Artículos deportivos para entrenar y pasear al aire libre. Bicicleta, deporte, ejercicio y protección. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Deportes",
+    "mode": "Venta",
+    "condition": "ComoNuevo",
+    "price": 294.0,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-023",
+    "title": "[DEMO] Raqueta de tenis",
+    "description": "Artículos deportivos para entrenar y pasear al aire libre. Bicicleta, deporte, ejercicio y protección. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Deportes",
+    "mode": "Intercambio",
+    "condition": "BuenEstado",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-024",
+    "title": "[DEMO] Bicicleta de montaña",
+    "description": "Artículos deportivos para entrenar y pasear al aire libre. Bicicleta, deporte, ejercicio y protección. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Deportes",
+    "mode": "Donacion",
+    "condition": "Aceptable",
+    "price": null,
+    "available": false
+  },
+  {
+    "id": "demo-ml-art-025",
+    "title": "[DEMO] Libro de programación",
+    "description": "Libros para lectura y aprendizaje. Material de estudio, programación y lectura universitaria, páginas completas. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Libros",
+    "mode": "Venta",
+    "condition": "Nuevo",
+    "price": 330.0,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-026",
+    "title": "[DEMO] Novela de aventuras",
+    "description": "Libros para lectura y aprendizaje. Material de estudio, programación y lectura universitaria, páginas completas. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Libros",
+    "mode": "Intercambio",
+    "condition": "ComoNuevo",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-027",
+    "title": "[DEMO] Libro de matemática",
+    "description": "Libros para lectura y aprendizaje. Material de estudio, programación y lectura universitaria, páginas completas. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Libros",
+    "mode": "Donacion",
+    "condition": "BuenEstado",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-028",
+    "title": "[DEMO] Manual de física",
+    "description": "Libros para lectura y aprendizaje. Material de estudio, programación y lectura universitaria, páginas completas. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Libros",
+    "mode": "Venta",
+    "condition": "Aceptable",
+    "price": 366.0,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-029",
+    "title": "[DEMO] Colección de cuentos",
+    "description": "Libros para lectura y aprendizaje. Material de estudio, programación y lectura universitaria, páginas completas. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Libros",
+    "mode": "Intercambio",
+    "condition": "Nuevo",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-030",
+    "title": "[DEMO] Libro de historia",
+    "description": "Libros para lectura y aprendizaje. Material de estudio, programación y lectura universitaria, páginas completas. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Libros",
+    "mode": "Donacion",
+    "condition": "ComoNuevo",
+    "price": null,
+    "available": false
+  },
+  {
+    "id": "demo-ml-art-031",
+    "title": "[DEMO] Cuadernos para apuntes",
+    "description": "Útiles de oficina para estudiar, escribir apuntes y organizar documentos. Material escolar y universitario. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Oficina y útiles",
+    "mode": "Venta",
+    "condition": "BuenEstado",
+    "price": 402.0,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-032",
+    "title": "[DEMO] Lámpara de estudio",
+    "description": "Útiles de oficina para estudiar, escribir apuntes y organizar documentos. Material escolar y universitario. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Oficina y útiles",
+    "mode": "Intercambio",
+    "condition": "Aceptable",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-033",
+    "title": "[DEMO] Archivador de documentos",
+    "description": "Útiles de oficina para estudiar, escribir apuntes y organizar documentos. Material escolar y universitario. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Oficina y útiles",
+    "mode": "Donacion",
+    "condition": "Nuevo",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-034",
+    "title": "[DEMO] Set de lápices",
+    "description": "Útiles de oficina para estudiar, escribir apuntes y organizar documentos. Material escolar y universitario. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Oficina y útiles",
+    "mode": "Venta",
+    "condition": "ComoNuevo",
+    "price": 438.0,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-035",
+    "title": "[DEMO] Calculadora científica",
+    "description": "Útiles de oficina para estudiar, escribir apuntes y organizar documentos. Material escolar y universitario. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Oficina y útiles",
+    "mode": "Intercambio",
+    "condition": "BuenEstado",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-036",
+    "title": "[DEMO] Organizador de escritorio",
+    "description": "Útiles de oficina para estudiar, escribir apuntes y organizar documentos. Material escolar y universitario. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Oficina y útiles",
+    "mode": "Donacion",
+    "condition": "Aceptable",
+    "price": null,
+    "available": false
+  },
+  {
+    "id": "demo-ml-art-037",
+    "title": "[DEMO] Celular básico",
+    "description": "Teléfono móvil y accesorios para comunicación, llamadas y clases virtuales. Celular, batería y conexiones. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Celulares y accesorios",
+    "mode": "Venta",
+    "condition": "Nuevo",
+    "price": 474.0,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-038",
+    "title": "[DEMO] Celular para fotografía",
+    "description": "Teléfono móvil y accesorios para comunicación, llamadas y clases virtuales. Celular, batería y conexiones. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Celulares y accesorios",
+    "mode": "Intercambio",
+    "condition": "ComoNuevo",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-039",
+    "title": "[DEMO] Cargador USB",
+    "description": "Teléfono móvil y accesorios para comunicación, llamadas y clases virtuales. Celular, batería y conexiones. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Celulares y accesorios",
+    "mode": "Donacion",
+    "condition": "BuenEstado",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-040",
+    "title": "[DEMO] Audífonos con cable",
+    "description": "Teléfono móvil y accesorios para comunicación, llamadas y clases virtuales. Celular, batería y conexiones. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Celulares y accesorios",
+    "mode": "Venta",
+    "condition": "Aceptable",
+    "price": 510.0,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-041",
+    "title": "[DEMO] Funda protectora",
+    "description": "Teléfono móvil y accesorios para comunicación, llamadas y clases virtuales. Celular, batería y conexiones. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Celulares y accesorios",
+    "mode": "Intercambio",
+    "condition": "Nuevo",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-042",
+    "title": "[DEMO] Soporte para celular",
+    "description": "Teléfono móvil y accesorios para comunicación, llamadas y clases virtuales. Celular, batería y conexiones. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Celulares y accesorios",
+    "mode": "Donacion",
+    "condition": "ComoNuevo",
+    "price": null,
+    "available": false
+  },
+  {
+    "id": "demo-ml-art-043",
+    "title": "[DEMO] Licuadora de cocina",
+    "description": "Electrodoméstico de cocina y hogar. Aparato para preparar alimentos o facilitar tareas domésticas. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Electrodomésticos",
+    "mode": "Venta",
+    "condition": "BuenEstado",
+    "price": 546.0,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-044",
+    "title": "[DEMO] Hervidor eléctrico",
+    "description": "Electrodoméstico de cocina y hogar. Aparato para preparar alimentos o facilitar tareas domésticas. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Electrodomésticos",
+    "mode": "Intercambio",
+    "condition": "Aceptable",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-045",
+    "title": "[DEMO] Plancha de ropa",
+    "description": "Electrodoméstico de cocina y hogar. Aparato para preparar alimentos o facilitar tareas domésticas. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Electrodomésticos",
+    "mode": "Donacion",
+    "condition": "Nuevo",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-046",
+    "title": "[DEMO] Ventilador pequeño",
+    "description": "Electrodoméstico de cocina y hogar. Aparato para preparar alimentos o facilitar tareas domésticas. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Electrodomésticos",
+    "mode": "Venta",
+    "condition": "ComoNuevo",
+    "price": 582.0,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-047",
+    "title": "[DEMO] Tostadora",
+    "description": "Electrodoméstico de cocina y hogar. Aparato para preparar alimentos o facilitar tareas domésticas. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Electrodomésticos",
+    "mode": "Intercambio",
+    "condition": "BuenEstado",
+    "price": null,
+    "available": true
+  },
+  {
+    "id": "demo-ml-art-048",
+    "title": "[DEMO] Batidora manual",
+    "description": "Electrodoméstico de cocina y hogar. Aparato para preparar alimentos o facilitar tareas domésticas. Publicación ficticia para demostración académica; no realizar pagos.",
+    "category": "Electrodomésticos",
+    "mode": "Donacion",
+    "condition": "Aceptable",
+    "price": null,
+    "available": false
+  }
+]

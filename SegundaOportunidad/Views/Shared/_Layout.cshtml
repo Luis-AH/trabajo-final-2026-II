@@ -1,5 +1,7 @@
+@inject IConfiguration Configuration
+@inject IWebHostEnvironment HostEnvironment
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,20 +10,24 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SegundaOportunidad.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/experience.css" asp-append-version="true" />
 </head>
 <body>
+<a class="skip-link" href="#contenido-principal">Saltar al contenido</a>
+@if((HostEnvironment.IsEnvironment("Demo")||(HostEnvironment.IsDevelopment()&&Configuration.GetValue<bool>("Demo:UseDataset")))){<aside class="demo-banner" role="note">ENTORNO DEMO · Datos y cuentas ficticios · Almacenamiento temporal, sin garantías de persistencia</aside>}
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-brand border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SegundaOportunidad</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                        aria-expanded="false" aria-label="Abrir navegación">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-white fw-bold" asp-area="" asp-controller="Articulos" asp-action="Explorar">Explorar</a>
@@ -29,6 +35,7 @@
                         <li class="nav-item">
                             <a class="nav-link text-white fw-bold" asp-area="" asp-controller="Articulos" asp-action="Create">Publicar</a>
                         </li>
+                    @if(User.IsInRole("Admin")&&(HostEnvironment.IsDevelopment()||HostEnvironment.IsEnvironment("Demo"))){<li class="nav-item"><a class="nav-link text-white" asp-controller="Demo" asp-action="Index">Datos DEMO</a></li>}
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
@@ -37,13 +44,13 @@
     </header>
     @if (ViewData["UseFluidLayout"] as bool? == true)
     {
-        @RenderBody()
+        <div id="contenido-principal">@RenderBody()</div>
     }
     else
     {
         <div class="container">
             <main role="main" class="pb-3">
-                @RenderBody()
+                <div id="contenido-principal">@RenderBody()</div>
             </main>
         </div>
     }
@@ -55,6 +62,7 @@
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/recommendations.js" asp-append-version="true" defer></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 

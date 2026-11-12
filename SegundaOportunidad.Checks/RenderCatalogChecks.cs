@@ -27,7 +27,7 @@ internal static class RenderCatalogChecks
             info.Environment["ConnectionStrings__DefaultConnection"]="Data Source="+Path.GetRelativePath(root,database);
             info.Environment["DataProtection__KeyPath"]="";
             info.Environment["SampleData__InitializeOnStartup"]="true";
-            info.Environment["SampleData__CredentialsJson"]=JsonSerializer.Serialize(credentials);
+            info.Environment["SampleData__CredentialsJson"]=run==0?"":JsonSerializer.Serialize(credentials);
             info.Environment["Logging__EventLog__LogLevel__Default"]="None";
             foreach(var key in new[]{"BootstrapAdmin__Email","BootstrapAdmin__Password","RabbitMQ__ConnectionString","Redis__ConnectionString","PieSocket__ApiKey","PieSocket__ApiSecret","PieSocket__ClusterId","Algolia__AppId","Algolia__WriteApiKey","Gemini__ApiKey","GEMINI_API_KEY","GOOGLE_API_KEY"})info.Environment[key]="";
             using var process=Process.Start(info)??throw new Exception("No se pudo iniciar la app de ensayo.");
@@ -39,14 +39,25 @@ internal static class RenderCatalogChecks
                     throw new Exception("Falló el arranque del catálogo de ensayo; diagnóstico: "+await error);
                 using var http=new HttpClient(new HttpClientHandler {AllowAutoRedirect=false}) {BaseAddress=new Uri(await ready.Task)};
                 http.DefaultRequestHeaders.Add("X-Forwarded-Proto","https");
-                Ensure((await http.GetAsync("/health")).StatusCode==HttpStatusCode.OK,"arranque Demo con credenciales privadas, sin BootstrapAdmin");
+                Ensure((await http.GetAsync("/health")).StatusCode==HttpStatusCode.OK,run==0?"arranque público sin credenciales ni APIs externas":"arranque con credenciales privadas configuradas");
                 var catalog=await http.GetStringAsync("/Articulos");
                 Ensure(catalog.Contains((run==0?"40":"41")+" publicaciones disponibles"),"total público correcto tras arranque "+(run+1));
                 Ensure(!catalog.Contains("demo-banner")&&!catalog.Contains("TF-IDF /"),"textos solicitados retirados");
                 Ensure((await http.GetAsync("/images/catalog/libros.jpg")).StatusCode==HttpStatusCode.OK,"fotografía empaquetada accesible");
+                using var recommendations=JsonDocument.Parse(await http.GetStringAsync("/api/ml/recomendaciones?consulta=libros&cantidad=4"));
+                Ensure(recommendations.RootElement.GetProperty("publicaciones").GetArrayLength()>0,"Machine Learning entrega publicaciones reales sin depender de APIs externas");
                 await using var db=new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite("Data Source="+database).Options);
                 Ensure(await db.Users.CountAsync(u=>u.Id.StartsWith("demo-ml-user-"))==10&&await db.Articulos.IgnoreQueryFilters().CountAsync(a=>a.Id.StartsWith("demo-ml-art-"))==48,"diez cuentas y 48 artículos sin duplicación");
                 var user=await db.Users.SingleAsync(u=>u.Id=="demo-ml-user-01");
+                if(run==0)
+                {
+                    Ensure(!string.IsNullOrEmpty(user.PasswordHash),"cuentas protegidas con claves aleatorias cuando falta el secreto");
+                    db.Users.Add(new ApplicationUser {Id="new-after-seed",UserName="new-after-seed"});
+                    db.Articulos.Add(new Articulo {Id="new-after-seed",Title="Nueva publicación de ensayo",UserId=user.Id,CategoriaId=await db.Categorias.Select(c=>c.Id).FirstAsync()});
+                    await db.SaveChangesAsync();
+                    Ensure((await http.GetStringAsync("/Articulos")).Contains("41 publicaciones disponibles"),"contador público refleja una publicación nueva");
+                    continue;
+                }
                 Ensure(new PasswordHasher<ApplicationUser>().VerifyHashedPassword(user,user.PasswordHash!,credentials[0].Password)!=PasswordVerificationResult.Failed,run==0?"la clave privada configurada coincide con Identity":"reiniciar sincroniza la clave nueva del secreto con la cuenta existente");
                 // Secure cookies se transportan manualmente en el ensayo HTTP local del proxy HTTPS.
                 using var loginPage=await http.GetAsync("/Identity/Account/Login");
@@ -63,16 +74,7 @@ internal static class RenderCatalogChecks
                 {using var request=new HttpRequestMessage(HttpMethod.Get,"/Home/Dashboard");request.Headers.Add("Cookie",string.Join("; ",cookies));using var response=await http.SendAsync(request);Ensure(response.StatusCode==HttpStatusCode.OK,"dashboard autenticado responde 200");return await response.Content.ReadAsStringAsync();}
                 var dashboard=await Dashboard();
                 Ensure(dashboard.Contains("id=\"catalog-count\">"+(run==0?40:41)+"</span>"),"contador del inicio coincide con el catálogo");
-                if(run==0)
-                {
-                    db.Users.Add(new ApplicationUser {Id="new-after-seed",UserName="new-after-seed"});
-                    db.Articulos.Add(new Articulo {Id="new-after-seed",Title="Nueva publicación de ensayo",UserId=user.Id,CategoriaId=await db.Categorias.Select(c=>c.Id).FirstAsync()});
-                    await db.SaveChangesAsync();
-                    credentials[0]=new DemoAccount(credentials[0].Email,"Updated!"+Guid.NewGuid().ToString("N"));
-                    var refreshed=await Dashboard();
-                    Ensure(refreshed.Contains("id=\"catalog-count\">41</span>")&&refreshed.Contains("id=\"own-publication-count\">1</span>"),"publicar actualiza total y propios sin esperar caché");
-                }
-                else Ensure(await db.Users.AnyAsync(u=>u.Id=="new-after-seed")&&await db.Articulos.AnyAsync(a=>a.Id=="new-after-seed"),"reinicio conserva nuevas cuentas y publicaciones sin reseed");
+                Ensure(await db.Users.AnyAsync(u=>u.Id=="new-after-seed")&&await db.Articulos.AnyAsync(a=>a.Id=="new-after-seed"),"reinicio conserva nuevas cuentas y publicaciones sin reseed");
             }
             finally {if(!process.HasExited)process.Kill(entireProcessTree:true);await process.WaitForExitAsync();await output;}
         }

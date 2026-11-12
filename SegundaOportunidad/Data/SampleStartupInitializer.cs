@@ -86,11 +86,12 @@ public static class SampleStartupInitializer
             return;
         }
 
+        await services.GetRequiredService<DemoCatalogSeeder>().SeedAsync(ct);
         if (string.IsNullOrWhiteSpace(config["SampleData:CredentialsJson"]))
         {
-            throw new InvalidOperationException("Configura SampleData:CredentialsJson como secreto de Render para preparar las cuentas.");
+            services.GetRequiredService<ILoggerFactory>()
+                .CreateLogger("SampleStartupInitializer")
+                .LogInformation("Catálogo y recomendaciones listos. Configura SampleData__CredentialsJson para utilizar las contraseñas conocidas de presentación.");
         }
-
-        await services.GetRequiredService<DemoCatalogSeeder>().SeedAsync(ct);
     }
 }

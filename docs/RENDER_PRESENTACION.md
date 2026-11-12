@@ -21,11 +21,17 @@ Si el registro muestra el antiguo error sobre una ruta SQLite absoluta, desplega
 | ConnectionStrings__DefaultConnection | `Data Source=/tmp/segunda-demo/app.db;Cache=Shared` |
 | DataProtection__KeyPath | `/tmp/segunda-demo/keys` |
 | SampleData__InitializeOnStartup | `true` |
-| SampleData__CredentialsJson | Contenido privado de `.demo/render-accounts.private.json` |
+| SampleData__CredentialsJson | Opcional para catálogo/ML. Para accesos conocidos, usar `.demo/render-accounts.private.json` |
 
 No hace falta BootstrapAdmin con este modo: la primera cuenta del conjunto es administradora. No usar Development en Render. No habilitar el modo de presentación sobre una base de producción; el inicializador está prohibido en Production. Si ya existen los diez perfiles y 48 artículos, conserva los cambios posteriores y no vuelve a sembrarlos. Si una base vacía necesita inicializarse pero faltan credenciales o hay datos ajenos, falla con explicación sin mezclar registros.
 
 Las contraseñas de las diez cuentas ficticias se sincronizan con `SampleData__CredentialsJson` al arrancar cuando `SampleData__InitializeOnStartup=true`. Ese secreto determina los accesos del conjunto de presentación. Cambiarlo y reiniciar actualiza las claves existentes. El proceso usa Identity y una transacción, y reconoce los correos antiguos demo01…demo10 para actualizar su acceso al correo actual.
+
+El catálogo público y Machine Learning arrancan también cuando falta ese JSON. En ese caso se crean claves aleatorias para las cuentas ficticias. Configurar el JSON posteriormente y reiniciar permite utilizar las contraseñas del archivo privado local. Gemini, Groq, Algolia, SMTP, RabbitMQ y Redis pueden configurarse después de comprobar el catálogo y las recomendaciones.
+
+### Qué ocurrió con el PR #4
+
+El PR #4 se fusionó con `main` en el commit `8447fda`, con origen `8707d4e`. Los despliegues fallidos consultados apuntaban a ese merge. La corrección posterior de rutas SQLite y Docker `3a533a7` estaba únicamente en `feature/reciclaje-ronaldo`. Los nuevos commits de esa rama requieren otro PR hacia `main` o un despliegue que construya directamente la rama actualizada.
 
 ### Si aparece el error de inicio de sesión
 

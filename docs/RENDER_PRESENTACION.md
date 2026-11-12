@@ -21,6 +21,14 @@ Los usuarios se crean mediante Identity con hashes y roles al arrancar una base 
 
 No hace falta BootstrapAdmin con este modo: la primera cuenta del conjunto es administradora. No usar Development en Render. No habilitar el modo de presentación sobre una base de producción; el inicializador está prohibido en Production. Si ya existen los diez perfiles y 48 artículos, conserva los cambios posteriores y no vuelve a sembrarlos. Si una base vacía necesita inicializarse pero faltan credenciales o hay datos ajenos, falla con explicación sin mezclar registros.
 
+Las contraseñas de las diez cuentas ficticias se sincronizan con `SampleData__CredentialsJson` al arrancar cuando `SampleData__InitializeOnStartup=true`. Ese secreto determina los accesos del conjunto de presentación. Cambiarlo y reiniciar actualiza las claves existentes. El proceso usa Identity y una transacción, y reconoce los correos antiguos demo01…demo10 para actualizar su acceso al correo actual.
+
+### Si aparece el error de inicio de sesión
+
+La versión anterior omitía comprobar contraseñas cuando ya encontraba diez perfiles y 48 artículos. Una carga previa con claves aleatorias podía seguir usando esas claves después de configurar el JSON.
+
+Comprobar en Environment `ASPNETCORE_ENVIRONMENT=Demo`, `SampleData__InitializeOnStartup=true` y `SampleData__CredentialsJson` con el contenido de `.demo/render-accounts.private.json`. Después desplegar la versión corregida desde `feature/reciclaje-ronaldo` y volver a cargar el formulario de acceso. El registro de arranque informa cuántas contraseñas se sincronizaron. La captura de un error genérico requiere contrastar también la configuración y los logs de la instancia para confirmar la causa concreta.
+
 ## Archivo privado listo para importar
 
 Se genera localmente, con los valores existentes y sin imprimirlos:

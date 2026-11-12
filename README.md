@@ -86,6 +86,8 @@ powershell -NoProfile -File scripts/export-render-env.ps1 -PublicBaseUrl https:/
 
 Importar `.demo/render-presentation.private.env` en **Render → Environment → Add from .env**, revisar valores y desplegar la rama. No subir el archivo privado ni la SQLite a GitHub. La carga automática solo permite Demo/Development con opción explícita; nunca Production. Si el conjunto ya existe, no se reemplaza ni duplica. Este modo no requiere BootstrapAdmin.
 
+Con la carga automática habilitada, las contraseñas de esas diez cuentas se sincronizan al iniciar con `SampleData__CredentialsJson`. Ese secreto también permite reparar accesos que conservaron contraseñas aleatorias de una preparación anterior. Consultar el apartado de acceso de la guía de Render.
+
 **Render Free es efímero:** puede perder SQLite, sesiones, mensajes y fotos nuevas al reiniciar/reemplazar la instancia. El conjunto inicial se reconstruye desde el paquete y sus secretos; las operaciones posteriores requieren almacenamiento persistente para conservarse. `render.persistent.yaml` es una alternativa de pago.
 
 ## Integraciones y secretos

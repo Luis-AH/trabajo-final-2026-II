@@ -31,20 +31,7 @@ public sealed class DemoCatalogSeeder(ApplicationDbContext db,UserManager<Applic
         await CategoryCatalog.EnsureAsync(db,ct);
         if(!await roles.RoleExistsAsync("Admin") && !(await roles.CreateAsync(new IdentityRole("Admin"))).Succeeded)throw new InvalidOperationException("No se pudo crear rol para la demostración.");
         var accounts=new List<DemoAccount>();
-        var configuredJson=config["SampleData:CredentialsJson"];
-        Dictionary<string,string>? configuredPasswords=null;
-        if(!string.IsNullOrWhiteSpace(configuredJson))
-        {
-            try
-            {
-                var configured=JsonSerializer.Deserialize<List<DemoAccount>>(configuredJson,new JsonSerializerOptions {PropertyNameCaseInsensitive=true})??[];
-                if(configured.Count!=10||configured.Any(a=>string.IsNullOrWhiteSpace(a.Password))||configured.Select(a=>a.Email).Distinct(StringComparer.OrdinalIgnoreCase).Count()!=10
-                    ||SampleProfiles.Accounts.Any(a=>!configured.Any(c=>string.Equals(c.Email,a.Email,StringComparison.OrdinalIgnoreCase))))
-                    throw new InvalidOperationException("SampleData:CredentialsJson debe contener las diez cuentas del catálogo y sus contraseñas privadas.");
-                configuredPasswords=configured.ToDictionary(a=>a.Email,a=>a.Password,StringComparer.OrdinalIgnoreCase);
-            }
-            catch(JsonException){throw new InvalidOperationException("SampleData:CredentialsJson no tiene formato JSON válido; no se registra su contenido.");}
-        }
+        var configuredPasswords=SampleProfiles.ReadPasswords(config["SampleData:CredentialsJson"]);
         for(var number=1;number<=10;number++)
         {
             var id=$"demo-ml-user-{number:00}";

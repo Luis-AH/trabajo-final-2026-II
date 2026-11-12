@@ -46,7 +46,7 @@ internal static class RenderCatalogChecks
                 await using var db=new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite("Data Source="+database).Options);
                 Ensure(await db.Users.CountAsync(u=>u.Id.StartsWith("demo-ml-user-"))==10&&await db.Articulos.IgnoreQueryFilters().CountAsync(a=>a.Id.StartsWith("demo-ml-art-"))==48,"diez cuentas y 48 artículos sin duplicación");
                 var user=await db.Users.SingleAsync(u=>u.Id=="demo-ml-user-01");
-                Ensure(new PasswordHasher<ApplicationUser>().VerifyHashedPassword(user,user.PasswordHash!,credentials[0].Password)!=PasswordVerificationResult.Failed,"la clave privada configurada coincide con Identity");
+                Ensure(new PasswordHasher<ApplicationUser>().VerifyHashedPassword(user,user.PasswordHash!,credentials[0].Password)!=PasswordVerificationResult.Failed,run==0?"la clave privada configurada coincide con Identity":"reiniciar sincroniza la clave nueva del secreto con la cuenta existente");
                 // Secure cookies se transportan manualmente en el ensayo HTTP local del proxy HTTPS.
                 using var loginPage=await http.GetAsync("/Identity/Account/Login");
                 var html=await loginPage.Content.ReadAsStringAsync();
@@ -67,6 +67,7 @@ internal static class RenderCatalogChecks
                     db.Users.Add(new ApplicationUser {Id="new-after-seed",UserName="new-after-seed"});
                     db.Articulos.Add(new Articulo {Id="new-after-seed",Title="Nueva publicación de ensayo",UserId=user.Id,CategoriaId=await db.Categorias.Select(c=>c.Id).FirstAsync()});
                     await db.SaveChangesAsync();
+                    credentials[0]=new DemoAccount(credentials[0].Email,"Updated!"+Guid.NewGuid().ToString("N"));
                     var refreshed=await Dashboard();
                     Ensure(refreshed.Contains("id=\"catalog-count\">41</span>")&&refreshed.Contains("id=\"own-publication-count\">1</span>"),"publicar actualiza total y propios sin esperar caché");
                 }

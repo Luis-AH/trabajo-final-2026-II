@@ -7,7 +7,10 @@ const root = new URL('../', import.meta.url);
 const read = path => fs.readFile(new URL(path, root), 'utf8');
 const recommendations = await read('SegundaOportunidad/wwwroot/js/recommendations.js');
 class Element {
-    children = []; attributes = {}; textContent = ''; dataset = {};
+    children = []; attributes = {}; textContent = ''; dataset = {}; style = {};
+    classes = new Set();
+    classList = { add: name => this.classes.add(name), remove: name => this.classes.delete(name) };
+    addEventListener(name, handler) { this[name] = handler; }
     appendChild(node) { this.children.push(node); return node; }
     setAttribute(key, value) { this.attributes[key] = value; }
     set innerHTML(_) { throw new Error('No debe insertar HTML del servidor o IA.'); }
@@ -19,10 +22,12 @@ async function runCase(scenario, payload) {
     const section = new Element(), status = new Element(), grid = new Element();
     section.dataset.query = 'libros & estudio';
     section.querySelector = selector => selector === '.ml-status' ? status : grid;
-    let timer, cleared = false, request;
+    let timer, cleared = false, request, observer;
     const context = {
         document: { querySelectorAll: () => [section], createElement: tag => Object.assign(new Element(), { tag }) },
         URLSearchParams, Intl, AbortController, encodeURIComponent,
+        matchMedia: () => ({ matches: scenario === 'reduced' }),
+        IntersectionObserver: scenario === 'observed' ? class { constructor(callback) { observer = this; this.callback = callback; } observe(card) { this.card = card; } unobserve(card) { this.unobserved = card; } } : undefined,
         setTimeout: callback => { timer = callback; return 1; }, clearTimeout: () => { cleared = true; },
         fetch: (url, options) => {
             request = { url, options };
@@ -38,9 +43,10 @@ async function runCase(scenario, payload) {
     assert.equal(section.attributes['aria-busy'], 'false'); assert.ok(cleared);
     assert.equal(request.options.credentials, 'same-origin');
     assert.equal(new URL(request.url, 'https://example.invalid').searchParams.get('consulta'), 'libros & estudio');
-    return { status, grid };
+    return { status, grid, observer };
 }
 let result = await runCase('ok', { criterio: 'Contenido real', publicaciones: [product] });
+assert.equal(result.status.textContent, 'Contenido real');
 assert.equal(result.grid.children.length, 1);
 const card = result.grid.children[0], image = card.children[0], body = card.children[1];
 assert.equal(image.src, '/images/catalog-placeholder.svg');
@@ -53,5 +59,17 @@ assert.match((await runCase('html', {})).status.textContent, /servicio de recome
 assert.match((await runCase('offline', {})).status.textContent, /Conexión no disponible/);
 assert.match((await runCase('timeout', {})).status.textContent, /tardó demasiado/);
 assert.equal((await runCase('ok', { publicaciones: Array.from({ length: 30 }, () => product) })).grid.children.length, 12);
+const animated = await runCase('observed', { publicaciones: [product, product] });
+assert.equal(animated.grid.children[1].style.animationDelay, '130ms');
+assert.ok(animated.grid.children[0].classes.has('recommendation-pending'));
+animated.observer.callback([{ target: animated.grid.children[0], isIntersecting: true }]);
+assert.ok(animated.grid.children[0].classes.has('recommendation-reveal'));
+assert.ok(!animated.grid.children[0].classes.has('recommendation-pending'));
+const reduced = await runCase('reduced', { publicaciones: [product] });
+assert.ok(!reduced.grid.children[0].classes.has('recommendation-pending'));
+const photo = await runCase('ok', { publicaciones: [{ ...product, imagen: '/images/catalog/libros.jpg', similitud: .42 }] });
+assert.equal(photo.grid.children[0].children[0].src, '/images/catalog/libros.jpg');
+assert.equal(photo.grid.children[0].children[1].children.find(c => c.tag === 'meter').value, .42);
+console.log('OK ANIMACION: revelado al entrar en pantalla, demora escalonada, movimiento reducido, foto local y afinidad real.');
 console.log('OK FRONTEND: texto malicioso sin HTML, enlaces locales, imágenes seguras, límite 12, vacío, 503, HTML inesperado, red y timeout; carga accesible restaurada.');
 console.log('Sin navegador ni APIs externas.');

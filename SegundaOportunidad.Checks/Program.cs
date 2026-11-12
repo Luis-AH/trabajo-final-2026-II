@@ -19,6 +19,9 @@ using SegundaOportunidad.Models;
 using SegundaOportunidad.Services;
 
 if (args.Length == 1 && args[0] == "--demo-ui-checks") { await DemoUiChecks.Run(); return; }
+if (args.Length == 1 && args[0] == "--render-catalog-checks") { await RenderCatalogChecks.Run(); return; }
+if (args.Length == 2 && args[0] == "--demo-short-passwords") { await DemoPasswordChecks.Run(args[1]); return; }
+if (args.Length == 2 && args[0] == "--refresh-sample-presentation") { await SamplePresentationChecks.Run(args[1]); return; }
 if (args.Length == 1 && args[0] == "--demo-safety-checks") { await DemoSafetyChecks.Run(); return; }
 if (args.Length == 2 && args[0] == "--demo-setup") { await DemoSetupChecks.Run(args[1]); return; }
 if (args.Length == 1 && args[0] == "--ml-checks") { await MlChecks.Run(); return; }

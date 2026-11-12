@@ -1,4 +1,4 @@
-> ESTADO ACTUAL: Google Maps y puntos de encuentro retirados por solicitud del usuario. No configurar claves Maps ni activar facturacion. Las referencias a pruebas de mapas restantes son historicas.
+> GUÍA VIGENTE DE DESPLIEGUE: `docs/RENDER_PRESENTACION.md` sustituye la preparación manual/BootstrapAdmin de este documento para Render free. Incluye inicio automático con credenciales privadas y contador actualizado. Google Maps sigue retirado. Las referencias a mapas y métricas anteriores que quedan debajo son históricas.
 
 # Recomendaciones, ubicaciones y demo gratuita
 

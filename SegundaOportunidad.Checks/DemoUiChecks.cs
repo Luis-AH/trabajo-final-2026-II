@@ -45,11 +45,15 @@ internal static class DemoUiChecks
             foreach(var route in new[]{"/","/Articulos","/Identity/Account/Login","/Identity/Account/Register","/css/experience.css","/js/recommendations.js","/lib/bootstrap-icons/bootstrap-icons.min.css"})
                 Ensure((await anonymous.GetAsync(route)).StatusCode==HttpStatusCode.OK,"ruta pública "+route+" responde 200");
             var catalog=await anonymous.GetStringAsync("/Articulos");Ensure(Regex.Matches(catalog,"class=\"product-card\"").Count==12,"catálogo paginado en 12 tarjetas");
-            Ensure(catalog.Contains("ENTORNO DEMO")&&catalog.Contains("ml-recommendations"),"aviso DEMO y módulo ML presentes");
+            Ensure(!catalog.Contains("demo-banner")&&catalog.Contains("ml-recommendations"),"catálogo sin aviso superior y módulo ML presente");
             Ensure((await anonymous.GetAsync("/App_Data/recommender.json")).StatusCode==HttpStatusCode.NotFound,"artefacto y corpus no se sirven como archivos públicos");
             using(var response=await anonymous.GetAsync("/api/ml/recomendaciones?consulta=laptop"))
             {using var json=JsonDocument.Parse(await response.Content.ReadAsStringAsync());Ensure(response.IsSuccessStatusCode&&json.RootElement.GetProperty("publicaciones").GetArrayLength()>0,"API ML funciona con las publicaciones DEMO reales");}
-            await Login(admin,"demo01@example.invalid");await Login(member,"demo02@example.invalid");await Login(other,"demo03@example.invalid");
+            await Login(admin,accounts[0].Email);await Login(member,accounts[1].Email);await Login(other,accounts[2].Email);
+            var dashboard=await admin.GetStringAsync("/Home/Dashboard");
+            Ensure(dashboard.Contains("id=\"catalog-count\">40</span>")&&dashboard.Contains("id=\"own-publication-count\">0</span>"),"administrador ve 40 disponibles y cero propios, sin confundir contadores");
+            var memberDashboard=await member.GetStringAsync("/Home/Dashboard");
+            Ensure(memberDashboard.Contains("id=\"own-publication-count\">6</span>"),"usuario ve sus seis publicaciones reales");
             foreach(var route in new[]{"/Admin","/AdminGuard","/Supervisor","/Seguridad","/Demo"})Ensure((await admin.GetAsync(route)).StatusCode==HttpStatusCode.OK,"vista administrativa "+route+" responde 200");
             Ensure((await admin.PostAsync("/Demo/Preparar",new FormUrlEncodedContent(new Dictionary<string,string>()))).StatusCode==HttpStatusCode.BadRequest,"preparación DEMO rechaza POST sin antiforgery");
             var demoForm=await admin.GetStringAsync("/Demo");
@@ -63,7 +67,7 @@ internal static class DemoUiChecks
             int category;
             await using(var db=new SqliteConnection("Data Source="+path)){await db.OpenAsync();using var cmd=db.CreateCommand();cmd.CommandText="SELECT CategoriaId FROM Articulos WHERE Id='demo-ml-art-001'";category=Convert.ToInt32(await cmd.ExecuteScalarAsync());}
             using var edited=await member.PostAsync("/Articulos/Edit/"+id,new FormUrlEncodedContent(new Dictionary<string,string> {
-                ["Title"]="[DEMO] Laptop para clases",["Description"]="Publicación ficticia para probar edición segura.",["Modalidad"]="Venta",["EstadoFisico"]="BuenEstado",["Price"]="42",["CategoriaId"]=category.ToString(),["ModeracionVersion"]=version,["__RequestVerificationToken"]=Token(form)}));
+                ["Title"]="Laptop para clases",["Description"]="Publicación ficticia para probar edición segura.",["Modalidad"]="Venta",["EstadoFisico"]="BuenEstado",["Price"]="42",["CategoriaId"]=category.ToString(),["ModeracionVersion"]=version,["__RequestVerificationToken"]=Token(form)}));
             Ensure(edited.StatusCode==HttpStatusCode.Redirect,"edición propia guarda sin cambiar propietario ni moderación");
             var create=await member.GetStringAsync("/Articulos/Create");
             Ensure(!create.Contains("location-picker")&&!form.Contains("location-picker")&&!catalog.Contains("maps.googleapis.com")&&!catalog.Contains("data-google-maps-key"),"formularios y layout sin Google Maps");

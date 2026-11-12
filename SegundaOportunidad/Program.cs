@@ -59,6 +59,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         await SegundaOportunidad.Data.DataSeeder.SeedDataAsync(services);
+        await SampleStartupInitializer.InitializeAsync(services,builder.Environment,builder.Configuration);
     }
     catch (Exception ex)
     {

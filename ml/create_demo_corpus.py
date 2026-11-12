@@ -14,8 +14,10 @@ rows=[]
 for category, titles, description in catalog:
     for title in titles:
         i=len(rows)+1
-        rows.append({'id':f'demo-ml-art-{i:03d}','title':'[DEMO] '+title,
-                     'description':description+' Publicación ficticia para demostración académica; no realizar pagos.',
+        images=['computacion','ropa','muebles','deportes','libros','oficina','celulares','electrodomesticos']
+        rows.append({'id':f'demo-ml-art-{i:03d}','title':title,
+                     'description':title+'. '+description,
+                     'image':'/images/catalog/'+images[(i-1)//6]+'.jpg',
                      'category':category,'mode':['Venta','Intercambio','Donacion'][(i-1)%3],
                      'condition':['Nuevo','ComoNuevo','BuenEstado','Aceptable'][(i-1)%4],
                      'price':float(30+i*12) if (i-1)%3==0 else None,

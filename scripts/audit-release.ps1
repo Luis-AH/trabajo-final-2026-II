@@ -8,6 +8,8 @@ try {
     & dotnet publish SegundaOportunidad/SegundaOportunidad.csproj -c Release --no-restore -o $publishPath
     if ($LASTEXITCODE -ne 0) { throw 'Falló dotnet publish. No se inicia ninguna aplicación.' }
     $required = @('SegundaOportunidad.dll', 'App_Data/recommender.json', 'App_Data/demo-corpus.json', 'wwwroot/css/experience.css', 'wwwroot/js/recommendations.js', 'wwwroot/lib/bootstrap-icons/fonts/bootstrap-icons.woff2')
+    $required += @('computacion','ropa','muebles','deportes','libros','oficina','celulares','electrodomesticos') | ForEach-Object { 'wwwroot/images/catalog/' + $_ + '.jpg' }
+    $required += 'wwwroot/images/catalog/sources.json'
     foreach ($relative in $required) {
         if (-not (Test-Path -LiteralPath (Join-Path $publishPath $relative) -PathType Leaf)) { throw ('Falta recurso publicado: ' + $relative) }
     }

@@ -13,7 +13,6 @@
 
 <main class="p-4 p-md-5">
     @if(isOwner){<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-brand mb-3">Editar mi publicación</a>}
-    @if(Model.Id.StartsWith("demo-ml-art-")){<div class="alert alert-info">Publicación DEMO: identidad, actividad e imagen ficticias. No representa una oferta real.</div>}
     <div class="mb-4">
         <a asp-action="Index" class="text-decoration-none text-muted"><i class="bi bi-arrow-left me-1"></i> Volver al catálogo</a>
     </div>
@@ -53,7 +52,6 @@
             <h1 class="display-5 fw-bold text-dark mb-4">@Model.Title</h1>
 
             @if(isOwner){<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-brand mb-3">Editar mi publicación</a>}
-    @if(Model.Id.StartsWith("demo-ml-art-")){<div class="alert alert-info">Publicación DEMO: identidad, actividad e imagen ficticias. No representa una oferta real.</div>}
     <div class="mb-4">
                 @if (Model.Modalidad == ModalidadArticulo.Venta) {
                     <h2 class="text-brand fw-bold display-6 mb-0">S/ @Model.Price</h2>
@@ -150,3 +148,5 @@
     </div>
 <section class="ml-recommendations mt-5" data-article="@Model.Id"><div class="section-heading"><span class="eyebrow">Afinidad por contenido</span><h2>También podrían interesarte</h2></div><p class="ml-status" role="status">Cargando recomendaciones…</p><div class="recommendation-grid"></div></section>
 </main>
+
+@if(Model.Id.StartsWith("demo-ml-art-")){<p class="small text-muted text-center">Fotografía ilustrativa de categoría · Fuente: Unsplash. No representa el estado del artículo.</p>}

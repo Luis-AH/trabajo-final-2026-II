@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using SegundaOportunidad.Models;
+using Microsoft.EntityFrameworkCore;
+using SegundaOportunidad.Services;
 
 namespace SegundaOportunidad.Controllers;
 
@@ -55,6 +57,10 @@ public class HomeController : Controller
             await _redisService.SetCacheAsync(cacheKey, stats, TimeSpan.FromHours(1));
         }
 
+        // Los contadores se leen siempre de SQLite: no conservar durante una hora cifras anteriores al seed o a una publicación.
+        stats.ArticulosPublicados=await _context.Articulos.AsNoTracking().CountAsync(a=>a.UserId==user.Id);
+        stats.PublicacionesDisponibles=await ChatCatalogAccess.Visible(_context,DateTime.UtcNow).CountAsync();
+        stats.FullName=user.FullName??user.UserName??"Usuario";
         stats.IsVerified = User.IsInRole("Admin") || (user.IsVerified && user.VerifiedAtUtc != null && user.VerifiedByAdminId != null);
         stats.Dni = user.Dni;
         return View(stats);
@@ -75,6 +81,7 @@ public class HomeController : Controller
         public int DonacionesEntregadas { get; set; }
         public int ArticulosSalvados { get; set; }
         public int ArticulosPublicados { get; set; }
+        public int PublicacionesDisponibles { get; set; }
         public int ConexionesLocales { get; set; }
     }
 

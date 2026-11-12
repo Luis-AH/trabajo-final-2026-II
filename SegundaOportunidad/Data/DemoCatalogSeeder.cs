@@ -9,7 +9,7 @@ namespace SegundaOportunidad.Data;
 public sealed record DemoAccount(string Email,string Password);
 public sealed record DemoSeedResult(int NuevasCuentas,int NuevasPublicaciones,int NuevosIntercambios,IReadOnlyList<DemoAccount> CuentasNuevas);
 public sealed class DemoSeedSafetyException(string message):InvalidOperationException(message);
-public sealed class DemoCatalogSeeder(ApplicationDbContext db,UserManager<ApplicationUser> users,RoleManager<IdentityRole> roles,IWebHostEnvironment environment)
+public sealed class DemoCatalogSeeder(ApplicationDbContext db,UserManager<ApplicationUser> users,RoleManager<IdentityRole> roles,IWebHostEnvironment environment,IConfiguration config)
 {
     public async Task<DemoSeedResult> SeedAsync(CancellationToken ct=default)
     {
@@ -31,18 +31,33 @@ public sealed class DemoCatalogSeeder(ApplicationDbContext db,UserManager<Applic
         await CategoryCatalog.EnsureAsync(db,ct);
         if(!await roles.RoleExistsAsync("Admin") && !(await roles.CreateAsync(new IdentityRole("Admin"))).Succeeded)throw new InvalidOperationException("No se pudo crear rol para la demostración.");
         var accounts=new List<DemoAccount>();
+        var configuredJson=config["SampleData:CredentialsJson"];
+        Dictionary<string,string>? configuredPasswords=null;
+        if(!string.IsNullOrWhiteSpace(configuredJson))
+        {
+            try
+            {
+                var configured=JsonSerializer.Deserialize<List<DemoAccount>>(configuredJson,new JsonSerializerOptions {PropertyNameCaseInsensitive=true})??[];
+                if(configured.Count!=10||configured.Any(a=>string.IsNullOrWhiteSpace(a.Password))||configured.Select(a=>a.Email).Distinct(StringComparer.OrdinalIgnoreCase).Count()!=10
+                    ||SampleProfiles.Accounts.Any(a=>!configured.Any(c=>string.Equals(c.Email,a.Email,StringComparison.OrdinalIgnoreCase))))
+                    throw new InvalidOperationException("SampleData:CredentialsJson debe contener las diez cuentas del catálogo y sus contraseñas privadas.");
+                configuredPasswords=configured.ToDictionary(a=>a.Email,a=>a.Password,StringComparer.OrdinalIgnoreCase);
+            }
+            catch(JsonException){throw new InvalidOperationException("SampleData:CredentialsJson no tiene formato JSON válido; no se registra su contenido.");}
+        }
         for(var number=1;number<=10;number++)
         {
             var id=$"demo-ml-user-{number:00}";
-            var email=$"demo{number:00}@example.invalid";
+            var profile=SampleProfiles.Accounts[number-1];
+            var email=profile.Email;
             var existing=await users.FindByIdAsync(id);
             if(existing!=null)
             {
-                if(existing.Email!=email || !existing.FullName.StartsWith("[DEMO]"))throw new DemoSeedSafetyException("Colisión de identificadores DEMO: no se alteró la cuenta existente.");
+                if((existing.Email!=email && existing.Email!=$"demo{number:00}@example.invalid") || (!existing.FullName.StartsWith("[DEMO]")&&existing.FullName!=profile.Name))throw new DemoSeedSafetyException("Colisión de identificadores: no se alteró la cuenta existente.");
                 continue;
             }
-            var password="D3mo!"+Convert.ToHexString(RandomNumberGenerator.GetBytes(18))+"a";
-            var user=new ApplicationUser {Id=id,UserName=email,Email=email,EmailConfirmed=true,FullName=$"[DEMO] Persona ficticia {number:00}",RegisteredAtUtc=DateTime.UtcNow,
+            var password=configuredPasswords?.GetValueOrDefault(email)??"D!"+RandomNumberGenerator.GetString("ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789",6)+"7a";
+            var user=new ApplicationUser {Id=id,UserName=email,Email=email,EmailConfirmed=true,FullName=profile.Name,RegisteredAtUtc=DateTime.UtcNow,
                 IsVerified=true,VerifiedAtUtc=DateTime.UtcNow,VerifiedByAdminId="demo-ml-user-01",Dni=null};
             // El primer usuario se guarda sin referencia circular, luego se registra aprobación técnica DEMO.
             if(number==1)user.VerifiedByAdminId=null;
@@ -61,14 +76,14 @@ public sealed class DemoCatalogSeeder(ApplicationDbContext db,UserManager<Applic
             var existing=await db.Articulos.IgnoreQueryFilters().SingleOrDefaultAsync(a=>a.Id==row.Id,ct);
             if(existing!=null)
             {
-                if(!existing.Title.StartsWith("[DEMO]"))throw new DemoSeedSafetyException("Colisión de artículo DEMO: no se modificó el existente.");
+                if(!existing.UserId.StartsWith("demo-ml-user-"))throw new DemoSeedSafetyException("Colisión de artículo: no se modificó el existente.");
                 continue;
             }
             var number=int.Parse(row.Id[^3..],System.Globalization.CultureInfo.InvariantCulture);
             var state=number switch {6=>EstadoModeracion.Oculta,12=>EstadoModeracion.Suspendida,18=>EstadoModeracion.Eliminada,_=>EstadoModeracion.Visible};
             db.Articulos.Add(new Articulo {Id=row.Id,Title=row.Title,Description=row.Description,UserId=$"demo-ml-user-{2+(number-1)%9:00}",CategoriaId=categories[row.Category],
                 Modalidad=Enum.Parse<ModalidadArticulo>(row.Mode),EstadoFisico=Enum.Parse<EstadoFisico>(row.Condition),Price=row.Price,IsActive=number is not (24 or 30 or 36 or 42 or 48),Moderacion=state,
-                ExchangeDetails=row.Mode=="Intercambio"?"[DEMO] Busco artículos relacionados para una simulación académica.":null,ImageUrl="/images/demo-placeholder.svg"});
+                ExchangeDetails=row.Mode=="Intercambio"?"Busco artículos relacionados con estudio, hogar o deporte.":null,ImageUrl=row.Image});
             added++;
         }
         await db.SaveChangesAsync(ct);
@@ -92,5 +107,6 @@ public sealed class DemoCatalogSeeder(ApplicationDbContext db,UserManager<Applic
     {
         public string Id {get;set;}=""; public string Title {get;set;}=""; public string Description {get;set;}="";public string Category {get;set;}="";
         public string Mode {get;set;}="";public string Condition {get;set;}="";public decimal? Price {get;set;}
+        public string Image {get;set;}="/images/catalog-placeholder.svg";
     }
 }

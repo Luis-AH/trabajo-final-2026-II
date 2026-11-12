@@ -1,13 +1,13 @@
 {
   "dataset": "Publicaciones DEMO sintéticas; evaluación de recuperación, no prueba con usuarios reales",
   "documents": 40,
-  "features": 3168,
+  "features": 3226,
   "queries": [
     {
       "query": "laptop para estudiar",
       "relevantCategory": "Computación y accesorios",
       "precisionAt5": 0.4,
-      "ndcgAt5": 0.4703652827859579
+      "ndcgAt5": 0.48522855511632257
     },
     {
       "query": "bicicleta deporte",
@@ -30,8 +30,8 @@
     {
       "query": "mueble escritorio silla",
       "relevantCategory": "Muebles",
-      "precisionAt5": 1.0,
-      "ndcgAt5": 1.0
+      "precisionAt5": 0.8,
+      "ndcgAt5": 0.8687949224876582
     },
     {
       "query": "cuaderno oficina estudiar",
@@ -40,8 +40,8 @@
       "ndcgAt5": 1.0
     }
   ],
-  "meanPrecisionAt5": 0.9,
-  "meanNdcgAt5": 0.9117275471309929,
+  "meanPrecisionAt5": 0.8666666666666667,
+  "meanNdcgAt5": 0.8923372462673301,
   "coverageAt5": 0.675,
   "training": "Ajuste TF-IDF una vez fuera del servidor HTTP; corpus completo de candidatos públicos",
   "limitations": "Relevancia sintética por categoría; no demuestra preferencias reales ni satisfacción."

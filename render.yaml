@@ -18,9 +18,9 @@ services:
         value: Data Source=/tmp/segunda-demo/app.db;Cache=Shared
       - key: DataProtection__KeyPath
         value: /tmp/segunda-demo/keys
-      - key: BootstrapAdmin__Email
+      - key: SampleData__InitializeOnStartup
+        value: "true"
+      - key: SampleData__CredentialsJson
         sync: false
-      - key: BootstrapAdmin__Password
-        sync: false
-# Tras iniciar sesión como BootstrapAdmin, ejecutar /Demo explícitamente.
+# CredentialsJson se configura en privado; prepara cuentas y artículos al iniciar una base nueva.
 # ML no usa Python ni un segundo servicio en runtime; su JSON va en la imagen.

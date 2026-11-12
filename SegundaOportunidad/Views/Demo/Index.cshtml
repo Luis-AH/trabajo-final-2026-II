@@ -1,9 +1,9 @@
-﻿@model SegundaOportunidad.Data.DemoSeedResult
+@model SegundaOportunidad.Data.DemoSeedResult
 @{Layout="_DashboardLayout";ViewData["Title"]="Datos de demostración";}
 <main class="p-4 p-md-5"><div class="workspace-heading"><span class="eyebrow">Laboratorio académico</span><h1>Una comunidad de ejemplo</h1><p>10 cuentas ficticias, 48 artículos y 6 solicitudes simuladas. No representan identidades, reseñas ni operaciones reales.</p></div>
 <div asp-validation-summary="All" class="text-danger" role="alert"></div>
-<div class="card p-4"><p>Usa una base separada: el proceso rechaza cuentas normales o actividad ajena a DEMO. Conserva el administrador inicial. No borra ni sustituye datos. En Render gratuito debes ejecutarlo explícitamente si el almacenamiento se reinicia.</p>
-<form asp-action="Preparar" method="post"><button class="btn btn-brand" type="submit">Preparar datos DEMO</button></form></div>
+<div class="card p-4"><p>Usa una base separada: el proceso rechaza cuentas normales o actividad ajena al catálogo de simulación. Conserva el administrador inicial. No borra ni sustituye datos. En Render gratuito debes ejecutarlo explícitamente si el almacenamiento se reinicia.</p>
+<form asp-action="Preparar" method="post"><button class="btn btn-brand" type="submit">Preparar catálogo</button></form></div>
 @if(Model!=null){<div class="alert alert-success mt-4">Cuentas nuevas: @Model.NuevasCuentas · Artículos nuevos: @Model.NuevasPublicaciones · Solicitudes nuevas: @Model.NuevosIntercambios</div>
 @if(Model.CuentasNuevas.Count>0){<div class="card p-4"><h2>Credenciales nuevas: guárdalas en privado</h2><p>Solo aparecen al crear cada cuenta. No se guardan en el repositorio ni se recuperan desde Identity en texto claro.</p><div class="table-responsive"><table class="table"><thead><tr><th>Cuenta ficticia</th><th>Contraseña aleatoria</th></tr></thead><tbody>@foreach(var account in Model.CuentasNuevas){<tr><td>@account.Email</td><td><code>@account.Password</code></td></tr>}</tbody></table></div></div>}}
 </main>

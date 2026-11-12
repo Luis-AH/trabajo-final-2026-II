@@ -27,7 +27,7 @@
                     <h4 class="fw-bold text-dark mb-1">@(Model.FullName ?? "Usuario")</h4>
                     <p class="text-muted mb-3">@(Model.Email ?? "")</p>
 
-                    @if(Model.Id.StartsWith("demo-ml-user-")){<span class="badge bg-info text-dark">Cuenta ficticia DEMO · aprobación técnica de ensayo</span>}
+                    @if(Model.Id.StartsWith("demo-ml-user-")){<span class="badge bg-info text-dark">Cuenta de simulación</span>}
                     else if (Model.IsVerified)
                     {
                         <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">

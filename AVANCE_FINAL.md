@@ -1,4 +1,4 @@
-> ACTUALIZACION 11/11/2026: Google Maps retirado por solicitud del usuario para evitar esa dependencia de facturacion. Selector, mapas, puntos de encuentro, endpoints, servicios Google, JS y cartografia eliminados. No configurar GoogleMaps__BrowserApiKey ni GoogleMaps__ServerApiKey. Compilacion, regresion y pruebas HTTP sin Maps aprobadas. Base app.db intacta; columnas/migracion se conservan por compatibilidad, sin borrar datos. El resto de este documento registra tambien el avance historico anterior a esa decision.
+> ACTUALIZACIÓN 12/11/2026: guía vigente `docs/RENDER_PRESENTACION.md`. Catálogo, imágenes, nombres y modelo listos para GitHub/Render. Inicio automático exclusivo de Demo/Development mediante SampleData__InitializeOnStartup y SampleData__CredentialsJson privado; sin publicar passwords ni SQLite. Contador global y propio separados y actualizados por consulta. Aviso superior y texto técnico retirados. Google Maps sigue retirado; el resto de este documento incluye avances históricos.
 
 # Avance final — SegundaOportunidad
 
@@ -62,3 +62,24 @@ Los pendientes restantes requieren condiciones externas: claves Maps/billing hab
 
 ## Cierre: retirada de Google Maps
 Build Debug y publish Release correctos; suite completa, HTTP y frontend sin Maps aprobados. Endpoints de encuentros y /js/maps.js devuelven 404. Publicación nueva sin scripts Maps ni cartografía: 113.4 MiB. No quedan referencias GoogleMaps ni URLs Maps en el proyecto MVC. app.db sin cambios. Sin commit, push ni cambios en main. Pendientes actuales: PieSocket, entrega real, Docker/Render y revisión visual; Maps ya no es un requisito del proyecto.
+
+## Actualización 12/11/2026: presentación del catálogo
+
+- Retiradas las etiquetas visibles DEMO y los prefijos de 48 títulos. Un aviso de simulación académica e imágenes ilustrativas distingue los datos ficticios sin repetir etiquetas en cada tarjeta.
+- Diez nombres y correos nuevos; contraseñas cortas conservadas. Identificadores internos preservados para mantener relaciones. Actualización transaccional con respaldo únicamente en .demo/segunda-demo.db; app.db intacta.
+- Ocho fotos de Unsplash descargadas, inspeccionadas y asignadas por categoría. Servidas localmente; procedencia/licencia/SHA256 en wwwroot/images/catalog/sources.json. No se presentan como fotos reales del vendedor.
+- Recomendaciones: IntersectionObserver, animación escalonada 130 ms, opacidad/desplazamiento, acceso por teclado y prefers-reduced-motion. Afinidad textual real con indicador; no representa calidad ni seguridad.
+- Modelo reentrenado con los textos nuevos: 40 elegibles, 3226 características, Precision@5=0.8667, nDCG@5=0.892337, cobertura=0.675. Sustituye las métricas de textos anteriores; sin inventar mejora.
+- Build y regresión completa aprobados. Pruebas HTTP de diez logins nuevos, perfil, imágenes (8x200), catálogo sin DEMO visible, tres búsquedas y recomendaciones distintas entre Mateo/Valeria. JavaScript probado con DOM simulado; revisión visual de navegador pendiente.
+- Guía vigente: docs/mostrar-machine-learning.md. Página iniciada en http://localhost:5194. Sin commit ni push en esta actualización.
+
+## Paquete de presentación para GitHub/Render — 12/11/2026
+
+- Eliminados el aviso superior de simulación y el sufijo técnico de las recomendaciones. Conservados los controles de acceso, la naturaleza ficticia documentada y las leyendas de imágenes ilustrativas.
+- Contador del inicio: total disponible del catálogo y publicaciones propias separados. Lectura directa de SQLite en cada visita; no se conserva una hora el contador viejo. Estado inicial: 40 disponibles, 48 registros de ensayo en total; Renata 0 propios y Mateo/Valeria 6.
+- SampleStartupInitializer crea cuentas/artículos únicamente en Demo/Development con opción explícita y credenciales JSON privadas. No necesita BootstrapAdmin en este modo. Es idempotente y conserva nueva actividad tras reinicio; bloqueado en Production.
+- render.yaml actualizado. scripts/export-render-env.ps1 genera .demo/render-presentation.private.env (21 variables locales, sin mostrar secretos) y JSON privado de cuentas. Archivo privado excluido de Git/Docker; no se exporta localhost como URL de recuperación.
+- Pruebas nuevas --render-catalog-checks: dos arranques reales, 10 cuentas/48 registros, contraseña externa verificada, login Secure con proxy local de ensayo, foto 200, contadores 40→41 y 0→1 al publicar, reinicio sin duplicación ni pérdida de nueva actividad. Aprobadas junto con regresión y HTTP de vistas.
+- Publicación Release auditada: 15 recursos requeridos, imágenes/modelo incluidos, sin privados. ZIP local .demo/segunda-presentacion-release.zip (~48.8 MB), no subido a Git por ser artefacto de compilación.
+- Revisados 308 archivos versionables contra secretos y contraseñas locales, sin coincidencias. app.db intacta. Guía vigente docs/RENDER_PRESENTACION.md.
+- Sin despliegue real de Render ni prueba Docker/Linux. El usuario debe importar las variables privadas y desplegar la rama desde el panel. El free puede perder modificaciones posteriores; reconstruye solo el conjunto inicial.

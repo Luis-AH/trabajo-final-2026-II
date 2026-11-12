@@ -31,6 +31,7 @@ namespace SegundaOportunidad.Data
                     throw new InvalidOperationException("No se pudo crear el rol administrativo.");
                 if(await (from ur in context.UserRoles join r in context.Roles on ur.RoleId equals r.Id where r.Name=="Admin" select ur).AnyAsync()) return;
                 var config=scope.ServiceProvider.GetRequiredService<IConfiguration>();
+                if(environment.IsEnvironment("Demo")&&config.GetValue<bool>("SampleData:InitializeOnStartup"))return;
                 var email=config["BootstrapAdmin:Email"];
                 var password=config["BootstrapAdmin:Password"];
                 if(string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))

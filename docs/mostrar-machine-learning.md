@@ -13,6 +13,8 @@ Actualización: 12/11/2026. La interfaz ya no repite etiquetas «DEMO» ni muest
 
 La afinidad en porcentaje es la similitud del texto escalada de 0 a 100. No mide calidad, confiabilidad, satisfacción ni probabilidad de compra. Una bicicleta puede recomendar un casco porque comparten contenido; no es un filtro exacto de categoría.
 
+Al recargar, la web solicita una selección rotativa dentro de candidatos afines calculados por el modelo. Conserva los puntajes y las restricciones de visibilidad. Si existen suficientes alternativas, cambia parte de las publicaciones; con pocas coincidencias pueden repetirse o cambiar solo de orden. El contador se guarda por búsqueda/artículo en la sesión del navegador, sin guardar publicaciones ni datos personales. No es aprendizaje nuevo por recarga ni reentrenamiento automático. Para inspeccionar el ranking inicial determinista de la API, omitir `rotacion` o usar `rotacion=0`.
+
 ## Accesos de simulación
 
 Se conservan las contraseñas cortas, ahora asociadas a estos correos:

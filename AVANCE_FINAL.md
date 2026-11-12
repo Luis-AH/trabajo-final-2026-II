@@ -83,3 +83,10 @@ Build Debug y publish Release correctos; suite completa, HTTP y frontend sin Map
 - Publicación Release auditada: 15 recursos requeridos, imágenes/modelo incluidos, sin privados. ZIP local .demo/segunda-presentacion-release.zip (~48.8 MB), no subido a Git por ser artefacto de compilación.
 - Revisados 308 archivos versionables contra secretos y contraseñas locales, sin coincidencias. app.db intacta. Guía vigente docs/RENDER_PRESENTACION.md.
 - Sin despliegue real de Render ni prueba Docker/Linux. El usuario debe importar las variables privadas y desplegar la rama desde el panel. El free puede perder modificaciones posteriores; reconstruye solo el conjunto inicial.
+
+## Recomendaciones variables por recarga — 12/11/2026
+
+- Frontend conserva un contador por contexto en sessionStorage, pide rotacion distinta y evita caché. No guarda datos personales ni entrena al recargar.
+- Servidor selecciona de forma rotativa entre candidatos con score real: hasta tres veces el límite de tarjetas, incorporando alternativas adicionales solo si tienen al menos 55% del mejor score. Siempre conserva resultados iniciales y filtra permisos/disponibilidad antes de responder.
+- Si no hay suficientes opciones pueden repetirse; con cero coincidencias no inventa artículos. Puntajes TF-IDF/coseno sin modificar y API determinista por defecto (rotacion=0).
+- Build aprobado con NU1901 existentes. Pruebas ML y frontend aprobadas: siguiente carga solicita otra selección, IDs distintos con alternativas, sin duplicados/ocultos, puntajes equivalentes a Python, sin resultados e inputs inválidos.

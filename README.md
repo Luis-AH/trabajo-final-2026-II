@@ -52,6 +52,8 @@ POST /api/chat
 
 La API devuelve JSON; la presentación para usuarios está en las tarjetas. El perfil considera publicaciones/intercambios propios; sin historial utiliza contenido representativo, sin inventar popularidad. Gemini es una integración distinta del recomendador.
 
+Cada recarga de las tarjetas pide una selección rotativa entre coincidencias afines. Cambia publicaciones cuando hay alternativas suficientes, manteniendo sus puntajes y permisos. No reentrena el modelo. La API conserva el ranking inicial con `rotacion=0`; la web incrementa ese parámetro por contexto en la sesión del navegador.
+
 Evaluación actual: 40 documentos, 3226 características y seis consultas sintéticas; Precision@5 **0.8667**, nDCG@5 **0.8923**, cobertura@5 **0.675**. No es validación con compradores reales. La afinidad textual no mide calidad, seguridad ni probabilidad de compra.
 
 Reentrenamiento con Python 3.12:

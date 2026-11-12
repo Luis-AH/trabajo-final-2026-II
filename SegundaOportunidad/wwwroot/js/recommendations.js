@@ -13,7 +13,16 @@
         const parameters = new URLSearchParams({ cantidad: '4' });
         if (section.dataset.article) parameters.set('articuloId', section.dataset.article);
         if (section.dataset.query) parameters.set('consulta', section.dataset.query);
-        fetch('/api/ml/recomendaciones?' + parameters.toString(), { signal: controller.signal, credentials: 'same-origin', headers: { Accept: 'application/json' } }).then(async response => {
+        // Guardar solo un contador por contexto, nunca artículos ni datos de la cuenta.
+        const rotationKey = 'segunda-recommendations-v1:' + JSON.stringify([section.dataset.article || '', section.dataset.query || '']);
+        let rotation = 0;
+        try {
+            const previous = Number(sessionStorage.getItem(rotationKey) || 0);
+            rotation = Number.isInteger(previous) && previous >= 0 && previous <= 1000000 ? previous : 0;
+            sessionStorage.setItem(rotationKey, String((rotation + 1) % 1000001));
+        } catch { rotation = Math.floor(Math.random() * 1000000); }
+        parameters.set('rotacion', String(rotation));
+        fetch('/api/ml/recomendaciones?' + parameters.toString(), { signal: controller.signal, credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json' } }).then(async response => {
             if (!response.headers.get('content-type')?.includes('application/json')) throw new Error('El servicio de recomendaciones no está disponible ahora.');
             const data = await response.json(); if (!response.ok) throw new Error(data.criterio || 'Las recomendaciones no están disponibles ahora.'); return data;
         }).then(data => {

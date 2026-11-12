@@ -89,6 +89,18 @@ internal static class MlChecks
             Ensure((await http.GetAsync("/api/ml/recomendaciones?cantidad=100")).StatusCode==System.Net.HttpStatusCode.BadRequest,"límite de recomendaciones validado");
             var expectedScores=artifact.RootElement.GetProperty("parity")[0].GetProperty("scores");
             Ensure(json.RootElement.GetProperty("publicaciones").EnumerateArray().All(p=>Math.Abs(p.GetProperty("similitud").GetDouble()-expectedScores.GetProperty(p.GetProperty("id").GetString()!).GetDouble())<1e-6),"extracción y scoring del endpoint coinciden con Python");
+            using var firstRotation=JsonDocument.Parse(await http.GetStringAsync("/api/ml/recomendaciones?cantidad=2&rotacion=0"));
+            using var nextRotation=JsonDocument.Parse(await http.GetStringAsync("/api/ml/recomendaciones?cantidad=2&rotacion=1"));
+            var firstIds=firstRotation.RootElement.GetProperty("publicaciones").EnumerateArray().Select(p=>p.GetProperty("id").GetString()!).ToHashSet();
+            var nextIds=nextRotation.RootElement.GetProperty("publicaciones").EnumerateArray().Select(p=>p.GetProperty("id").GetString()!).ToHashSet();
+            Ensure(firstIds.Count==2&&nextIds.Count==2&&!firstIds.SetEquals(nextIds),"recargar cambia publicaciones entre candidatos afines, sin duplicados");
+            Ensure(nextIds.All(corpus.ContainsKey),"rotación mantiene restricciones de visibilidad");
+            using var rotatedQuery=JsonDocument.Parse(await http.GetStringAsync("/api/ml/recomendaciones?consulta=laptop%20para%20estudiar&cantidad=5&rotacion=2"));
+            Ensure(rotatedQuery.RootElement.GetProperty("publicaciones").EnumerateArray().All(p=>Math.Abs(p.GetProperty("similitud").GetDouble()-expectedScores.GetProperty(p.GetProperty("id").GetString()!).GetDouble())<1e-6),"rotar no modifica las similitudes calculadas por Scikit-learn");
+            using var noMatches=JsonDocument.Parse(await http.GetStringAsync("/api/ml/recomendaciones?consulta=zzzzzzzzzzzzzzzzzzzz&rotacion=3"));
+            Ensure(noMatches.RootElement.GetProperty("publicaciones").GetArrayLength()==0,"rotación sin coincidencias no inventa resultados");
+            Ensure((await http.GetAsync("/api/ml/recomendaciones?rotacion=-1")).StatusCode==System.Net.HttpStatusCode.BadRequest,"rotación negativa rechazada");
+            Ensure((await http.GetAsync("/api/ml/recomendaciones?rotacion=texto")).StatusCode==System.Net.HttpStatusCode.BadRequest,"rotación no numérica rechazada");
             using var scope=app.Services.CreateScope();
             var context=scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             context.Users.Add(new ApplicationUser {Id="interest-user",IsVerified=true,VerifiedAtUtc=DateTime.UtcNow,VerifiedByAdminId="ml-user"});

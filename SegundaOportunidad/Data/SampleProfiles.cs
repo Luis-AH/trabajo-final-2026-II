@@ -2,6 +2,21 @@ namespace SegundaOportunidad.Data;
 
 public static class SampleProfiles
 {
+    // Accesos públicos solo para las diez cuentas ficticias del entorno Demo.
+    public static Dictionary<string, string>? ResolvePasswords(IConfiguration config, IWebHostEnvironment environment)
+    {
+        if (environment.IsEnvironment("Demo") && config.GetValue<bool>("SampleData:UsePublicDemoPasswords"))
+        {
+            var admin = config["SampleData:PublicAdminPassword"];
+            var member = config["SampleData:PublicMemberPassword"];
+            if (string.IsNullOrWhiteSpace(admin) || string.IsNullOrWhiteSpace(member))
+                throw new InvalidOperationException("Faltan las claves públicas del entorno Demo.");
+            return Accounts.Select((profile, index) => new { profile.Email, Password = index == 0 ? admin : member })
+                .ToDictionary(profile => profile.Email, profile => profile.Password, StringComparer.OrdinalIgnoreCase);
+        }
+        return ReadPasswords(config["SampleData:CredentialsJson"]);
+    }
+
     public static Dictionary<string, string>? ReadPasswords(string? json)
     {
         if (string.IsNullOrWhiteSpace(json))

@@ -1,5 +1,9 @@
 # SegundaOportunidad
 
+El entorno Demo incluye ahora accesos públicos de presentación desde archivos,
+sin importar contraseñas en Render. Consultar [accesos de presentación](docs/acceso-presentacion.md).
+Las instrucciones de credenciales privadas requieren desactivar `SampleData:UsePublicDemoPasswords`.
+
 Plataforma universitaria para publicar, comprar, donar e intercambiar artículos con una comunidad. Incluye recomendaciones de contenido entrenadas mediante Scikit-learn y un asistente Gemini que consulta publicaciones reales autorizadas.
 
 ## Tecnologías y funciones

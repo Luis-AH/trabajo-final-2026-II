@@ -29,7 +29,7 @@ public static class SampleStartupInitializer
 
         if (userCount == 10 && articleCount == 48)
         {
-            var passwords = SampleProfiles.ReadPasswords(config["SampleData:CredentialsJson"]);
+            var passwords = SampleProfiles.ResolvePasswords(config, environment);
             if (passwords == null)
             {
                 return;
@@ -87,7 +87,7 @@ public static class SampleStartupInitializer
         }
 
         await services.GetRequiredService<DemoCatalogSeeder>().SeedAsync(ct);
-        if (string.IsNullOrWhiteSpace(config["SampleData:CredentialsJson"]))
+        if (SampleProfiles.ResolvePasswords(config, environment) == null)
         {
             services.GetRequiredService<ILoggerFactory>()
                 .CreateLogger("SampleStartupInitializer")

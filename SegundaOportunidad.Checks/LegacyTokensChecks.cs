@@ -16,8 +16,9 @@ internal static class LegacyTokensChecks
         await db.GetService<IMigrator>().MigrateAsync(previous);
         await db.Database.ExecuteSqlRawAsync("INSERT INTO AspNetUsers (Id,FullName,IsVerified,Co2Saved,ObjectsReused,FamiliesHelped,Rating,EmailConfirmed,PhoneNumberConfirmed,TwoFactorEnabled,LockoutEnabled,AccessFailedCount,SanctionVersion) VALUES ('legacy','',0,'0',0,0,'0',0,0,0,0,0,'');");
         db.Categorias.Add(new Categoria { Id = 1, Name = "Prueba" });
-        db.Articulos.AddRange(new Articulo { Id = "old1", UserId = "legacy", CategoriaId = 1, ModeracionVersion = "" }, new Articulo { Id = "old2", UserId = "legacy", CategoriaId = 1, ModeracionVersion = "" });
+
         await db.SaveChangesAsync();
+        await db.Database.ExecuteSqlRawAsync("INSERT INTO Articulos (Id,Title,Description,Modalidad,EstadoFisico,IsActive,CreatedAt,CategoriaId,UserId,Moderacion,ModeracionVersion) VALUES ('old1','Legacy 1','',0,0,1,'2026-01-01',1,'legacy',0,''),('old2','Legacy 2','',0,0,1,'2026-01-01',1,'legacy',0,'');");
         await db.Database.MigrateAsync();
         db.ChangeTracker.Clear();
         var tokens = await db.Articulos.Select(a => a.ModeracionVersion).ToListAsync();

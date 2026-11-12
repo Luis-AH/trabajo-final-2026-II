@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+builder.AddDeploymentConfiguration(connectionString);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -31,6 +32,12 @@ builder.Services.AddHttpClient<SegundaOportunidad.Services.IAdminGuardImageReade
     .ConfigurePrimaryHttpMessageHandler(SegundaOportunidad.Services.AdminGuardImageReader.Handler);
 
 builder.Services.AddHttpClient<AiSearchService>(client => client.Timeout = TimeSpan.FromSeconds(25));
+builder.Services.AddScoped<ChatCatalogService>();
+builder.Services.AddScoped<ChatSellerService>();
+builder.Services.AddScoped<ChatAssistantService>();
+builder.Services.AddSingleton<ScikitContentModel>();
+builder.Services.AddScoped<MlRecommendationService>();
+builder.Services.AddScoped<DemoCatalogSeeder>();
 
 builder.Services.AddSingleton<SegundaOportunidad.Services.RedisService>();
 builder.Services.AddSingleton<SegundaOportunidad.Services.RabbitMqPublisher>();
@@ -52,14 +59,17 @@ using (var scope = app.Services.CreateScope())
     try
     {
         await SegundaOportunidad.Data.DataSeeder.SeedDataAsync(services);
+        await SampleStartupInitializer.InitializeAsync(services,builder.Environment,builder.Configuration);
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Un error ocurrió sembrando la base de datos.");
+        logger.LogCritical("No se pudo inicializar la base de datos ({Type}). Revisa almacenamiento, migraciones y BootstrapAdmin.", ex.GetType().Name);
+        throw;
     }
 }
 
+app.UseForwardedHeaders();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -85,6 +95,9 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+app.MapGet("/health", async (ApplicationDbContext db) =>
+    await db.Database.CanConnectAsync() ? Results.Ok(new { status = "ok" }) : Results.StatusCode(503));
 
 app.MapRazorPages()
    .WithStaticAssets();

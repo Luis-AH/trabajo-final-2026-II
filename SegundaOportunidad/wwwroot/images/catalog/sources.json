@@ -1,0 +1,58 @@
+[
+  {
+    "file": "computacion.jpg",
+    "source": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80&fm=jpg",
+    "license": "https://unsplash.com/license",
+    "sha256": "b5c0d4c129c93b6822ec4a0ecc45787b9742834afe10395bc3047f973bd063c0",
+    "use": "Fotografia ilustrativa de categoria; no acredita el estado ni propiedad del articulo."
+  },
+  {
+    "file": "ropa.jpg",
+    "source": "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=800&q=80&fm=jpg",
+    "license": "https://unsplash.com/license",
+    "sha256": "1f415b7c2f47cc3db86b414b35602b833edd8d56a59dcdaa44ca3deb7996cdff",
+    "use": "Fotografia ilustrativa de categoria; no acredita el estado ni propiedad del articulo."
+  },
+  {
+    "file": "muebles.jpg",
+    "source": "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=800&q=80&fm=jpg",
+    "license": "https://unsplash.com/license",
+    "sha256": "be897412476c89d11d29965d5c54e13931e6e3341e1965eb257b7f4ee661bf47",
+    "use": "Fotografia ilustrativa de categoria; no acredita el estado ni propiedad del articulo."
+  },
+  {
+    "file": "deportes.jpg",
+    "source": "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=800&q=80&fm=jpg",
+    "license": "https://unsplash.com/license",
+    "sha256": "d6836978327373f1772fe875b075bd74d07fcd2728d8dfd4bd0260ef505d3291",
+    "use": "Fotografia ilustrativa de categoria; no acredita el estado ni propiedad del articulo."
+  },
+  {
+    "file": "libros.jpg",
+    "source": "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=800&q=80&fm=jpg",
+    "license": "https://unsplash.com/license",
+    "sha256": "c027d784248b9dc65e3b9dc4e32a1720d3c699eda440bc1042c80f1ed097308e",
+    "use": "Fotografia ilustrativa de categoria; no acredita el estado ni propiedad del articulo."
+  },
+  {
+    "file": "oficina.jpg",
+    "source": "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=800&q=80&fm=jpg",
+    "license": "https://unsplash.com/license",
+    "sha256": "aa204797238177182f44ea4af6088102351f990c936910679a8e272b455397d0",
+    "use": "Fotografia ilustrativa de categoria; no acredita el estado ni propiedad del articulo."
+  },
+  {
+    "file": "celulares.jpg",
+    "source": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80&fm=jpg",
+    "license": "https://unsplash.com/license",
+    "sha256": "c9c40f9e4b016dab25c882abb2201695cf52df32691d69f5ec2d8e5f3d165bc1",
+    "use": "Fotografia ilustrativa de categoria; no acredita el estado ni propiedad del articulo."
+  },
+  {
+    "file": "electrodomesticos.jpg",
+    "source": "https://images.unsplash.com/photo-1570222094114-d054a817e56b?auto=format&fit=crop&w=800&q=80&fm=jpg",
+    "license": "https://unsplash.com/license",
+    "sha256": "968976e6882dec75e52c97bd6ca0c05120bf6f67e33c380e7e2442a8d5733b52",
+    "use": "Fotografia ilustrativa de categoria; no acredita el estado ni propiedad del articulo."
+  }
+]

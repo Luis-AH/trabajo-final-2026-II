@@ -1,3 +1,4 @@
+@inject IConfiguration Configuration
 @{
     ViewData["Title"] = "Mensajes";
     var contacts = ViewBag.Contacts as List<SegundaOportunidad.Models.ApplicationUser>;
@@ -27,12 +28,12 @@
                 <h5 class="offcanvas-title fw-bold" id="sidebarMenuLabel"><i class="bi bi-bullseye text-brand me-2"></i> SegundaOportunidad</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
             </div>
-            
+
             <div class="offcanvas-body d-flex flex-column h-100 p-3">
                 <a asp-controller="Home" asp-action="Dashboard" class="d-flex align-items-center mb-4 text-dark text-decoration-none fw-bold fs-5">
                     <i class="bi bi-bullseye text-brand me-2"></i> SegundaOportunidad
                 </a>
-                
+
                 <ul class="nav nav-pills flex-column mb-auto">
                     <li class="nav-item mb-2">
                         <a asp-controller="Home" asp-action="Dashboard" class="nav-link text-dark">
@@ -102,7 +103,7 @@
             <!-- Contacts -->
             <div class="col-4 border-end bg-white rounded-start shadow-sm p-3 overflow-auto">
                 <h5 class="fw-bold mb-3">Conversaciones</h5>
-                
+
                 <!-- Search Bar -->
                 <div class="mb-3">
                     <div class="input-group">
@@ -144,7 +145,7 @@
                         <h6 class="mb-0 fw-bold">Chat con el usuario seleccionado</h6>
                         <small id="ws-status" class="text-warning"><i class="bi bi-circle-fill"></i> Conectando...</small>
                     </div>
-                    
+
                     <div class="p-3 flex-grow-1 overflow-auto" id="chat-messages" style="height: 400px;">
                         @if(messages != null)
                         {
@@ -198,46 +199,54 @@
     <script>
         const activeUserId = '@activeChatUserId';
         const currentUserId = '@currentUserId';
-        
+
         if (activeUserId) {
             const form = document.getElementById('chat-form');
             const input = document.getElementById('chat-input');
-            
+
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const text = input.value;
                 if (!text) return;
-                
-                input.value = '';
-                
-                // Add optimistic UI message
-                addMessageToUI(text, true);
 
-                try {
-                    await fetch('/Mensajes/SendMessage', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                        },
-                        body: JSON.stringify({
-                            receiverId: activeUserId,
-                            content: text
-                        })
-                    });
-                } catch(err) {
-                    console.error('Error enviando mensaje', err);
+                const button=form.querySelector('button[type="submit"]');
+                if(button.disabled) return;
+                button.disabled=true;
+                let errorBox=document.getElementById('message-send-error');
+                if(!errorBox) {
+                    errorBox=document.createElement('p');
+                    errorBox.id='message-send-error';
+                    errorBox.className='text-danger small mt-2 mb-0';
+                    errorBox.setAttribute('role','alert');
+                    form.after(errorBox);
                 }
+                errorBox.textContent='';
+                try {
+                    const response=await fetch('/Mensajes/SendMessage', {
+                        method:'POST',
+                        headers: {
+                            'Content-Type':'application/json',
+                            'RequestVerificationToken':document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body:JSON.stringify({receiverId:activeUserId,content:text})
+                    });
+                    if(!response.ok) throw new Error('No se pudo enviar el mensaje. Comprueba tu conexión y permisos e inténtalo más tarde.');
+                    input.value='';
+                    addMessageToUI(text,true);
+                } catch(err) {
+                    errorBox.textContent='No se pudo enviar el mensaje. El texto se conserva para volver a intentarlo.';
+                } finally { button.disabled=false; }
             });
 
         // WebSocket/PieSocket simulation for receiving
-        const clusterId = 'free.blr2'; 
-        const apiKey = 'QJQg5C3y3tX745y7gypLKDnw6Q7CGVpT9n1d8V4n'; 
+        const clusterId = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Configuration["PieSocket:ClusterId"] ?? ""));
+        const apiKey = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Configuration["PieSocket:ApiKey"] ?? ""));
         const channelId = `chat_${currentUserId}`;
-        
+
         try {
+            if (!clusterId || !apiKey) throw new Error("PieSocket no configurado");
             const pieSocket = new WebSocket(`wss://${clusterId}.piesocket.com/v3/${channelId}?api_key=${apiKey}&notify_self=1`);
-            
+
             pieSocket.onopen = function() {
                 const status = document.getElementById('ws-status');
                 if(status) {
@@ -245,7 +254,7 @@
                     status.innerHTML = '<i class="bi bi-circle-fill"></i> Conectado';
                 }
             };
-            
+
             pieSocket.onerror = function() {
                 const status = document.getElementById('ws-status');
                 if(status) {
@@ -264,8 +273,8 @@
 
             pieSocket.onmessage = function(event) {
                 const data = JSON.parse(event.data);
-                if (data.event === 'new_message' && data.data.senderId === activeUserId) {
-                    addMessageToUI(data.data.content, false);
+                if (data.event === 'new_message') {
+                    awaitRefreshMessages();
                 }
             };
         } catch(e) {
@@ -278,7 +287,7 @@
         }
 
         // FALLBACK: Auto-refrescar los mensajes cada 3 segundos en caso PieSocket falle (por credenciales o restricciones)
-        setInterval(async () => {
+        async function awaitRefreshMessages() {
             try {
                 const response = await fetch(window.location.href);
                 const html = await response.text();
@@ -286,7 +295,7 @@
                 const doc = parser.parseFromString(html, 'text/html');
                 const newChat = doc.getElementById('chat-messages');
                 const currentChat = document.getElementById('chat-messages');
-                
+
                 if(newChat && currentChat) {
                     // Solo actualizamos si la cantidad de mensajes cambió para no interferir con la escritura
                     const currentMessagesCount = currentChat.children.length;
@@ -297,19 +306,20 @@
                     }
                 }
             } catch(err) {}
-        }, 3000);
+        }
+        setInterval(awaitRefreshMessages, 3000);
         }
 
         function addMessageToUI(content, isSent) {
             const container = document.getElementById('chat-messages');
             const div = document.createElement('div');
             div.className = isSent ? 'd-flex justify-content-end mb-3' : 'd-flex justify-content-start mb-3';
-            
+
             const innerDiv = document.createElement('div');
             innerDiv.className = isSent ? 'bg-brand text-white p-2 rounded-3' : 'bg-light p-2 rounded-3 border';
             innerDiv.style.maxWidth = '75%';
             innerDiv.textContent = content;
-            
+
             div.appendChild(innerDiv);
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;

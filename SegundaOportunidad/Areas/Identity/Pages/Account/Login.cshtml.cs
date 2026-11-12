@@ -128,7 +128,7 @@ namespace SegundaOportunidad.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "No se pudo iniciar sesión. Revisa el correo y la contraseña.");
                     return Page();
                 }
             }

@@ -7,21 +7,23 @@ namespace SegundaOportunidad.Services
 {
     public class AlgoliaService
     {
-        private readonly SearchClient _client;
-        private readonly SearchIndex _index;
+        private readonly SearchClient? _client;
+        private readonly SearchIndex? _index;
+        public bool Configurado => _index != null;
 
         public AlgoliaService(IConfiguration configuration)
         {
-            // App ID and Write API Key for syncing
-            _client = new SearchClient(
-                configuration["Algolia:AppId"] ?? "PLHOKYL1K3", 
-                configuration["Algolia:WriteApiKey"] ?? "b8e668ea9a836b86fd7a78cba373cbf7"
-            );
-            _index = _client.InitIndex("articulos");
+            var appId = configuration["Algolia:AppId"];
+            var key = configuration["Algolia:WriteApiKey"];
+            if (!string.IsNullOrWhiteSpace(appId) && !string.IsNullOrWhiteSpace(key))
+            {
+                _client = new SearchClient(appId, key);
+                _index = _client.InitIndex("articulos");
+            }
         }
-
         public virtual async Task IndexArticuloAsync(Articulo articulo)
         {
+            if (_index == null) return;
             try
             {
                 var record = new AlgoliaArticuloRecord
@@ -41,12 +43,21 @@ namespace SegundaOportunidad.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[Algolia Error] {ex.Message}");
+                Console.WriteLine($"[Algolia] Indexación no disponible ({ex.GetType().Name}).");
             }
+        }
+
+        // Consulta acotada para el asistente; conserva las operaciones existentes del catálogo.
+        public virtual async Task<List<string>> SearchChatIdsAsync(string query, CancellationToken ct)
+        {
+            if (_index == null) return [];
+            var result = await _index.SearchAsync<AlgoliaArticuloRecord>(new Query(query) { HitsPerPage = 50 }).WaitAsync(ct);
+            return result.Hits.Select(hit => hit.ObjectID).ToList();
         }
 
         public async Task<List<string>> SearchArticulosIdsAsync(string query)
         {
+            if (_index == null) return [];
             try
             {
                 var search = new Query(query)
@@ -57,21 +68,23 @@ namespace SegundaOportunidad.Services
                 var result = await _index.SearchAsync<AlgoliaArticuloRecord>(search);
                 return result.Hits.Select(h => h.ObjectID).ToList();
             }
-            catch (AlgoliaApiException ex) when (ex.HttpErrorCode == 404)
+            catch (Exception ex)
             {
-                // El índice no existe todavía, retornar lista vacía
+                Console.WriteLine($"[Algolia] Búsqueda no disponible ({ex.GetType().Name}); catálogo usará EF.");
                 return new List<string>();
             }
         }
         
         public async Task<List<string>> SearchAllArticulosIdsAsync(string query, CancellationToken ct)
         {
+            if (_index == null) return [];
             var ids = new HashSet<string>();
             var page = 0;
             while (true)
             {
                 ct.ThrowIfCancellationRequested();
-                var result = await _index.SearchAsync<AlgoliaArticuloRecord>(new Query(query) { HitsPerPage = 100, Page = page });
+                if (_index == null) return [];
+            var result = await _index.SearchAsync<AlgoliaArticuloRecord>(new Query(query) { HitsPerPage = 100, Page = page });
                 foreach (var hit in result.Hits) ids.Add(hit.ObjectID);
                 page++;
                 if (page >= result.NbPages) break;

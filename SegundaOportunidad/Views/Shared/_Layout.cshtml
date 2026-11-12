@@ -1,5 +1,7 @@
+@inject IConfiguration Configuration
+@inject IWebHostEnvironment HostEnvironment
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,20 +10,23 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SegundaOportunidad.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/experience.css" asp-append-version="true" />
 </head>
 <body>
+<a class="skip-link" href="#contenido-principal">Saltar al contenido</a>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-brand border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SegundaOportunidad</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                        aria-expanded="false" aria-label="Abrir navegación">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-white fw-bold" asp-area="" asp-controller="Articulos" asp-action="Explorar">Explorar</a>
@@ -29,6 +34,7 @@
                         <li class="nav-item">
                             <a class="nav-link text-white fw-bold" asp-area="" asp-controller="Articulos" asp-action="Create">Publicar</a>
                         </li>
+                    @if(User.IsInRole("Admin")&&(HostEnvironment.IsDevelopment()||HostEnvironment.IsEnvironment("Demo"))){<li class="nav-item"><a class="nav-link text-white" asp-controller="Demo" asp-action="Index">Laboratorio</a></li>}
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
@@ -37,13 +43,13 @@
     </header>
     @if (ViewData["UseFluidLayout"] as bool? == true)
     {
-        @RenderBody()
+        <div id="contenido-principal">@RenderBody()</div>
     }
     else
     {
         <div class="container">
             <main role="main" class="pb-3">
-                @RenderBody()
+                <div id="contenido-principal">@RenderBody()</div>
             </main>
         </div>
     }
@@ -55,41 +61,44 @@
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/recommendations.js" asp-append-version="true" defer></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
     <!-- WIDGET FLOTANTE DE CHAT CON IA -->
-    <div id="chat-widget" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: sans-serif;">
-        <button id="chat-toggle" style="background: #0d6efd; color: white; border: none; border-radius: 50px; width: 55px; height: 55px; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;">💬</button>
+    <div id="assistant-widget" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: sans-serif;">
+        <button id="assistant-toggle" aria-label="Abrir asistente" aria-controls="assistant-box" aria-expanded="false" style="background: #0d6efd; color: white; border: none; border-radius: 50px; width: 55px; height: 55px; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;">💬</button>
         
-        <div id="chat-box" style="display: none; position: absolute; bottom: 70px; right: 0; width: 320px; height: 420px; background: white; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); flex-direction: column; overflow: hidden;">
+        <div id="assistant-box" style="display: none; position: absolute; bottom: 70px; right: 0; width: min(420px, calc(100vw - 40px)); height: min(600px, calc(100dvh - 110px)); background: white; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); flex-direction: column; overflow: hidden;">
             <div style="background: #0d6efd; color: white; padding: 12px; display: flex; justify-content: space-between; align-items: center; font-weight: bold;">
                 <span>Asistente Virtual</span>
-                <button id="chat-close" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">&times;</button>
+                <button id="assistant-close" aria-label="Cerrar asistente" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">&times;</button>
             </div>
-            <div id="chat-messages" style="flex: 1; padding: 12px; overflow-y: auto; font-size: 0.9rem; display: flex; flex-direction: column; gap: 8px; background: #f8f9fa;">
+            <div id="assistant-messages" aria-live="polite" style="flex: 1; min-height: 0; overflow-wrap: anywhere; padding: 12px; overflow-y: auto; font-size: 0.9rem; display: flex; flex-direction: column; gap: 8px; background: #f8f9fa;">
                 <div style="background: #e9ecef; color: #333; padding: 8px 12px; border-radius: 8px; max-width: 80%;">¡Hola! ¿Qué artículo estás buscando hoy?</div>
             </div>
             <div style="padding: 10px; background: white; border-top: 1px solid #dee2e6; display: flex; gap: 6px;">
-                <input type="text" id="chat-input" placeholder="Ej: ¿Qué productos hay disponibles?" style="flex: 1; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.85rem; outline: none;">
-                <button id="chat-send" style="background: #0d6efd; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">Enviar</button>
+                <input type="text" id="assistant-input" maxlength="1000" aria-label="Consulta al asistente" placeholder="Ej: ¿Qué productos hay disponibles?" style="flex: 1; min-width: 0; padding: 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.85rem; outline: none;">
+                <button id="assistant-send" style="background: #0d6efd; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">Enviar</button>
             </div>
         </div>
     </div>
 
     <script>
-        const toggleBtn = document.getElementById('chat-toggle');
-        const closeBtn = document.getElementById('chat-close');
-        const chatBox = document.getElementById('chat-box');
-        const sendBtn = document.getElementById('chat-send');
-        const inputField = document.getElementById('chat-input');
-        const messagesContainer = document.getElementById('chat-messages');
+        const toggleBtn = document.getElementById('assistant-toggle');
+        const closeBtn = document.getElementById('assistant-close');
+        const chatBox = document.getElementById('assistant-box');
+        const sendBtn = document.getElementById('assistant-send');
+        const inputField = document.getElementById('assistant-input');
+        const messagesContainer = document.getElementById('assistant-messages');
 
         toggleBtn.onclick = () => {
             chatBox.style.display = chatBox.style.display === 'none' ? 'flex' : 'none';
+            toggleBtn.setAttribute('aria-expanded', String(chatBox.style.display === 'flex'));
         };
         closeBtn.onclick = () => {
             chatBox.style.display = 'none';
+            toggleBtn.setAttribute('aria-expanded', 'false');
         };
 
         async function enviarMensaje() {
@@ -97,7 +106,10 @@
             const texto = inputField.value.trim();
             if (!texto) return;
 
-            messagesContainer.innerHTML += `<div style="background: #0d6efd; color: white; padding: 8px 12px; border-radius: 8px; align-self: flex-end; max-width: 80%;">${texto}</div>`;
+            const userMessage = document.createElement('div');
+            userMessage.style.cssText = 'background: #0d6efd; color: white; padding: 8px 12px; border-radius: 8px; align-self: flex-end; max-width: 100%; white-space: pre-wrap;';
+            userMessage.textContent = texto;
+            messagesContainer.appendChild(userMessage);
             inputField.value = '';
             const previousButtonText = sendBtn.textContent;
             sendBtn.disabled = true;
@@ -114,15 +126,47 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ mensajeUsuario: texto })
                 });
+                if (response.status === 403) throw new Error('Necesitas una cuenta verificada y aprobada para usar esta opción.');
+                if (response.status === 401) throw new Error('Inicia sesión para continuar.');
                 const data = await response.json();
                 if (!response.ok) {
                     throw new Error(data.error || `Error HTTP ${response.status}`);
                 }
 
                 const reply = document.createElement('div');
-                reply.style.cssText = 'background: #e9ecef; color: #333; padding: 8px 12px; border-radius: 8px; align-self: flex-start; max-width: 80%; white-space: pre-wrap;';
+                reply.style.cssText = 'background: #e9ecef; color: #333; padding: 8px 12px; border-radius: 8px; align-self: flex-start; max-width: 100%; white-space: pre-wrap;';
                 reply.textContent = data.respuesta || data.error || 'El asistente no devolvió una respuesta.';
                 messagesContainer.appendChild(reply);
+                for (const item of (Array.isArray(data.publicaciones) ? data.publicaciones : []).slice(0, 8)) {
+                    const card = document.createElement('article');
+                    card.style.cssText = 'background: white; border: 1px solid #dbe4f0; border-radius: 10px; padding: 12px; box-shadow: 0 2px 5px #00000008;';
+                    const addText = (tag, text) => {
+                        const node = document.createElement(tag);
+                        node.textContent = text;
+                        node.style.cssText = 'display: block; margin: 0 0 6px; font-size: .85rem;';
+                        card.appendChild(node);
+                        return node;
+                    };
+                    addText('strong', item.titulo);
+                    const price = item.precio == null ? 'Sin precio de venta' : new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(item.precio);
+                    addText('p', `${price} · ${item.modalidad} · ${item.categoria} · ${item.estado}`);
+                    addText('p', item.descripcion);
+                    for (const reason of (item.motivos || [])) addText('p', '• ' + reason);
+                    if (item.vendedor) {
+                        const seller = item.vendedor;
+                        addText('strong', `${seller.referencia}: ${seller.identidadVerificada ? 'identidad verificada' : 'sin verificación registrada'}`);
+                        addText('p', `${seller.intercambiosCompletados} intercambios completados · ${seller.publicacionesVisibles} publicaciones disponibles`);
+                        addText('small', seller.valoraciones);
+                        addText('small', seller.orientacion);
+                    }
+                    // Construir un enlace local con el ID del servidor; nunca usar HTML o URLs de la IA.
+                    if (typeof item.id === 'string' && /^[A-Za-z0-9_-]{1,100}$/.test(item.id)) {
+                        const link = addText('a', 'Ver publicación →');
+                        link.href = '/Articulos/Details/' + encodeURIComponent(item.id);
+                        link.className = 'fw-bold';
+                    }
+                    messagesContainer.appendChild(card);
+                }
             } catch (error) {
                 const errorMessage = document.createElement('div');
                 errorMessage.style.cssText = 'color: #b02a37; font-size: 0.8rem;';

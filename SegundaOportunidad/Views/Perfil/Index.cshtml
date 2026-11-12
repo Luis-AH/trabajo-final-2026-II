@@ -27,7 +27,8 @@
                     <h4 class="fw-bold text-dark mb-1">@(Model.FullName ?? "Usuario")</h4>
                     <p class="text-muted mb-3">@(Model.Email ?? "")</p>
 
-                    @if (Model.IsVerified)
+                    @if(Model.Id.StartsWith("demo-ml-user-")){<span class="badge bg-info text-dark">Cuenta de simulación</span>}
+                    else if (Model.IsVerified)
                     {
                         <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2">
                             <i class="bi bi-shield-check me-1"></i> Identidad Verificada
@@ -53,7 +54,7 @@
                             <small class="text-muted">Artículos</small>
                         </div>
                         <div class="col-4">
-                            <div class="fw-bold text-dark fs-5">@Model.Rating.ToString("0.0")</div>
+                            <div class="fw-bold text-dark fs-5">—</div>
                             <small class="text-muted">Calificación</small>
                         </div>
                         <div class="col-4">
@@ -148,7 +149,7 @@
             </div>
         </div>
     </div>
-</div>
+<section class="ml-recommendations mt-5"><div class="section-heading"><span class="eyebrow">Tu siguiente descubrimiento</span><h2>Relacionados con tus intereses</h2></div><p class="ml-status" role="status">Cargando recomendaciones…</p><div class="recommendation-grid"></div></section></div>
 
 <style>
     .bg-brand-light { background-color: rgba(33, 115, 70, 0.1) !important; }

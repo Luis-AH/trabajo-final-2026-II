@@ -316,8 +316,16 @@ namespace SegundaOportunidad.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Departamento")
+                        .HasMaxLength(120)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Description")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Distrito")
+                        .HasMaxLength(120)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("EstadoFisico")
@@ -331,6 +339,12 @@ namespace SegundaOportunidad.Data.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");
+
+                    b.Property<double?>("LatitudPublica")
+                        .HasColumnType("REAL");
+
+                    b.Property<double?>("LongitudPublica")
+                        .HasColumnType("REAL");
 
                     b.Property<int>("Modalidad")
                         .HasColumnType("INTEGER");
@@ -346,8 +360,19 @@ namespace SegundaOportunidad.Data.Migrations
                     b.Property<decimal?>("Price")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Provincia")
+                        .HasMaxLength(120)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UbicacionPlaceId")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UbicacionValidadaUtc")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
@@ -455,6 +480,35 @@ namespace SegundaOportunidad.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EncuentroConfirmadoPor")
+                        .HasMaxLength(450)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("EncuentroConfirmadoUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<double?>("EncuentroLatitud")
+                        .HasColumnType("REAL");
+
+                    b.Property<double?>("EncuentroLongitud")
+                        .HasColumnType("REAL");
+
+                    b.Property<string>("EncuentroNombre")
+                        .HasMaxLength(120)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EncuentroPropuestoPor")
+                        .HasMaxLength(450)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("EncuentroPropuestoUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EncuentroVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Estado")

@@ -1,11 +1,26 @@
+﻿# Demo gratuita y efímera: no sirve para conservar datos reales.
 services:
   - type: web
-    name: segunda-oportunidad
-    env: docker
+    name: segunda-oportunidad-demo
+    runtime: docker
+    branch: feature/reciclaje-ronaldo
     plan: free
-    dockerCommand: dotnet SegundaOportunidad.dll
+    autoDeployTrigger: "off"
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
-        value: Production
+        value: Demo
       - key: PORT
         value: 8080
+      - key: ConnectionStrings__DefaultConnection
+        value: Data Source=/tmp/segunda-demo/app.db;Cache=Shared
+      - key: DataProtection__KeyPath
+        value: /tmp/segunda-demo/keys
+      - key: SampleData__InitializeOnStartup
+        value: "true"
+      - key: SampleData__CredentialsJson
+        sync: false
+# CredentialsJson se configura en privado; prepara cuentas y artículos al iniciar una base nueva.
+# ML no usa Python ni un segundo servicio en runtime; su JSON va en la imagen.

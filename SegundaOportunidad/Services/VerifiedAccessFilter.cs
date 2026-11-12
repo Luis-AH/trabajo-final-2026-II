@@ -27,7 +27,8 @@ public sealed class VerifiedAccessFilter(ApplicationDbContext db) : IAsyncAuthor
         var read=HttpMethods.IsGet(http.Request.Method) || HttpMethods.IsHead(http.Request.Method);
         // Excepciones de cuenta y verificación; ninguna operación de negocio.
         var allowed=controller is "Verificacion" or "Seguridad"
-            || (read && controller=="Articulos" && action is "Index" or "Details" or "Imagen")
+            || (read && controller=="Ml")
+            || (read && controller=="Articulos" && action is "Index" or "Details" or "Imagen" or "Explorar")
             || (read && controller=="Home" && action is "Index" or "Dashboard" or "Privacy" or "Error")
             || (read && controller=="Perfil" && action=="Index");
         if(allowed) return;

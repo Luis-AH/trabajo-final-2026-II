@@ -12,6 +12,7 @@
 }
 
 <main class="p-4 p-md-5">
+    @if(isOwner){<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-brand mb-3">Editar mi publicación</a>}
     <div class="mb-4">
         <a asp-action="Index" class="text-decoration-none text-muted"><i class="bi bi-arrow-left me-1"></i> Volver al catálogo</a>
     </div>
@@ -50,7 +51,8 @@
 
             <h1 class="display-5 fw-bold text-dark mb-4">@Model.Title</h1>
 
-            <div class="mb-4">
+            @if(isOwner){<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-brand mb-3">Editar mi publicación</a>}
+    <div class="mb-4">
                 @if (Model.Modalidad == ModalidadArticulo.Venta) {
                     <h2 class="text-brand fw-bold display-6 mb-0">S/ @Model.Price</h2>
                     <span class="badge bg-secondary rounded-pill mt-2">Venta</span>
@@ -88,8 +90,8 @@
                     <div>
                         <h5 class="mb-1 fw-bold text-dark">@Model.User?.FullName</h5>
                         <div class="text-muted small">
-                            <i class="bi bi-star-fill text-warning"></i> @Model.User?.Rating / 5.0
-                            @if (Model.User?.IsVerified == true) {
+                            <i class="bi bi-star-fill text-warning"></i> Sin reseñas verificables
+                            @if (Model.User?.IsVerified == true && !Model.User.Id.StartsWith("demo-ml-user-")) {
                                 <span class="ms-2 text-success"><i class="bi bi-shield-check me-1"></i>DNI Verificado</span>
                             }
                         </div>
@@ -144,4 +146,7 @@
             }
         </div>
     </div>
+<section class="ml-recommendations mt-5" data-article="@Model.Id"><div class="section-heading"><span class="eyebrow">Afinidad por contenido</span><h2>También podrían interesarte</h2></div><p class="ml-status" role="status">Cargando recomendaciones…</p><div class="recommendation-grid"></div></section>
 </main>
+
+@if(Model.Id.StartsWith("demo-ml-art-")){<p class="small text-muted text-center">Fotografía ilustrativa de categoría · Fuente: Unsplash. No representa el estado del artículo.</p>}

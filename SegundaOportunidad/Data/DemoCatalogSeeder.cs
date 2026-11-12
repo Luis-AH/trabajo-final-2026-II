@@ -31,7 +31,7 @@ public sealed class DemoCatalogSeeder(ApplicationDbContext db,UserManager<Applic
         await CategoryCatalog.EnsureAsync(db,ct);
         if(!await roles.RoleExistsAsync("Admin") && !(await roles.CreateAsync(new IdentityRole("Admin"))).Succeeded)throw new InvalidOperationException("No se pudo crear rol para la demostración.");
         var accounts=new List<DemoAccount>();
-        var configuredPasswords=SampleProfiles.ReadPasswords(config["SampleData:CredentialsJson"]);
+        var configuredPasswords=SampleProfiles.ResolvePasswords(config,environment);
         for(var number=1;number<=10;number++)
         {
             var id=$"demo-ml-user-{number:00}";

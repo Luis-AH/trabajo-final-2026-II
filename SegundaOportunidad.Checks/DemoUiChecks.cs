@@ -40,7 +40,7 @@ internal static class DemoUiChecks
                 var account=accounts.Single(a=>a.Email==email);
                 var html=await client.GetStringAsync("/Identity/Account/Login");
                 using var response=await client.PostAsync("/Identity/Account/Login",new FormUrlEncodedContent(new Dictionary<string,string>{["Input.Email"]=account.Email,["Input.Password"]=account.Password,["__RequestVerificationToken"]=Token(html)}));
-                Ensure(response.StatusCode==HttpStatusCode.Redirect,"Identity acepta credenciales DEMO aleatorias");
+                Ensure(response.StatusCode==HttpStatusCode.Redirect,"Identity acepta las credenciales del archivo privado");
             }
             foreach(var route in new[]{"/","/Articulos","/Identity/Account/Login","/Identity/Account/Register","/css/experience.css","/js/recommendations.js","/lib/bootstrap-icons/bootstrap-icons.min.css"})
                 Ensure((await anonymous.GetAsync(route)).StatusCode==HttpStatusCode.OK,"ruta pública "+route+" responde 200");
@@ -50,6 +50,12 @@ internal static class DemoUiChecks
             using(var response=await anonymous.GetAsync("/api/ml/recomendaciones?consulta=laptop"))
             {using var json=JsonDocument.Parse(await response.Content.ReadAsStringAsync());Ensure(response.IsSuccessStatusCode&&json.RootElement.GetProperty("publicaciones").GetArrayLength()>0,"API ML funciona con las publicaciones DEMO reales");}
             await Login(admin,accounts[0].Email);await Login(member,accounts[1].Email);await Login(other,accounts[2].Email);
+            foreach(var account in accounts.Skip(3))
+            {
+                using var client=Client();
+                await Login(client,account.Email);
+                Ensure((await client.GetAsync("/Perfil")).StatusCode==HttpStatusCode.OK,"cuenta ficticia autenticada accede a su perfil");
+            }
             var dashboard=await admin.GetStringAsync("/Home/Dashboard");
             Ensure(dashboard.Contains("id=\"catalog-count\">40</span>")&&dashboard.Contains("id=\"own-publication-count\">0</span>"),"administrador ve 40 disponibles y cero propios, sin confundir contadores");
             var memberDashboard=await member.GetStringAsync("/Home/Dashboard");

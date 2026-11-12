@@ -18,7 +18,7 @@ internal static class RenderCatalogChecks
         var temp=Path.Combine(Path.GetTempPath(),"segunda-render-catalog-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(temp);
         var database=Path.Combine(temp,"catalog.db");
         var credentials=SampleProfiles.Accounts.Select(p=>new DemoAccount(p.Email,"Check!"+Guid.NewGuid().ToString("N"))).ToList();
-        for(var run=0;run<2;run++)
+        for(var run=0;run<3;run++)
         {
             var info=new ProcessStartInfo("dotnet") {WorkingDirectory=root,UseShellExecute=false,CreateNoWindow=true,RedirectStandardOutput=true,RedirectStandardError=true};
             foreach(var arg in new[]{Path.Combine(root,"bin","Debug","net10.0","SegundaOportunidad.dll"),"--urls","http://127.0.0.1:0"})info.ArgumentList.Add(arg);
@@ -28,6 +28,8 @@ internal static class RenderCatalogChecks
             info.Environment["DataProtection__KeyPath"]="";
             info.Environment["SampleData__InitializeOnStartup"]="true";
             info.Environment["SampleData__CredentialsJson"]=run==0?"":JsonSerializer.Serialize(credentials);
+            // El tercer arranque usa las claves del archivo Demo incluso con un JSON antiguo.
+            info.Environment["SampleData__UsePublicDemoPasswords"]=run==2?"true":"false";
             info.Environment["Logging__EventLog__LogLevel__Default"]="None";
             foreach(var key in new[]{"BootstrapAdmin__Email","BootstrapAdmin__Password","RabbitMQ__ConnectionString","Redis__ConnectionString","PieSocket__ApiKey","PieSocket__ApiSecret","PieSocket__ClusterId","Algolia__AppId","Algolia__WriteApiKey","Gemini__ApiKey","GEMINI_API_KEY","GOOGLE_API_KEY"})info.Environment[key]="";
             using var process=Process.Start(info)??throw new Exception("No se pudo iniciar la app de ensayo.");
@@ -58,7 +60,16 @@ internal static class RenderCatalogChecks
                     Ensure((await http.GetStringAsync("/Articulos")).Contains("41 publicaciones disponibles"),"contador público refleja una publicación nueva");
                     continue;
                 }
-                Ensure(new PasswordHasher<ApplicationUser>().VerifyHashedPassword(user,user.PasswordHash!,credentials[0].Password)!=PasswordVerificationResult.Failed,run==0?"la clave privada configurada coincide con Identity":"reiniciar sincroniza la clave nueva del secreto con la cuenta existente");
+                var expectedPassword=run==2?"Admin123!":credentials[0].Password;
+                Ensure(new PasswordHasher<ApplicationUser>().VerifyHashedPassword(user,user.PasswordHash!,expectedPassword)!=PasswordVerificationResult.Failed,"reiniciar sincroniza la clave esperada con la cuenta existente");
+                if(run==2)
+                {
+                    foreach(var profile in SampleProfiles.Accounts.Skip(1))
+                    {
+                        var member=await db.Users.SingleAsync(u=>u.Email==profile.Email);
+                        Ensure(new PasswordHasher<ApplicationUser>().VerifyHashedPassword(member,member.PasswordHash!,"Usuario123!")!=PasswordVerificationResult.Failed,"clave sencilla de usuario aplicada desde archivos Demo");
+                    }
+                }
                 // Secure cookies se transportan manualmente en el ensayo HTTP local del proxy HTTPS.
                 using var loginPage=await http.GetAsync("/Identity/Account/Login");
                 var html=await loginPage.Content.ReadAsStringAsync();
@@ -66,9 +77,9 @@ internal static class RenderCatalogChecks
                 var cookies=loginPage.Headers.GetValues("Set-Cookie").Select(v=>v.Split(';')[0]).ToList();
                 using var loginRequest=new HttpRequestMessage(HttpMethod.Post,"/Identity/Account/Login");
                 loginRequest.Headers.Add("Cookie",string.Join("; ",cookies));
-                loginRequest.Content=new FormUrlEncodedContent(new Dictionary<string,string>{{"Input.Email",credentials[0].Email},{"Input.Password",credentials[0].Password},{"__RequestVerificationToken",token}});
+                loginRequest.Content=new FormUrlEncodedContent(new Dictionary<string,string>{{"Input.Email",credentials[0].Email},{"Input.Password",expectedPassword},{"__RequestVerificationToken",token}});
                 using var login=await http.SendAsync(loginRequest);
-                Ensure(login.StatusCode==HttpStatusCode.Redirect&&login.Headers.TryGetValues("Set-Cookie",out var authCookies),"login real con secreto externo funciona en Demo");
+                Ensure(login.StatusCode==HttpStatusCode.Redirect&&login.Headers.TryGetValues("Set-Cookie",out var authCookies),run==2?"login real con clave del archivo Demo funciona sin actualizar Render":"login real con secreto externo funciona en Demo");
                 cookies.AddRange(login.Headers.GetValues("Set-Cookie").Select(v=>v.Split(';')[0]));
                 async Task<string> Dashboard()
                 {using var request=new HttpRequestMessage(HttpMethod.Get,"/Home/Dashboard");request.Headers.Add("Cookie",string.Join("; ",cookies));using var response=await http.SendAsync(request);Ensure(response.StatusCode==HttpStatusCode.OK,"dashboard autenticado responde 200");return await response.Content.ReadAsStringAsync();}

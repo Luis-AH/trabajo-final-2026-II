@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +15,9 @@ internal static class DemoPasswordChecks
     {
         var full=DemoSetupChecks.ValidateDemoPath(path);
         if(!File.Exists(full))throw new InvalidOperationException("La base DEMO debe existir; no se crea ni migra ninguna base.");
+        var privateFile=Path.Combine(Path.GetDirectoryName(full)!,"accounts.private.json");
+        var passwords=SampleProfiles.ReadPasswords(await File.ReadAllTextAsync(privateFile))
+            ??throw new InvalidOperationException("Configura primero el archivo privado con las diez cuentas ficticias.");
         var builder=WebApplication.CreateBuilder(new WebApplicationOptions {EnvironmentName="Demo",ContentRootPath=Path.GetFullPath("SegundaOportunidad")});
         builder.Logging.ClearProviders();
         builder.Services.AddDbContext<ApplicationDbContext>(o=>o.UseSqlite(new SqliteConnectionStringBuilder {DataSource=full,Mode=SqliteOpenMode.ReadWrite}.ToString()));
@@ -36,22 +38,20 @@ internal static class DemoPasswordChecks
         await using(var source=new SqliteConnection("Data Source="+full+";Mode=ReadOnly"))
         await using(var target=new SqliteConnection("Data Source="+backup))
         {await source.OpenAsync();await target.OpenAsync();source.BackupDatabase(target);}
-        var credentials=new List<DemoAccount>();var used=new HashSet<string>();
+        var credentials=new List<DemoAccount>();
         await using var transaction=await db.Database.BeginTransactionAsync();
         foreach(var user in accounts)
         {
-            string password;
-            do {password="D!"+RandomNumberGenerator.GetString("ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789",6)+"7a";}while(!used.Add(password));
+            var password=passwords[user.Email!];
             if(await users.HasPasswordAsync(user)&&!(await users.RemovePasswordAsync(user)).Succeeded)throw new Exception("No se pudo actualizar la cuenta ficticia.");
             if(!(await users.AddPasswordAsync(user,password)).Succeeded||!await users.CheckPasswordAsync(user,password))throw new Exception("Identity rechazó la contraseña DEMO.");
             credentials.Add(new(user.Email!,password));
         }
-        var privateFile=Path.Combine(Path.GetDirectoryName(full)!,"accounts.private.json");
         var pendingFile=Path.Combine(Path.GetDirectoryName(full)!,"accounts.private.pending.json");
         await File.WriteAllTextAsync(pendingFile,JsonSerializer.Serialize(credentials,new JsonSerializerOptions {WriteIndented=true}));
         await transaction.CommitAsync();
         File.Move(pendingFile,privateFile,overwrite:true);
-        Console.WriteLine("OK: diez contraseñas DEMO distintas de 10 caracteres, verificadas por Identity. Sesiones previas invalidadas.");
+        Console.WriteLine("OK: diez contraseñas del archivo privado sincronizadas y verificadas por Identity. Sesiones previas invalidadas.");
         Console.WriteLine("Credenciales actualizadas en archivo privado local; respaldo SQLite conservado. Sin cambios en app.db ni cuentas reales.");
     }
 }

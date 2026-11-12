@@ -1,5 +1,11 @@
 # Presentación en Render: usuarios, catálogo y recomendaciones
 
+**Actualización:** el entorno Demo usa por defecto las claves públicas de
+`appsettings.Demo.json`. Ver [accesos de presentación](acceso-presentacion.md).
+No requiere importar CredentialsJson. Las instrucciones de secretos de esta
+guía corresponden a la modalidad privada, desactivando
+`SampleData:UsePublicDemoPasswords`.
+
 Guía vigente: 12/11/2026. Rama `feature/reciclaje-ronaldo`. Google Maps retirado. Esta guía sustituye las instrucciones antiguas de preparación manual y BootstrapAdmin para el Blueprint free.
 
 ## Qué contiene GitHub

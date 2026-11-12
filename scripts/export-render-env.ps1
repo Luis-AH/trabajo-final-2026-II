@@ -8,6 +8,7 @@ $accounts = Get-Content -LiteralPath $accountsPath -Raw -Encoding UTF8 | Convert
 if ($accounts.Count -ne 10 -or @($accounts | Where-Object { $_.Email -notlike '*@example.invalid' -or [string]::IsNullOrWhiteSpace($_.Password) }).Count) { throw 'El archivo debe contener las diez cuentas ficticias del catálogo.' }
 $settings = [ordered]@{
     ASPNETCORE_ENVIRONMENT = 'Demo'
+    DOTNET_ENVIRONMENT = 'Demo'
     PORT = '8080'
     ConnectionStrings__DefaultConnection = 'Data Source=/tmp/segunda-demo/app.db;Cache=Shared'
     DataProtection__KeyPath = '/tmp/segunda-demo/keys'

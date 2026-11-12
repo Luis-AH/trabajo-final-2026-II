@@ -23,8 +23,9 @@ internal static class RenderCatalogChecks
             var info=new ProcessStartInfo("dotnet") {WorkingDirectory=root,UseShellExecute=false,CreateNoWindow=true,RedirectStandardOutput=true,RedirectStandardError=true};
             foreach(var arg in new[]{Path.Combine(root,"bin","Debug","net10.0","SegundaOportunidad.dll"),"--urls","http://127.0.0.1:0"})info.ArgumentList.Add(arg);
             info.Environment["ASPNETCORE_ENVIRONMENT"]="Demo";info.Environment["DOTNET_ENVIRONMENT"]="Demo";
-            info.Environment["ConnectionStrings__DefaultConnection"]="Data Source="+database;
-            info.Environment["DataProtection__KeyPath"]=Path.Combine(temp,"keys");
+            // Reproduce el despliegue que recibía una ruta relativa y ninguna ruta de claves.
+            info.Environment["ConnectionStrings__DefaultConnection"]="Data Source="+Path.GetRelativePath(root,database);
+            info.Environment["DataProtection__KeyPath"]="";
             info.Environment["SampleData__InitializeOnStartup"]="true";
             info.Environment["SampleData__CredentialsJson"]=JsonSerializer.Serialize(credentials);
             info.Environment["Logging__EventLog__LogLevel__Default"]="None";

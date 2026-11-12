@@ -10,6 +10,10 @@ Los usuarios se crean mediante Identity con hashes y roles al arrancar una base 
 
 ## Configuración mínima exacta
 
+El Dockerfile incluye valores predeterminados para el entorno Demo, SQLite bajo `/tmp/segunda-demo`, claves Data Protection y carga del catálogo. Las variables del panel de Render tienen prioridad. Una ruta SQLite relativa ahora se resuelve antes de abrir la base. Si falta la ruta de Data Protection fuera de Development, se usa una carpeta `keys` junto a la base. Estas rutas siguen sujetas al almacenamiento efímero del plan gratuito.
+
+Si el registro muestra el antiguo error sobre una ruta SQLite absoluta, desplegar el commit de corrección. Revisar que `ASPNETCORE_ENVIRONMENT` sea `Demo`. Si está configurado `DOTNET_ENVIRONMENT`, debe coincidir con `Demo` para esta presentación. Mantener el JSON privado de cuentas en Environment.
+
 | Variable Render | Valor |
 |---|---|
 | ASPNETCORE_ENVIRONMENT | `Demo` (nombre interno del entorno; no muestra un aviso en la web) |

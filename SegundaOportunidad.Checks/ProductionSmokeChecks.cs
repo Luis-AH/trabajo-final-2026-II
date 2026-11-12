@@ -20,8 +20,8 @@ internal static class ProductionSmokeChecks
             info.Environment["ASPNETCORE_ENVIRONMENT"]=environment;
             info.Environment["DOTNET_ENVIRONMENT"]=environment;
             info.Environment["Logging__EventLog__LogLevel__Default"]="None";
-            info.Environment["ConnectionStrings__DefaultConnection"]="Data Source="+Path.Combine(temp,"app.db");
-            info.Environment["DataProtection__KeyPath"]=Path.Combine(temp,"keys");
+            info.Environment["ConnectionStrings__DefaultConnection"]="Data Source="+Path.GetRelativePath(root,Path.Combine(temp,"app.db"));
+            info.Environment["DataProtection__KeyPath"]="";
             info.Environment["BootstrapAdmin__Email"]=run==0?"admin-audit@example.invalid":"";
             info.Environment["BootstrapAdmin__Password"]=run==0?"Audit!"+Guid.NewGuid().ToString("N"):"";
             foreach(var key in new[]{"RabbitMQ__ConnectionString","Redis__ConnectionString","PieSocket__ApiKey","PieSocket__ApiSecret","PieSocket__ClusterId","Algolia__AppId","Algolia__WriteApiKey","Gemini__ApiKey","GEMINI_API_KEY","GOOGLE_API_KEY"}) info.Environment[key]="";

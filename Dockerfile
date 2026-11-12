@@ -8,6 +8,10 @@ RUN dotnet publish SegundaOportunidad/SegundaOportunidad.csproj -c Release -o /a
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 COPY --from=build /app/out .
+ENV ASPNETCORE_ENVIRONMENT=Demo \
+    ConnectionStrings__DefaultConnection="Data Source=/tmp/segunda-demo/app.db;Cache=Shared" \
+    DataProtection__KeyPath=/tmp/segunda-demo/keys \
+    SampleData__InitializeOnStartup=true
 EXPOSE 8080
 # PORT se evalúa al arrancar, no durante docker build. No copiar bases ni claves.
 ENTRYPOINT ["sh", "-c", "exec dotnet SegundaOportunidad.dll --urls \"http://0.0.0.0:${PORT:-8080}\""]

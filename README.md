@@ -1,5 +1,11 @@
 # SegundaOportunidad
 
+El chatbot utiliza Microsoft Semantic Kernel 1.81.0 para ejecutar el plugin de lectura
+`Catalogo.Buscar` y coordinar la respuesta de Gemini mediante `IChatCompletionService`.
+Reutiliza `AiSearchService` y las credenciales existentes. El endpoint `POST /api/chat`
+identifica el orquestador en su respuesta. Las recomendaciones de la página siguen
+utilizando Scikit-learn con inferencia C# mediante `/api/ml/recomendaciones`.
+
 El entorno Demo incluye ahora accesos públicos de presentación desde archivos,
 sin importar contraseñas en Render. Consultar [accesos de presentación](docs/acceso-presentacion.md).
 Las instrucciones de credenciales privadas requieren desactivar `SampleData:UsePublicDemoPasswords`.

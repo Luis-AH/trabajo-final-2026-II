@@ -8,7 +8,10 @@ public sealed record ChatSeller(string Referencia, bool IdentidadVerificada, int
 public sealed record ChatProduct(string Id, string Titulo, decimal? Precio, string Modalidad,
     string Categoria, string Estado, string Descripcion, string Enlace, ChatSeller Vendedor, IReadOnlyList<string> Motivos);
 public sealed record ChatAnswer(string Respuesta, IReadOnlyList<ChatProduct> Publicaciones,
-    string Fuente, bool GeminiUtilizado);
+    string Fuente, bool GeminiUtilizado)
+{
+    public string Orquestador => "Microsoft Semantic Kernel";
+}
 internal sealed record CatalogItem(string Id, string Title, decimal? Price, ModalidadArticulo Mode,
     string Category, EstadoFisico Condition, string Description, string SellerId);
 internal sealed record CatalogResult(ChatCatalogQuery Query, IReadOnlyList<CatalogItem> Items, string Source);

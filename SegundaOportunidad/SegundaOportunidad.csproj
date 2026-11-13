@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.SemanticKernel.Core" Version="1.81.0" />
     <None Update="app.db" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Never" ExcludeFromSingleFile="true" />
     <Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
     <Content Update="App_Data/**/*.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />

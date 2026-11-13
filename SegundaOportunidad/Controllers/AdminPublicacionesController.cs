@@ -46,8 +46,6 @@ public sealed class AdminPublicacionesController(ApplicationDbContext db, Algoli
     {
         var articulo = await db.Articulos.IgnoreQueryFilters().AsNoTracking().Include(a => a.User).Include(a => a.Categoria).SingleOrDefaultAsync(a => a.Id == id, ct);
         if (articulo == null) return NotFound();
-        var classifier = HttpContext.RequestServices.GetService<MlNetModels>();
-        if (classifier != null) ViewBag.ClasificacionMl = classifier.Classify(articulo.Title + " " + articulo.Description);
         ViewBag.Historial = await db.ModeracionesPublicaciones.AsNoTracking().Include(m => m.Administrador)
             .Where(m => m.ArticuloId == id).OrderByDescending(m => m.FechaUtc).Take(100).ToListAsync(ct);
         return View(articulo);

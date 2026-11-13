@@ -84,6 +84,7 @@ internal static class RenderCatalogChecks
                 async Task<string> Dashboard()
                 {using var request=new HttpRequestMessage(HttpMethod.Get,"/Home/Dashboard");request.Headers.Add("Cookie",string.Join("; ",cookies));using var response=await http.SendAsync(request);Ensure(response.StatusCode==HttpStatusCode.OK,"dashboard autenticado responde 200");return await response.Content.ReadAsStringAsync();}
                 var dashboard=await Dashboard();
+                if (run == 2) await AiRequirementsChecks.Run(http, cookies);
                 Ensure(dashboard.Contains("id=\"catalog-count\">"+(run==0?40:41)+"</span>"),"contador del inicio coincide con el catálogo");
                 Ensure(await db.Users.AnyAsync(u=>u.Id=="new-after-seed")&&await db.Articulos.AnyAsync(a=>a.Id=="new-after-seed"),"reinicio conserva nuevas cuentas y publicaciones sin reseed");
             }

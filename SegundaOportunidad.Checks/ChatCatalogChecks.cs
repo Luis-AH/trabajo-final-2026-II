@@ -87,7 +87,9 @@ internal static class ChatCatalogChecks
             {
                 using var response=await client.PostAsync("/api/chat",new StringContent(JsonSerializer.Serialize(new {mensajeUsuario=question}),Encoding.UTF8,"application/json"));
                 Ensure(response.StatusCode==HttpStatusCode.OK,"POST /api/chat HTTP 200");
-                return JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+                var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+                Ensure(json.RootElement.GetProperty("orquestador").GetString() == "Microsoft Semantic Kernel", "agente Semantic Kernel en el punto de entrada del chatbot");
+                return json;
             }
             using(var result=await Ask("¿Qué bicicletas eléctricas hay disponibles?"))
             {

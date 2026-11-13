@@ -1,5 +1,21 @@
 # SegundaOportunidad
 
+## Revisión de IA y Machine Learning
+
+- Administración → **Machine Learning** (`/AdminMl`) permite clasificar texto y consultar recomendaciones con Microsoft.ML 5.0.1.
+- El detalle administrativo de cada publicación muestra la clasificación de su título y descripción. La predicción orienta la revisión humana.
+- `GET /api/ml/recomendaciones-mlnet?consulta=libros&cantidad=4` ejecuta el modelo de contenido de ML.NET sobre publicaciones autorizadas.
+- El chatbot `POST /api/chat` utiliza Microsoft Semantic Kernel 1.81.0, el plugin de lectura `Catalogo.Buscar` y un servicio `IChatCompletionService` que reutiliza Gemini mediante `AiSearchService`. La respuesta identifica el orquestador.
+- Los modelos locales se publican desde `App_Data/mlnet-classifier.zip` y `App_Data/mlnet-content.zip`. El servidor solo ejecuta inferencia.
+
+El clasificador se entrenó con 48 ejemplos sintéticos y se validó con otros 16, obteniendo 93,75 % de exactitud. Las etiquetas son «Contenido habitual» y «Revisión sugerida». Esta evaluación no demuestra detección de fraude en usuarios reales. Corpus y etiquetas están en `ml/classification-examples.json`, y el reporte está en `App_Data/mlnet-evaluation.json`.
+
+Para reproducir el entrenamiento ejecutar, desde la raíz y después de compilar,
+`dotnet SegundaOportunidad.Checks/bin/Debug/net10.0/SegundaOportunidad.Checks.dll --train-mlnet`.
+Las verificaciones HTTP de estos componentes están incluidas en `--render-catalog-checks` y `--chat-catalog-checks`.
+
+Referencias oficiales de [clasificación ML.NET](https://learn.microsoft.com/en-us/dotnet/machine-learning/tutorials/sentiment-analysis) y [servicios de conversación Semantic Kernel](https://learn.microsoft.com/en-us/semantic-kernel/concepts/ai-services/chat-completion/).
+
 El entorno Demo incluye ahora accesos públicos de presentación desde archivos,
 sin importar contraseñas en Render. Consultar [accesos de presentación](docs/acceso-presentacion.md).
 Las instrucciones de credenciales privadas requieren desactivar `SampleData:UsePublicDemoPasswords`.

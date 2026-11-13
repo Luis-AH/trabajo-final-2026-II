@@ -4,8 +4,8 @@
     
     var controller = ViewContext.RouteData.Values["controller"]?.ToString();
     var action = ViewContext.RouteData.Values["action"]?.ToString();
-    var adminWorkspace = controller is "Admin" or "AdminPublicaciones" or "AdminUsuarios" or "AdminReportes" or "AdminGuard" or "Seguridad" or "Supervisor" or "Reportes" or "Verificacion";
-    var adminLinks = new[] { ("Admin", "Resumen"), ("AdminPublicaciones", "Publicaciones"), ("AdminUsuarios", "Usuarios"), ("AdminReportes", "Reportes"), ("AdminGuard", "AdminGuard IA"), ("Seguridad", "Seguridad"), ("Supervisor", "Verificaciones") };
+    var adminWorkspace = controller is "Admin" or "AdminMl" or "AdminPublicaciones" or "AdminUsuarios" or "AdminReportes" or "AdminGuard" or "Seguridad" or "Supervisor" or "Reportes" or "Verificacion";
+    var adminLinks = new[] { ("Admin", "Resumen"), ("AdminPublicaciones", "Publicaciones"), ("AdminUsuarios", "Usuarios"), ("AdminReportes", "Reportes"), ("AdminGuard", "AdminGuard IA"), ("AdminMl", "Machine Learning"), ("Seguridad", "Seguridad"), ("Supervisor", "Verificaciones") };
 
     string GetActive(string c, string a = "Index") => 
         (controller == c && action == a) ? "active bg-brand-light text-brand fw-bold rounded-3" : "text-dark";

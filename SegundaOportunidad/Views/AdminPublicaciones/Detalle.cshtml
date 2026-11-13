@@ -3,6 +3,13 @@
 <main class="p-3 p-md-5"><a asp-action="Index">Volver a publicaciones</a>
 <a asp-controller="AdminGuard" asp-action="Index" asp-route-tipo="Publicacion" asp-route-objetivoId="@Model.Id" class="btn btn-outline-brand m-2">Analizar con AdminGuard</a><h1 class="h2 mt-3">@Model.Title</h1><p>@Model.User?.FullName · @Model.User?.Email · @Model.Categoria?.Name</p>
 <span class="badge bg-secondary">@Model.Moderacion</span>
+@if (ViewBag.ClasificacionMl is SegundaOportunidad.Services.MlNetClassification prediction)
+{
+    <section class="card rounded-4 p-3 my-3"><h2 class="h5">Revisión de texto con ML.NET</h2>
+        <p class="mb-1">@prediction.Categoria · puntuación de revisión @prediction.ProbabilidadRevision.ToString("P1")</p>
+        <p class="small text-muted mb-0">@prediction.Alcance</p>
+    </section>
+}
 @if(Model.ImageUrl?.StartsWith("/Articulos/Imagen/", StringComparison.Ordinal) == true || (Uri.TryCreate(Model.ImageUrl, UriKind.Absolute, out var imagen) && (imagen.Scheme == "https" || imagen.Scheme == "http"))) { <div class="my-3"><img src="@Model.ImageUrl" alt="Fotografía de la publicación" referrerpolicy="no-referrer" class="img-fluid rounded-4" style="max-height:400px" /></div> }
 <p class="my-3" style="white-space:pre-wrap">@Model.Description</p>
 <section class="card p-4 rounded-4"><h2 class="h5">Aplicar decisión</h2><p>La decisión se registra con tu usuario y fecha. Restaurar conserva la disponibilidad original del artículo.</p>

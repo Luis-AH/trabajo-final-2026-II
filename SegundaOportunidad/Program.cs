@@ -35,7 +35,10 @@ builder.Services.AddHttpClient<AiSearchService>(client => client.Timeout = TimeS
 builder.Services.AddScoped<ChatCatalogService>();
 builder.Services.AddScoped<ChatSellerService>();
 builder.Services.AddScoped<ChatAssistantService>();
+builder.Services.AddScoped<SemanticCatalogAgent>();
 builder.Services.AddSingleton<ScikitContentModel>();
+builder.Services.AddSingleton<MlNetModels>();
+builder.Services.AddScoped<MlNetRecommendationService>();
 builder.Services.AddScoped<MlRecommendationService>();
 builder.Services.AddScoped<DemoCatalogSeeder>();
 

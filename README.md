@@ -144,3 +144,50 @@ Estado local registrado: compilación, regresión, permisos, paridad Python/.NET
 - [Registro de avances](AVANCE_FINAL.md)
 
 Repositorio grupal: [Luis-AH/trabajo-final-2026-II](https://github.com/Luis-AH/trabajo-final-2026-II). Rama de esta presentación: `feature/reciclaje-ronaldo`.
+
+
+
+
+
+
+USUARIOS DISPONIBLES:
+Renata Ramos - ADMINISTRACION
+Correo: sofia.ramos@example.invalid
+Contraseña: Admin123!
+
+Mateo Torres - USUARIO
+Correo: mateo.torres@example.invalid
+Contraseña: Usuario123!
+
+Valeria Soto - USUARIO
+Correo: valeria.soto@example.invalid
+Contraseña: Usuario123!
+
+Diego Flores - USUARIO
+Correo: diego.flores@example.invalid
+Contraseña: Usuario123!
+
+Camila Rojas - USUARIO
+Correo: camila.rojas@example.invalid
+Contraseña: Usuario123!
+
+Sebastián Vega - USUARIO
+Correo: sebastian.vega@example.invalid
+Contraseña: Usuario123!
+
+Lucía Castro - USUARIO
+Correo: lucia.castro@example.invalid
+Contraseña: Usuario123!
+
+Andrés Mendoza - USUARIO
+Correo: andres.mendoza@example.invalid
+Contraseña: Usuario123!
+
+Paula Medina - USUARIO
+Correo: paula.medina@example.invalid
+Contraseña: Usuario123!
+
+Nicolás Ruiz - USUARIO
+Correo: nicolas.ruiz@example.invalid
+Contraseña: Usuario123!
+
